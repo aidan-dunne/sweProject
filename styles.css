@@ -1,0 +1,14 @@
+/*Stylesheet starts here!*/
+
+/*Footer styles*/
+footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	background-color: #ababab;
+	margin: 10px;
+	padding: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+	
+}

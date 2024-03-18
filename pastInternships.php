@@ -15,8 +15,16 @@
 			<a href="REUTab.php">REUs</a>
 		</nav>
 	</header>
-	
+	<!-- I've reached out to Modus Bonedus to get some alumni contributions,
+	so hopefully I should have some data to populate this all with soon. Should probably also consider some way
+	to reach out to current students -->
 	<main>
+		<h2>About</h2>
+		<section id="homepagemain">
+			To help you figure out which companies you should prioritize applying for, we thought it might be useful to include
+			a list of companies/programs Truman students have been accepted into as underclassmen in the past. That means these 
+			should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
+		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, Owen Murphy &mdash; 2024.
 		</footer>

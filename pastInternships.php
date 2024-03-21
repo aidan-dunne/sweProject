@@ -25,6 +25,20 @@
 			a list of companies/programs Truman students have been accepted into as underclassmen in the past. That means these 
 			should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
 		</section>
+		<body>
+		<?php 
+		$intern_json = file_get_contents('past_interns_list.json');
+		$decoded_json = json_decode($intern_json, true);
+		$interns_list = $decoded_json['pastInterns'];
+		foreach($interns_list as $intern)
+		{
+			$name = $intern["name"];
+			$company = $intern["company"];
+			echo "Person name: $name";
+			echo "Company: $company";
+		}
+		?>
+		</body>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, Owen Murphy &mdash; 2024.
 		</footer>

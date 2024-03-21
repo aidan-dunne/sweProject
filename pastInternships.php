@@ -34,6 +34,11 @@
 		{
 			$name = $intern["name"];
 			$company = $intern["company"];
+			$term = $intern["date"];
+			$email = $intern["email"];
+			$age = $intern["year"];
+			$international = $intern["international"];
+			$description = $intern["description"];
 			echo "Person name: $name";
 			echo "Company: $company";
 		}

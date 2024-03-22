@@ -46,7 +46,7 @@
 				andybernato@gmail.com for tips with applying! </p>
 			<h2>Consider Truman!</h2>
 			<p>Truman doesn't have a traditional REU program, but they do have research opportunities for eager students. If you're
-				interested, apply at (insert here).</p>
+				interested, apply <a href=https://osr.truman.edu/truscholars>here!</a></p>
 		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, Owen Murphy &mdash; 2024.

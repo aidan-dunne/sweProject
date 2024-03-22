@@ -19,3 +19,36 @@ footer {
 	padding-right: 10px;
 	
 }
+/*Homepage specific styles */
+#reuPageMain h2 {
+	font-size: 1.5vw;
+	margin:0;
+}
+/*For the tables on pastInternships (Might need to be migrated to a separate file at some point)*/
+table, td {
+	width:100%;
+	border:3px solid black;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+/* NavBar */
+#mainNav {
+    overflow:hidden;
+    background-color: #5107C6;
+    max-width:auto; /* This will need to be adjusted based on what we add */
+}
+
+#mainNav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+#mainNav a:hover {
+	background-color: white;
+	color: #5107C6;
+}

@@ -2,14 +2,17 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<link rel="Stylesheet" href="styles.css">
+	<!-- This might not be wholly necessary but I couldn't figure out how to get the PHP to see the file otherwise -->
+	<style>
+		<?php include 'styles.css' ?>
+	</style>
 	<title>Internship Database - Companies and Programs</title>
 </head>
 
 <body>
 	<header>
 		<h1>Companies and Programs</h1>
-		<nav>
+		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="pastInternships.php">Companies and Programs</a>
 			<a href="REUTab.php">REUs</a>
@@ -22,8 +25,8 @@
 		<h2>About</h2>
 		<section id="homepagemain">
 			To help you figure out which companies you should prioritize applying for, we thought it might be useful to include
-			a list of companies/programs Truman students have been accepted into as underclassmen in the past. That means these 
-			should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
+			a list of companies/programs Truman students have been accepted into as underclassmen and/or international students 
+			in the past. That means these should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
 		</section>
 		<body>
 		<?php 
@@ -39,8 +42,22 @@
 			$age = $intern["year"];
 			$international = $intern["international"];
 			$description = $intern["description"];
-			echo "Person name: $name";
-			echo "Company: $company";
+			echo (
+				"<table id=\"pastTable\"> 
+				<tr>
+				  <td>Intern: $name </td>
+				  <td>Company: $company </td>
+				  <td>Email: $email </td>
+				</tr>
+				<tr>
+				  <td>Term: $term </td>
+				  <td>Intern Age: $age </td>
+				  <td>Intern Nationality: $international </td>
+				</tr>
+				<tr>
+				  <td colspan=\"3\"> Description of Internship: $description </td>
+				</tr>
+				");
 		}
 		?>
 		</body>

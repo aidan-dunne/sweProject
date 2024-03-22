@@ -2,14 +2,16 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<link rel="stylesheet" href="styles.css">
+	<style>
+		<?php include 'styles.css' ?>
+	</style>
 	<title>Internship Database - Home</title>
 </head>
 
 <body>
 	<header>
 		<h1>Home</h1>
-		<nav>
+		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="pastInternships.php">Companies and Programs</a>
 			<a href="REUTab.php">REUs</a>

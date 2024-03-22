@@ -2,7 +2,6 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<link rel="stylesheet" href="styles.css">
 	<!-- This might not be wholly necessary but I couldn't figure out how to get the PHP to see the file otherwise -->
 	<style>
 		<?php include 'styles.css' ?>
@@ -13,7 +12,7 @@
 <body>
 	<header>
 		<h1>Companies and Programs</h1>
-		<nav>
+		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="pastInternships.php">Companies and Programs</a>
 			<a href="REUTab.php">REUs</a>
@@ -26,8 +25,8 @@
 		<h2>About</h2>
 		<section id="homepagemain">
 			To help you figure out which companies you should prioritize applying for, we thought it might be useful to include
-			a list of companies/programs Truman students have been accepted into as underclassmen in the past. That means these 
-			should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
+			a list of companies/programs Truman students have been accepted into as underclassmen and/or international students 
+			in the past. That means these should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
 		</section>
 		<body>
 		<?php 

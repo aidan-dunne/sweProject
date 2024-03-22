@@ -12,3 +12,11 @@ footer {
 	padding-right: 10px;
 	
 }
+
+/*For the table on pastInternships*/
+table, td {
+	width:100%;
+	border:3px solid black;
+	border-collapse: collapse;
+	table-layout: fixed;
+}

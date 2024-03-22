@@ -1,13 +1,22 @@
 {
     "pastInterns": [
         {
-            "name": "Andy",
+            "name": "Andy Bernatow",
             "company": "Hussmann",
             "date": "Spring 2023",
             "email": "andybernato@gmail.com",
             "year": "Sophomore",
-            "international": "no",
+            "international": "U.S. Citizen",
             "description": "Did React Native development for a commercially available mobile app. Worked mostly independently. Was also a part of a 'Shark Tank' style project in which we did market research on a proposed new project for the company."
+        },
+        {
+            "name": "Akansha Negi",
+            "company": "ClayCo",
+            "date": "Spring 2023",
+            "email": "placeholder",
+            "year": "Sophomore",
+            "international": "U.S. Citizen",
+            "description": "Placeholder"  
         }
     ]
 }

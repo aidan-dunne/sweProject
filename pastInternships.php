@@ -2,7 +2,11 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<link rel="Stylesheet" href="styles.css">
+	<link rel="stylesheet" href="styles.css">
+	<!-- This might not be wholly necessary but I couldn't figure out how to get the PHP to see the file otherwise -->
+	<style>
+		<?php include 'styles.css' ?>
+	</style>
 	<title>Internship Database - Companies and Programs</title>
 </head>
 
@@ -39,8 +43,22 @@
 			$age = $intern["year"];
 			$international = $intern["international"];
 			$description = $intern["description"];
-			echo "Person name: $name";
-			echo "Company: $company";
+			echo (
+				"<table id=\"pastTable\"> 
+				<tr>
+				  <td>Intern: $name </td>
+				  <td>Company: $company </td>
+				  <td>Email: $email </td>
+				</tr>
+				<tr>
+				  <td>Term: $term </td>
+				  <td>Intern Age: $age </td>
+				  <td>Intern Nationality: $international </td>
+				</tr>
+				<tr>
+				  <td colspan=\"3\"> Description of Internship: $description </td>
+				</tr>
+				");
 		}
 		?>
 		</body>

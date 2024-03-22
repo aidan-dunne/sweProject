@@ -1,12 +1,19 @@
 /*Stylesheet starts here!*/
 
+/*Body styles*/
+body {
+	display: flex;
+	flex-direction: column;
+}
+
 /*Footer styles*/
 footer {
 	position: absolute;
 	bottom: 0;
-	width: 100%;
+	left: 0;
+	right: 0;
 	background-color: #ababab;
-	margin: 10px;
+	margin: 0;
 	padding: 5px;
 	padding-left: 10px;
 	padding-right: 10px;

@@ -157,6 +157,10 @@ table, td {
 	border-collapse: collapse;
 	table-layout: fixed;
 }
+
+#pastTable {
+	margin-top: 10px;
+}
 /*
 
 #mainNav {

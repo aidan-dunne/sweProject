@@ -27,17 +27,16 @@
 	so hopefully I should have some data to populate this all with soon. Should probably also consider some way
 	to reach out to current students -->
 	<main>
-		<h2>About</h2>
 		<section class="pageContentMain">
+			<h2>About</h2>
 			To help you figure out which companies you should prioritize applying for, we thought it might be useful to include
 			a list of companies/programs Truman students have been accepted into as underclassmen and/or international students 
 			in the past. That means these should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
-		</section>
-		<body>
 		<?php 
 		$intern_json = file_get_contents('past_interns_list.json');
 		$decoded_json = json_decode($intern_json, true);
 		$interns_list = $decoded_json['pastInterns'];
+		echo "<table id=\"pastTable\">";
 		foreach($interns_list as $intern)
 		{
 			$name = $intern["name"];
@@ -48,8 +47,7 @@
 			$international = $intern["international"];
 			$description = $intern["description"];
 			echo (
-				"<table id=\"pastTable\"> 
-				<tr>
+				"<tr>
 				  <td>Intern: $name </td>
 				  <td>Company: $company </td>
 				  <td>Email: $email </td>
@@ -64,8 +62,9 @@
 				</tr>
 				");
 		}
+		echo ("</table>");
 		?>
-		</body>
+		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,
 			<small>and</small> Paige Su &mdash; 2024..

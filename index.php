@@ -14,9 +14,10 @@
 	<div class="headerTopBG"></div>
 	<header>
 		<h1>Home</h1>
-		<img src="images/profilePageIcon.png" class="profIcon"></img>
+		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
 		<nav id="mainNav">
 			<a href="index.php" class="currentPage">Home</a>
+			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
 			<a href="REUTab.php">REUs</a>
 		</nav>
@@ -31,7 +32,7 @@
 			<h3>Resources</h3>
 			<p>With our website, we aim to make the internship-searching process more accessible and less stressful for groups like
 			international students and underclassmen who may have a difficult time finding internships that will consider their
-			applications. Our internship database offers a range of easy-to-use search filters which will allow you to refine your internship search
+			applications. Our <a href="internshipDB.php">internship database</a> offers a range of easy-to-use search filters which will allow you to refine your internship search
 			and more efficiently find internships that are perfect for you. Additionally, our <a href="pastInternships.php">Companies and Programs</a> 
 			page provides a list of companies that offer internship programs at which Truman students have been successful at in the past.</p>
 			<p>Our <a href="REUTab.php">Research Experiences for Undergraduates (REU)</a> page offers an explanation of what REUs are, why you 

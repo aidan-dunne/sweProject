@@ -126,7 +126,7 @@ p a {
 }
 
 p a:hover {
-	color: #8229a8;
+	color: #23a1f6;
 }
 
 /*Footer styles*/
@@ -146,10 +146,12 @@ footer {
 /*****************************************************************************/
 
 /*Homepage specific styles */
+/*
 #reuPageMain h2 {
 	font-size: 1.5vw;
 	margin:0;
 }
+*/
 /*For the tables on pastInternships (Might need to be migrated to a separate file at some point)*/
 table, td {
 	width:100%;

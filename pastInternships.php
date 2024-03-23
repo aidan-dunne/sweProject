@@ -15,8 +15,10 @@
 	<div class="headerTopBG"></div>
 	<header>
 		<h1>Companies and Programs</h1>
+		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
+			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php" class="currentPage">Companies and Programs</a>
 			<a href="REUTab.php">REUs</a>
 		</nav>

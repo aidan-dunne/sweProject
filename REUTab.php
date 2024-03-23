@@ -10,18 +10,22 @@
 </head>
 
 <body>
+	<!-- divs with classes headerTopBG and headerBottomBorder are required to allow each page's header and its border to look as they did in design 
+	models apporoved by end users -->
+	<div class="headerTopBG"></div>
 	<header>
 		<h1>REUs</h1>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php">REUs</a>
+			<a href="REUTab.php" class="currentPage">REUs</a>
 		</nav>
 	</header>
+	<div class="headerBottomBorder"></div>
 	
 	<main>
 		<br>
-		<section id="reuPageMain">
+		<section class="pageContentMain">
 			<h2>What</h2>
             <p>REUs are 10 week programs hosted at universities across the country. You're assigned a research advisor
                 upon your acceptance, and that advisor has some kind of real-world project they'll guide you to work through, helping
@@ -49,7 +53,8 @@
 				interested, apply <a href=https://osr.truman.edu/truscholars>here!</a></p>
 		</section>
 		<footer>
-			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, Owen Murphy &mdash; 2024.
+			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,
+			<small>and</small> Paige Su &mdash; 2024.
 		</footer>
 	</main>
 </body>

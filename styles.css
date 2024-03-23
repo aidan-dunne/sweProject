@@ -1,9 +1,115 @@
-/*Stylesheet starts here!*/
+/*
+Stylesheet starts here!
 
-/*Body styles*/
+Generic styles (styles common to all webpages) listed below:
+*/
+
+/*Generic body styles*/
 body {
 	display: flex;
 	flex-direction: column;
+	position: relative;
+	min-height: 100vh;
+	background-color: #e2e2e2;
+	font-family: Georgia, serif;
+	font-size: 14pt;
+	padding: 0;
+	margin: 0;
+}
+
+/*Generic header styles*/
+header {
+	background-color: #4f0b74;
+	border-radius: 50px;
+	font-family: Calibri, sans-serif;
+	padding: 30px;
+	margin: 0 0 30px 0;
+	z-index: 2;
+}
+
+.headerTopBG {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 80px;
+	background-color: #4f0b74;
+	z-index: 1;
+}
+
+.headerBottomBorder {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 265px;
+	background-color: #66dfff;
+	border-radius: 35px;
+	z-index: 0;
+}
+
+/*Generic h1 styles -- webpage title in header*/
+h1 {
+	color: #ffffff;
+	font-size: 60pt;
+	font-weight: bold;
+	padding: 0;
+	margin: 0 0 15px 0;
+}
+
+/*Generic nav bar styles*/
+nav {
+	background-color: #8229a8;
+	border-radius: 35px;
+	font-size: 20pt;
+	margin: 0;
+	padding: 15px 15px 15px 0;
+}
+
+nav a {
+	color: #66dfff;
+	text-decoration: none;
+	margin: 0;
+	padding: 15px;
+}
+
+/*
+First-child selection is necessary to allow the alternate background color to
+stretch all the way to the left of the nav bar when first link is hovered over
+*/
+nav a:first-child {
+	padding-left: 30px;
+}
+
+nav a:hover {
+	background-color: #4f0b74;
+	color: #ffffff;
+}
+
+a.currentPage {
+	color: #ffffff;
+	font-weight: bold;
+}
+
+/*Generic main content styles*/
+main {
+	color: #594f5b;
+	margin-bottom: 50px; /*Required for nicer footer formatting*/
+}
+
+section.pageContentMain {
+	background-color: #ffffff;
+	border-radius: 35px;
+	padding: 15px 30px 15px 30px;
+	margin: 30px;
+}
+
+h2 {
+	font-size: 26pt;
+}
+
+h3 {
+	font-size: 18pt;
 }
 
 /*Footer styles*/
@@ -12,13 +118,16 @@ footer {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	background-color: #ababab;
+	background-color: #8229a8;
+	color: #66dfff;
+	border-top: 15px solid #66dfff;
+	font-family: Calibri, sans-serif;
 	margin: 0;
-	padding: 5px;
-	padding-left: 10px;
-	padding-right: 10px;
-	
+	padding: 10px;
 }
+
+/*****************************************************************************/
+
 /*Homepage specific styles */
 #reuPageMain h2 {
 	font-size: 1.5vw;
@@ -31,12 +140,12 @@ table, td {
 	border-collapse: collapse;
 	table-layout: fixed;
 }
+/*
 
-/* NavBar */
 #mainNav {
     overflow:hidden;
     background-color: #5107C6;
-    max-width:auto; /* This will need to be adjusted based on what we add */
+    max-width:auto; 
 }
 
 #mainNav a {
@@ -52,3 +161,4 @@ table, td {
 	background-color: white;
 	color: #5107C6;
 }
+*/

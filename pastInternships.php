@@ -10,20 +10,25 @@
 </head>
 
 <body>
+	<!-- divs with classes headerTopBG and headerBottomBorder are required to allow each page's header and its border to look as they did in design 
+	models apporoved by end users -->
+	<div class="headerTopBG"></div>
 	<header>
 		<h1>Companies and Programs</h1>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
-			<a href="pastInternships.php">Companies and Programs</a>
+			<a href="pastInternships.php" class="currentPage">Companies and Programs</a>
 			<a href="REUTab.php">REUs</a>
 		</nav>
 	</header>
+	<div class="headerBottomBorder"></div>
+	
 	<!-- I've reached out to Modus Bonedus to get some alumni contributions,
 	so hopefully I should have some data to populate this all with soon. Should probably also consider some way
 	to reach out to current students -->
 	<main>
 		<h2>About</h2>
-		<section id="homepagemain">
+		<section class="pageContentMain">
 			To help you figure out which companies you should prioritize applying for, we thought it might be useful to include
 			a list of companies/programs Truman students have been accepted into as underclassmen and/or international students 
 			in the past. That means these should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
@@ -62,7 +67,8 @@
 		?>
 		</body>
 		<footer>
-			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, Owen Murphy &mdash; 2024.
+			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,
+			<small>and</small> Paige Su &mdash; 2024..
 		</footer>
 	</main>
 </body>

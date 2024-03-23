@@ -38,6 +38,7 @@
 		$intern_json = file_get_contents('past_interns_list.json');
 		$decoded_json = json_decode($intern_json, true);
 		$interns_list = $decoded_json['pastInterns'];
+		echo "<table id=\"pastTable\">";
 		foreach($interns_list as $intern)
 		{
 			$name = $intern["name"];
@@ -48,8 +49,7 @@
 			$international = $intern["international"];
 			$description = $intern["description"];
 			echo (
-				"<table id=\"pastTable\"> 
-				<tr>
+				"<tr>
 				  <td>Intern: $name </td>
 				  <td>Company: $company </td>
 				  <td>Email: $email </td>
@@ -64,8 +64,10 @@
 				</tr>
 				");
 		}
+		echo ("</table>");
 		?>
 		</body>
+		<br>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,
 			<small>and</small> Paige Su &mdash; 2024..

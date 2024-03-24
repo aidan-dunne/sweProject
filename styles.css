@@ -119,13 +119,14 @@ h3 {
 	font-size: 18pt;
 }
 
-p a {
+/*Main content section link styles*/
+p a, .pastTable tr td a {
 	color: #8229a8;
 	font-style: italic;
 	text-decoration: none;
 }
 
-p a:hover {
+p a:hover, .pastTable tr td a:hover{
 	color: #23a1f6;
 }
 
@@ -142,46 +143,41 @@ footer {
 	margin: 0;
 	padding: 10px;
 }
-
-/*****************************************************************************/
-
-/*Homepage specific styles */
 /*
-#reuPageMain h2 {
-	font-size: 1.5vw;
-	margin:0;
-}
+Styles specific to certain individual elements listed below:
 */
-/*For the tables on pastInternships (Might need to be migrated to a separate file at some point)*/
-table, td {
-	width:100%;
-	border:3px solid black;
-	border-collapse: collapse;
-	table-layout: fixed;
+
+/*Past internship table styles*/
+.pastTable {
+	background-color: #e2e2e2;
+	border-left: 10px solid #8229a8;
+	border-radius: 10px;
+	font-size: 16pt;
+	padding: 18px 18px 18px 15px;
+	margin: 30px 10px 30px 10px;
 }
 
-#pastTable {
-	margin-top: 10px;
-}
-/*
-
-#mainNav {
-    overflow:hidden;
-    background-color: #5107C6;
-    max-width:auto; 
+.pastTable:hover {
+	background-color: #ffffff;
+	border: 3px solid #23a1f6;
+	border-left: 10px solid #23a1f6;
+	padding: 15px;
 }
 
-#mainNav a {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
+.pastTable tr td h2, .pastTable tr td h3 {
+	margin: 0;
+	padding: 0;
 }
 
-#mainNav a:hover {
-	background-color: white;
-	color: #5107C6;
+.pastTable tr td{
+	padding: 0 0 20px 0;
 }
-*/
+
+.pastSmallText {
+	font-size: 14pt;
+	font-style: italic;
+}
+
+tr.noPad td {
+	padding: 0;
+}

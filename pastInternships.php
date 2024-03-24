@@ -30,46 +30,58 @@
 	to reach out to current students -->
 	<main>
 		<section class="pageContentMain">
-			<h2>About</h2>
-			To help you figure out which companies you should prioritize applying for, we thought it might be useful to include
-			a list of companies/programs Truman students have been accepted into as underclassmen and/or international students 
-			in the past. That means these should all be internships you're guaranteed to have at least <i>some</i> chance of getting. 
+			<h2>Past Internship Successes</h2>
+			<p>To better aid you in your internship search and to give you a list of companies that you may want to prioritize applying at, this page
+			contains a list of companies and internship programs at which Truman students have found success at in the past. Within each list entry,
+			you'll find the name of the company at which the student applied and a link to its careers page, a description of the internship and work 
+			the student performed, and some information about the student themselves.</p>
+			<p>Some students' have also allowed thier contact information to be listed in case you'd like to talk to them about their internship
+			experience or would like to seek their help with the application process.</p>
+			<br>
 		<?php 
 		$intern_json = file_get_contents('past_interns_list.json');
 		$decoded_json = json_decode($intern_json, true);
 		$interns_list = $decoded_json['pastInterns'];
-		echo "<table id=\"pastTable\">";
 		foreach($interns_list as $intern)
 		{
 			$name = $intern["name"];
 			$company = $intern["company"];
+			$website = $intern["website"];
 			$term = $intern["date"];
 			$email = $intern["email"];
 			$age = $intern["year"];
 			$international = $intern["international"];
 			$description = $intern["description"];
-			echo (
-				"<tr>
-				  <td>Intern: $name </td>
-				  <td>Company: $company </td>
-				  <td>Email: $email </td>
-				</tr>
-				<tr>
-				  <td>Term: $term </td>
-				  <td>Intern Age: $age </td>
-				  <td>Intern Nationality: $international </td>
-				</tr>
-				<tr>
-				  <td colspan=\"3\"> Description of Internship: $description </td>
-				</tr>
-				");
+			echo ("
+				<table class='pastTable'>
+					<tr class='noPad'>
+					  <td colspan='3'><h2>$company</h2></td>
+					</tr>
+					<tr>
+					  <td colspan='3'><a href='$website' target='_blank' rel='noreferrer noopener'>$company Careers</a></td>
+					</tr>
+					<tr>
+					  <td colspan='3'><b>Intern:</b> $name <span class='pastSmallText'>($email)</span></td>
+					</tr>
+					<tr>
+					  <td><b>Internship Term:</b> $term </td>
+					  <td><b>Intern Year:</b> $age</td>
+					  <td><b>Intern Nationality:</b> $international</td>
+					</tr>
+					<tr class='noPad'>
+					  <td><h3>Internship Description</h3></td>
+					</tr>
+					<tr>
+					  <td colspan='3'>$description <span class='pastSmallText'>&mdash; $name</span></td>
+					</tr>
+				</table>
+			");
 		}
-		echo ("</table>");
 		?>
 		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,
-			<small>and</small> Paige Su &mdash; 2024..
+			<small>and</small> Paige Su &mdash; 2024.
 		</footer>
 	</main>
 </body>

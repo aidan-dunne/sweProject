@@ -26,6 +26,16 @@
 	
 	<main>
 		<section class="pageContentMain">
+			<h2>Internships that Fit You</h2>
+			<p>Our internship database contains a large variety of computer science internships and our website provides you many filters which we
+			hope will allow you to effectively search for and find the internships most interesting to you and most applicable to your skill set.
+			These filters will help you greatly refine your search based on whether internships are open to certain groups of students, where
+			internships are located, whether internships are remote or in person, and various other critera. Each of our filters is explained in-depth 
+			later in this page.</p>
+			<h2>Internship Database</h2>
+			<p>[DATABASE INTERFACE PLACEHOLDER]</p>
+			<h2>Filters</h2>
+			<h3>International Student Filter</h3>
 		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,

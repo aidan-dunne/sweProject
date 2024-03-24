@@ -3,6 +3,7 @@
         {
             "name": "Andy Bernatow",
             "company": "Hussmann",
+			"website": "https://www.hussmann.com/en/careers",
             "date": "Spring 2023",
             "email": "andybernato@gmail.com",
             "year": "Sophomore",
@@ -12,6 +13,7 @@
         {
             "name": "Akansha Negi",
             "company": "ClayCo",
+			"website": "https://claycorp.com/careers",
             "date": "Spring 2023",
             "email": "akanshanegi@gmail.com",
             "year": "Sophomore",

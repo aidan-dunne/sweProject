@@ -1,3 +1,7 @@
+<?php
+	session_start();
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,56 +50,57 @@
 				<input type="submit" value="Load Database!">
 			</form>
 			<?php
-				//EXAMPLE TO SHOW HOW ORDERING ALG WILL WORK
-				//Testing arrays
-				/*
-				$companyarr = array(
-					array("company" => "a", "title" => "internA", "INTL" => true),
-					array("company" => "b", "title" => "internB", "INTL" => true),
-					array("company" => "c", "title" => "internC", "INTL" => false),
-				);
-				
-				//Calculating filter attribute values
-				$valuesarr = array();
-				for ($subarr = 0; $subarr < sizeof($companyarr); $subarr++) {
-					array_push($valuesarr, 0);
-					if ($companyarr[$subarr]['INTL']) {
-						$valuesarr[$subarr]++;
+				//Sorting internships alphabetically by company name
+				function sortAlpha(&$unsorted) {
+					for ($i = 0; $i < sizeof($unsorted) - 1; $i++) {
+						for ($j = $i + 1; $j < sizeof($unsorted); $j++) {
+							if (strcmp(strtolower($unsorted[$i]['company']), strtolower($unsorted[$j]['company'])) > 0) {
+								$temp = $unsorted[$i]['company'];
+								$unsorted[$i]['company'] = $unsorted[$j]['company'];
+								$unsorted[$j]['company'] = $temp;
+							}
+						}
 					}
 				}
 				
-				//$valuesarr must be bubble-sorted here
+				$_SESSION['alphabetical']; //Session variable for alphabetically-sorted database data is currently unset
 				
-				//Display test for php array
-				for ($subarr = 0; $subarr < sizeof($companyarr); $subarr++) {
-					if ($valuesarr[$subarr] > 0) {
-						echo "<p>Company: ".$companyarr[$subarr]['company']."</p>";
-						echo "<p>Title: ".$companyarr[$subarr]['title']."</p>";	
-					}
-				}
-				*/
-				
-				//EXAMPLE TO SHOW FORM-SENT JSON DISPLAY
-				/*
-				if (isset($_POST['postsend'])) {
-					$jsontemp = $_POST['postsend'];
-					
-					$decoded = json_decode($jsontemp, true);
-					for ($i = 0; $i < 2; $i++) {
-						echo "<p>Name: ".$decoded[$i]['name']."</p>";
-						echo "<p>Email: ".$decoded[$i]['email']."</p>";
-					}
-				}
-				*/
-				
-				//IGNORE THE COMMENTED OUT STUFF ABOVE ^^^
-				//EXAMPLE TO SHOW FORM-SENT DATABASE DATA (NOT JSON FORMATTED -- JUST TESTING FOR RIGHT NOW)
 				if (isset($_POST['postsendDB'])) {
-					$displayDataDB = $_POST['postsendDB'];
-					echo "<p>".$displayDataDB."</p>";
+					$receiveJson = $_POST['postsendDB'];
+					$decode = json_decode($receiveJson, true); //Value "true" decodes received data as an associative array
+					
+					//Sorting received data alphabetically and storing in a session variable
+					sortAlpha($decode);
+					$_SESSION['alphabetical'] = $decode;
+				}
+				
+				if (isset($_SESSION['alphabetical'])) {
+					$displayData = $_SESSION['alphabetical'];
+					
+					//echo "<section id='databaseContainer'>";
+					
+					for ($i = 0; $i < sizeof($displayData); $i++) {
+						$com = $displayData[$i]['company'];
+						$nam = $displayData[$i]['name'];
+						
+						echo "<p>Company: ".$com.", Position: ".$nam."</p>";
+						/*
+						echo <<< MULTILINE
+							<table class='pastTable'>
+								<tr class='noPad'>
+									<td><h2>$com</h2></td>
+								</tr>
+								<tr>
+									<td><p>$nam</p></td>
+								</tr>
+							</table>
+						MULTILINE;
+						*/
+					}
+					
+					//echo "</section>";
 				}
 			?>
-			
 			<h2>Filters</h2>
 			<h3>International Student Filter</h3>
 		</section>
@@ -118,7 +123,6 @@
 				// Initialize Firebase
   				const app = initializeApp(firebaseConfig);
   				const db = getDatabase(app);
-				//const bookRef = ref(db, "book/Book1/Author");
 				
 				/*
 				EXPLANATION:
@@ -127,10 +131,27 @@
 				firebase db -- has loaded). In order to get the object being queried and not just "[object Promise]," an asynchronous function must be
 				used which returns a reference back to that Promise.
 				*/
-				async function getTitle() {
-					const titleSnap = await get(ref(db, "book/Book1/Title"));
+				async function getInfo(internshipIndex, internshipField) {
+					const titleSnap = await get(ref(db, "internships/" + internshipIndex + "/" + internshipField));
 					return titleSnap.val();
 				}
+				
+				let dbInfoArr = [];
+				
+				for (let i = 0; i < 6; i++) {
+					let company = await getInfo(i, "company");
+					let name = await getInfo(i, "job name");
+					let citizenship = await getInfo(i, "citizenship");
+					
+					dbInfoArr[i]= {};
+					dbInfoArr[i]["company"] = company;
+					dbInfoArr[i]["name"] = name;
+					dbInfoArr[i]["INTL"] = citizenship;
+					
+				}
+				
+				let sendjson = JSON.stringify(dbInfoArr);
+				document.getElementById("postsendDB").value = (sendjson);
 				
 				/*
 				EXPLANATION:
@@ -139,14 +160,14 @@
 				storing variable to wait until the object is loaded. THIS step is what allows the actual info returned to be accessed throughout the
 				program.
 				*/
-				let respTest = await getTitle();
+				//let respTest = await getTitle(5, "company");
 				
 				//Some testing to ensure that the returned info can be appended to strings (required for sending the info in the format I want)
-				let strTest = "Title (pulled from database): ";
-				strTest += respTest + "!";
+				//let strTest = "Company (pulled from database): ";
+				//strTest += respTest + "!";
 				
 				//Writing the info pulled from the database into a form to be sent to php
-				document.getElementById("postsendDB").value = strTest; //There it is baby!!!
+				//document.getElementById("postsendDB").value = sendJson; //There it is baby!!!
 				
 				/*************************************************************/
 				//Testing stuff -- disregard
@@ -155,7 +176,8 @@
 					{name: "Aidan", email: "Email"},
 					{name: "Owen", email: "Omail"}
 				]);
-				document.getElementById("postsend").value = infojson;
+				//document.getElementById("jsontest").innerHTML = (infojson);
+				document.getElementById("postsendDB").value = infojson;
 				*/
 		</script>
 		

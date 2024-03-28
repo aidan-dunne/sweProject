@@ -181,3 +181,9 @@ Styles specific to certain individual elements listed below:
 tr.noPad td {
 	padding: 0;
 }
+
+/*Database display styles*/
+.databaseContainer {
+	display: flex;
+	flex-direction: column;
+}

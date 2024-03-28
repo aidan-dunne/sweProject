@@ -45,9 +45,15 @@
 				input field. Once the form is submitted (using POST method so users can't see any extra info in the url), the php code below accesses
 				the info sent by the form, which is stored in the $_POST variable.
 			-->
-			<form method="post" action="internshipDB.php">
+			<form method="post" action="internshipDB.php" id="dbLoad">
 				<input type="hidden" name="postsendDB" id="postsendDB">
 				<input type="submit" value="Load Database!">
+			</form>
+			<!-- Form used to apply filters -->
+			<form method="post" action="internshipDB.php" id="dbFilter">
+				<input type="checkbox" name="filterINTL" id="filterINTL">
+				<label for="filterINTL">Open to International Students</label>
+				<input type="submit" value="Apply Filters">
 			</form>
 			<?php
 				//Sorting internships alphabetically by company name
@@ -55,9 +61,50 @@
 					for ($i = 0; $i < sizeof($unsorted) - 1; $i++) {
 						for ($j = $i + 1; $j < sizeof($unsorted); $j++) {
 							if (strcmp(strtolower($unsorted[$i]['company']), strtolower($unsorted[$j]['company'])) > 0) {
-								$temp = $unsorted[$i]['company'];
-								$unsorted[$i]['company'] = $unsorted[$j]['company'];
-								$unsorted[$j]['company'] = $temp;
+								$temp = $unsorted[$i];
+								$unsorted[$i] = $unsorted[$j];
+								$unsorted[$j] = $temp;
+							}
+						}
+					}
+				}
+				
+				//Creating an array that contains the number of filters each internship satisfies.
+				function createFAN(&$fan, $ref, &$fsFlag) {
+					//Initializing FAN array to be all zeros
+					for ($i = 0; $i < sizeof($ref); $i++) {
+						array_push($fan, 0);
+					}
+					
+					//Populating FAN array with each internship's associated FAN based upon filters currently applied
+					if (isset($_POST['filterINTL'])) {
+						$fsFlag = true;
+						for ($i = 0; $i < sizeof($ref); $i++) {
+							if ($ref[$i]['INTL']) {
+								$fan[$i] = $fan[$i] + 1;
+							}
+						}
+					}
+				}
+				
+				//Sorting FAN array in descending order and database info array concurrently
+				function sortFAN (&$fan, &$displayData) {
+					
+					//Performing bubble sort on the FAN and database data arrays simultaneously
+					//Following this, $displayData will contain database data properly ordered for display
+					for ($i = 0; $i < sizeof($fan); $i++) {
+						for ($j = 0; $j < (sizeof($fan) - $i); $j++) {
+							if ($fan[$j] < $fan[$j + 1]) {
+								
+								//Swapping elements in FAN array
+								$temp = $fan[$j];
+								$fan[$j] = $fan[$j + 1];
+								$fan[$j + 1] = $temp;
+								
+								//Swapping elements in database data array
+								$temp = $displayData[$j];
+								$displayData[$j] = $displayData[$j + 1];
+								$displayData[$j + 1] = $temp;
 							}
 						}
 					}
@@ -65,6 +112,7 @@
 				
 				$_SESSION['alphabetical']; //Session variable for alphabetically-sorted database data is currently unset
 				
+				//Receiving and decoding database data
 				if (isset($_POST['postsendDB'])) {
 					$receiveJson = $_POST['postsendDB'];
 					$decode = json_decode($receiveJson, true); //Value "true" decodes received data as an associative array
@@ -74,31 +122,42 @@
 					$_SESSION['alphabetical'] = $decode;
 				}
 				
+				//Formatting and displaying database data
 				if (isset($_SESSION['alphabetical'])) {
-					$displayData = $_SESSION['alphabetical'];
 					
-					//echo "<section id='databaseContainer'>";
+					//Assigning each internship a filter attribute number (FAN)
+					$filterAttributeNumbers = array();
+					$displayData = $_SESSION['alphabetical']; //$displayData will contain all database data formatted for display
+					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data
+					createFAN($filterAttributeNumbers, $displayData, $filterSetFlag);
 					
-					for ($i = 0; $i < sizeof($displayData); $i++) {
-						$com = $displayData[$i]['company'];
-						$nam = $displayData[$i]['name'];
-						
-						echo "<p>Company: ".$com.", Position: ".$nam."</p>";
-						/*
-						echo <<< MULTILINE
-							<table class='pastTable'>
-								<tr class='noPad'>
-									<td><h2>$com</h2></td>
-								</tr>
-								<tr>
-									<td><p>$nam</p></td>
-								</tr>
-							</table>
-						MULTILINE;
-						*/
+					//Sorting FAN and database data arrays at the same time so that the database data array will be properly formatted for output
+					//(internships will be listed in descending order according to each of their FANs)
+					if ($filterSetFlag) { //Sorting of internships by FAN will not occur if no filters are currently selected (all FANs are 0)
+						sortFAN($filterAttributeNumbers, $displayData);
 					}
 					
-					//echo "</section>";
+					//Displaying data
+					if ($filterSetFlag) { //Displaying data when a filter is set (internships with FANs of 0 are not displayed)
+						for ($i = 0; $i < sizeof($displayData); $i++) {
+							$com = $displayData[$i]['company'];
+							$nam = $displayData[$i]['name'];
+							$fan = $filterAttributeNumbers[$i]; //ONLY FOR TESTING
+							
+							if ($fan > 0) {
+								echo "<p>Company: ".$com.", Position: ".$nam."<h3>FAN: ".$fan."</h3></p>";
+							}
+						}
+					}
+					else { //Displaying data when no filters are set
+						for ($i = 0; $i < sizeof($displayData); $i++) {
+							$com = $displayData[$i]['company'];
+							$nam = $displayData[$i]['name'];
+							$fan = $filterAttributeNumbers[$i]; //ONLY FOR TESTING
+							
+							echo "<p>Company: ".$com.", Position: ".$nam."<h3>FAN: ".$fan."</h3></p>";
+						}
+					}
 				}
 			?>
 			<h2>Filters</h2>
@@ -138,7 +197,7 @@
 				
 				let dbInfoArr = [];
 				
-				for (let i = 0; i < 6; i++) {
+				for (let i = 0; i < 8; i++) {
 					let company = await getInfo(i, "company");
 					let name = await getInfo(i, "job name");
 					let citizenship = await getInfo(i, "citizenship");
@@ -147,7 +206,6 @@
 					dbInfoArr[i]["company"] = company;
 					dbInfoArr[i]["name"] = name;
 					dbInfoArr[i]["INTL"] = citizenship;
-					
 				}
 				
 				let sendjson = JSON.stringify(dbInfoArr);

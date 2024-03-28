@@ -1,11 +1,14 @@
 from serpapi import GoogleSearch
 import json
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
+APIKEY = os.getenv('API_KEY')
 
 def jobScrape():
-    
+
     params = {
-        'api_key': '5121d893caf92b7ccd439e36f6643ed5d781a31971d9dffe702e21d5003fc2ba',
+        'api_key': APIKEY,
         # https://serpapi.com/manage-api-key
         'engine': 'google_jobs',  # SerpApi search engine
         'gl': 'us',  # country of the search
@@ -40,8 +43,8 @@ def jobScrape():
         checkI = 0
         checkU = 0
 
-        if ('intern' in items.get('title').lower() or 'internship' in items.get('title').lower()
-                or 'internships' in items.get('title').lower or 'co-op' in items.get('title').lower()):
+        if ('intern' in items.get('title').lower() or 'internship' in items.get('title').lower() or
+                'internships' in items.get('title').lower() or 'co-op' in items.get('title').lower()):
 
             # if so, extract title, name, and location
 

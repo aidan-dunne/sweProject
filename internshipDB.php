@@ -53,9 +53,18 @@
 			<form method="post" action="internshipDB.php" id="dbFilter">
 				<input type="checkbox" name="filterINTL" id="filterINTL">
 				<label for="filterINTL">Open to International Students</label>
+				<input type="checkbox" name="filterUCLASS" id="filterUCLASS">
+				<label for="filterUCLASS">Open to Underclassmen</label>
 				<input type="submit" value="Apply Filters">
+				<input type="submit" name="filterCLEARALL" value="Clear Filters">
 			</form>
 			<?php
+				//Unsetting all filter variables if "Clear Filters" button is pressed
+				if (isset($_POST['filterCLEARALL'])) {
+					unset($_POST['filterINTL']);
+					unset($_POST['filterUCLASS']);
+				}
+			
 				//Sorting internships alphabetically by company name
 				function sortAlpha(&$unsorted) {
 					for ($i = 0; $i < sizeof($unsorted) - 1; $i++) {
@@ -77,11 +86,19 @@
 					}
 					
 					//Populating FAN array with each internship's associated FAN based upon filters currently applied
-					if (isset($_POST['filterINTL'])) {
+					if (isset($_POST['filterINTL'])) { //Open to International Students filter
 						$fsFlag = true;
 						for ($i = 0; $i < sizeof($ref); $i++) {
 							if ($ref[$i]['INTL']) {
 								$fan[$i] = $fan[$i] + 1;
+							}
+						}
+					}
+					if (isset($_POST['filterUCLASS'])) { //Open to Underclassmen filter
+						$fsFlag = true;
+						for ($i = 0; $i < sizeof($ref); $i++) {
+							if ($ref[$i]['UCLASS']) {
+								$fan[$i]++;
 							}
 						}
 					}
@@ -109,6 +126,8 @@
 						}
 					}
 				}
+				
+				/*************************************************************************************************************/
 				
 				$_SESSION['alphabetical']; //Session variable for alphabetically-sorted database data is currently unset
 				
@@ -142,10 +161,14 @@
 						for ($i = 0; $i < sizeof($displayData); $i++) {
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];
+							$loc = $displayData[$i]['location'];
+							$lnk = $displayData[$i]['link'];
 							$fan = $filterAttributeNumbers[$i]; //ONLY FOR TESTING
 							
 							if ($fan > 0) {
-								echo "<p>Company: ".$com.", Position: ".$nam."<h3>FAN: ".$fan."</h3></p>";
+								echo "<p>Company: ".$com." ||| Position: ".$nam." ||| Location: ".$loc."</p>";
+								echo "<a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a>";
+								echo "<h3>FAN: ".$fan."</h3>"; //ONLY FOR TESTING
 							}
 						}
 					}
@@ -153,9 +176,13 @@
 						for ($i = 0; $i < sizeof($displayData); $i++) {
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];
+							$loc = $displayData[$i]['location'];
+							$lnk = $displayData[$i]['link'];
 							$fan = $filterAttributeNumbers[$i]; //ONLY FOR TESTING
 							
-							echo "<p>Company: ".$com.", Position: ".$nam."<h3>FAN: ".$fan."</h3></p>";
+							echo "<p>Company: ".$com." ||| Position: ".$nam." ||| Location: ".$loc."</p>";
+							echo "<a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a>";
+							echo "<h3>FAN: ".$fan."</h3>"; //ONLY FOR TESTING
 						}
 					}
 				}
@@ -201,11 +228,17 @@
 					let company = await getInfo(i, "company");
 					let name = await getInfo(i, "job name");
 					let citizenship = await getInfo(i, "citizenship");
+					let underclassman = await getInfo(i, "underclassman");
+					let location = await getInfo(i, "location");
+					let link = await getInfo(i, "link");
 					
 					dbInfoArr[i]= {};
 					dbInfoArr[i]["company"] = company;
 					dbInfoArr[i]["name"] = name;
 					dbInfoArr[i]["INTL"] = citizenship;
+					dbInfoArr[i]["UCLASS"] = underclassman;
+					dbInfoArr[i]['location'] = location;
+					dbInfoArr[i]['link'] = link;
 				}
 				
 				let sendjson = JSON.stringify(dbInfoArr);

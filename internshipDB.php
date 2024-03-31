@@ -13,6 +13,69 @@
 </head>
 
 <body>
+	<script type="module">
+		//Importing needed methods and SDKs
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+		import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+		
+		//Storing our Firebase configuration info
+		const firebaseConfig = {
+			apiKey: "AIzaSyCEs4fuVQHi2dwqnV6TJHSO1fZ6qx6kXc8",
+			authDomain: "se-internship-database.firebaseapp.com",
+			databaseURL: "https://se-internship-database-default-rtdb.firebaseio.com/",
+			projectId: "se-internship-database",
+			storageBucket: "se-internship-database.appspot.com",
+			messagingSenderId: "520655988080",
+			appId: "1:520655988080:web:573c2f7436e2acddf89bb5"
+		};
+		
+		//Initializing Firebase
+		const app = initializeApp(firebaseConfig);
+		const db = getDatabase(app);
+		
+		//Retrieving the boolean php session variable value which indicates whether the database has been loaded
+		let dbLoadedPHP = document.getElementById("dbLoadedPHP").value;
+		
+		//Array for storing all retrieved database information
+		let dbInfoArr = [];
+		
+		//Database will only be loaded if it has not previously been loaded during the current browser session
+		if (dbLoadedPHP) {
+			//Do nothing -- database has already been loaded during the current browser session
+		}
+		else {
+			/*
+			Each time the get() method is called, the "await" keyword must be used in order to force the storing variable to wait until the object is loaded.
+			The get() method is asynchronous, meaning that if the "await" keyword is not used, it will return an object Promise rather than the desired data
+			(an object Promise is essentially a reference to an object which as not yet loaded). This step is what allows the actual info returned to be 
+			accessed throughout the program (the onValue method returns a value only usable within its scope).
+			*/
+			for (let i = 0; i < 8; i++) { //Retrieving all database data and storing it for later conversion to json format
+				let company = (await get(ref(db, "internships/" + i + "/company"))).val();
+				let name = (await get(ref(db, "internships/" + i + "/job name"))).val();
+				let citizenship = (await get(ref(db, "internships/" + i + "/citizenship"))).val();
+				let underclassman = (await get(ref(db, "internships/" + i + "/underclassman"))).val();
+				let location = (await get(ref(db, "internships/" + i + "/location"))).val();
+				let link = (await get(ref(db, "internships/" + i + "/link"))).val();
+				
+				dbInfoArr[i]= {};
+				dbInfoArr[i]["company"] = company;
+				dbInfoArr[i]["name"] = name;
+				dbInfoArr[i]["INTL"] = citizenship;
+				dbInfoArr[i]["UCLASS"] = underclassman;
+				dbInfoArr[i]['location'] = location;
+				dbInfoArr[i]['link'] = link;
+			}
+			
+			//Converting the database info array to json format so that it may be properly parsed and displayed later
+			let sendjson = JSON.stringify(dbInfoArr);
+			document.getElementById("postsendDB").value = (sendjson);
+			
+			//Submit form containing json format database data if the database has not been loaded during the current browser session
+			document.getElementById("dbLoad").submit();
+		}
+	</script>
+	
 	<!-- divs with classes headerTopBG and headerBottomBorder are required to allow each page's header and its border to look as they did in design 
 	models apporoved by end users -->
 	<div class="headerTopBG"></div>
@@ -39,30 +102,72 @@
 			<h2>Internship Database</h2>
 			
 			<!-- 
-				Form used to send pulled database info to the server to be accessed + displayed by php.
+				Form used to send pulled database info to the server to be later accessed + displayed by php.
 				
-				In the javascript section, document.getElementById("postsendDB").value = (strTest); is used to write the retrieved data into the hidden
-				input field. Once the form is submitted (using POST method so users can't see any extra info in the url), the php code below accesses
+				In the main javascript section, document.getElementById("postsendDB").value = (sendjson); is used to write the retrieved data into a
+				hidden input field. Once the form is submitted (via document.getElementById("dbLoad").submit()), the php code below is able to access
 				the info sent by the form, which is stored in the $_POST variable.
 			-->
 			<form method="post" action="internshipDB.php" id="dbLoad">
 				<input type="hidden" name="postsendDB" id="postsendDB">
-				<input type="submit" value="Load Database!">
-			</form>
-			<!-- Form used to apply filters -->
-			<form method="post" action="internshipDB.php" id="dbFilter">
-				<input type="checkbox" name="filterINTL" id="filterINTL">
-				<label for="filterINTL">Open to International Students</label>
-				<input type="checkbox" name="filterUCLASS" id="filterUCLASS">
-				<label for="filterUCLASS">Open to Underclassmen</label>
-				<input type="submit" value="Apply Filters">
-				<input type="submit" name="filterCLEARALL" value="Clear Filters">
 			</form>
 			<?php
 				//Unsetting all filter variables if "Clear Filters" button is pressed
 				if (isset($_POST['filterCLEARALL'])) {
 					unset($_POST['filterINTL']);
 					unset($_POST['filterUCLASS']);
+				}
+				
+				//Stores whether the internship database has been loaded during a given session (used for displaying filters)
+				if (isset($_POST['postsendDB'])) {
+					$_SESSION['dbLoaded'] = true;
+				}
+				
+				/*
+				Form with a hidden input field which stores whether the internship database has been loaded during a given session. This field's value is
+				read by javascript and used to determine whether the database should be loaded or not (javascript's session storage expires once a
+				particular tab is closed, while phps session variables only expire once an entire browser window has been closed. This method allows use
+				of javascript's suboptimal session storage to be avoided and prevents loading of the database more times than necessary)
+				*/
+				$dbLoadedPHP = $_SESSION['dbLoaded'];
+				echo <<< MULTILINE
+					<form>
+						<input type='hidden' id='dbLoadedPHP' value=$dbLoadedPHP>
+					</form>
+				MULTILINE;
+				
+				//Creating filter selection form (the form used to apply any filters)
+				if (isset($_SESSION['dbLoaded'])) { //Filter selection form is only displayed if database has been loaded
+					echo "<section id='dbContainer'>";
+					echo "<form method='post' action='internshipDB.php' id='dbFilters'>";
+					
+					//Determining which filters should be pre-selected when the page reloads based on which filters are currently applied
+					if (isset($_POST['filterINTL'])) { //Open to International Students filter
+						echo "<input type='checkbox' name='filterINTL' id='filterINTL' checked>";
+					}
+					else {
+						echo "<input type='checkbox' name='filterINTL' id='filterINTL'>";
+					}
+					echo "<label for='filterINTL'>Open to International Students</label>";
+					
+					if (isset($_POST['filterUCLASS'])) { //Open to Underclassmen filter
+						echo "<input type='checkbox' name='filterUCLASS' id='filterUCLASS' checked>";
+					}
+					else {
+						echo "<input type='checkbox' name='filterUCLASS' id='filterUCLASS'>";
+					}
+					echo "<label for='filterUCLASS'>Open to Underclassmen</label>";
+					
+					//Finish creating filter selection form
+					echo <<< MULTILINE
+						<input type='submit' value='Apply Filters'>
+						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
+						</form>
+						<div id='filtersBottomBG'></div>
+					MULTILINE;
+				}
+				else { //If the database has not been loaded during the current browser session, a loading indicator is displayed
+					echo "<p id='dbPageLoading'>Loading...</p>";
 				}
 			
 				//Sorting internships alphabetically by company name
@@ -163,12 +268,23 @@
 							$nam = $displayData[$i]['name'];
 							$loc = $displayData[$i]['location'];
 							$lnk = $displayData[$i]['link'];
-							$fan = $filterAttributeNumbers[$i]; //ONLY FOR TESTING
+							$fan = $filterAttributeNumbers[$i]; //Required for displaying only desired internships
 							
 							if ($fan > 0) {
-								echo "<p>Company: ".$com." ||| Position: ".$nam." ||| Location: ".$loc."</p>";
-								echo "<a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a>";
-								echo "<h3>FAN: ".$fan."</h3>"; //ONLY FOR TESTING
+								echo <<< MULTILINE
+									<table class='dbTable'>
+										<tr>
+											<td colspan='2'><h3>$com</h3></td>
+										</tr>
+										<tr>
+											<td colspan='2'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+										</tr>
+										<tr>
+											<td><b>Position:</b> $nam</td>
+											<td><b>Location:</b> $loc</td>
+										</tr>
+									</table>
+								MULTILINE;
 							}
 						}
 					}
@@ -178,100 +294,30 @@
 							$nam = $displayData[$i]['name'];
 							$loc = $displayData[$i]['location'];
 							$lnk = $displayData[$i]['link'];
-							$fan = $filterAttributeNumbers[$i]; //ONLY FOR TESTING
 							
-							echo "<p>Company: ".$com." ||| Position: ".$nam." ||| Location: ".$loc."</p>";
-							echo "<a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a>";
-							echo "<h3>FAN: ".$fan."</h3>"; //ONLY FOR TESTING
+							echo <<< MULTILINE
+								<table class='dbTable'>
+									<tr>
+										<td colspan='2'><h3>$com</h3></td>
+									</tr>
+									<tr>
+										<td colspan='2'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+									</tr>
+									<tr>
+										<td><b>Position:</b> $nam</td>
+										<td><b>Location:</b> $loc</td>
+									</tr>
+								</table>
+							MULTILINE;
 						}
 					}
+					
+					echo "</section>";
 				}
 			?>
 			<h2>Filters</h2>
 			<h3>International Student Filter</h3>
 		</section>
-		
-		<script type="module">
-			  // Import the functions you need from the SDKs you need
-				import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-				import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
-				// Your web app's Firebase configuration
-				const firebaseConfig = {
-					apiKey: "AIzaSyCEs4fuVQHi2dwqnV6TJHSO1fZ6qx6kXc8",
-					authDomain: "se-internship-database.firebaseapp.com",
-					databaseURL: "https://se-internship-database-default-rtdb.firebaseio.com/",
-					projectId: "se-internship-database",
-					storageBucket: "se-internship-database.appspot.com",
-					messagingSenderId: "520655988080",
-					appId: "1:520655988080:web:573c2f7436e2acddf89bb5"
-				};
-				
-				// Initialize Firebase
-  				const app = initializeApp(firebaseConfig);
-  				const db = getDatabase(app);
-				
-				/*
-				EXPLANATION:
-				
-				The get() function returns an object Promise (which indicates that an object will be sent once the thing that provides it -- in this case
-				firebase db -- has loaded). In order to get the object being queried and not just "[object Promise]," an asynchronous function must be
-				used which returns a reference back to that Promise.
-				*/
-				async function getInfo(internshipIndex, internshipField) {
-					const titleSnap = await get(ref(db, "internships/" + internshipIndex + "/" + internshipField));
-					return titleSnap.val();
-				}
-				
-				let dbInfoArr = [];
-				
-				for (let i = 0; i < 8; i++) {
-					let company = await getInfo(i, "company");
-					let name = await getInfo(i, "job name");
-					let citizenship = await getInfo(i, "citizenship");
-					let underclassman = await getInfo(i, "underclassman");
-					let location = await getInfo(i, "location");
-					let link = await getInfo(i, "link");
-					
-					dbInfoArr[i]= {};
-					dbInfoArr[i]["company"] = company;
-					dbInfoArr[i]["name"] = name;
-					dbInfoArr[i]["INTL"] = citizenship;
-					dbInfoArr[i]["UCLASS"] = underclassman;
-					dbInfoArr[i]['location'] = location;
-					dbInfoArr[i]['link'] = link;
-				}
-				
-				let sendjson = JSON.stringify(dbInfoArr);
-				document.getElementById("postsendDB").value = (sendjson);
-				
-				/*
-				EXPLANATION:
-				
-				When the get() function (encapsulated in the getTitle() funciton) is called, the "await" keyword must be used in order to force the
-				storing variable to wait until the object is loaded. THIS step is what allows the actual info returned to be accessed throughout the
-				program.
-				*/
-				//let respTest = await getTitle(5, "company");
-				
-				//Some testing to ensure that the returned info can be appended to strings (required for sending the info in the format I want)
-				//let strTest = "Company (pulled from database): ";
-				//strTest += respTest + "!";
-				
-				//Writing the info pulled from the database into a form to be sent to php
-				//document.getElementById("postsendDB").value = sendJson; //There it is baby!!!
-				
-				/*************************************************************/
-				//Testing stuff -- disregard
-				/*
-				let infojson = JSON.stringify([
-					{name: "Aidan", email: "Email"},
-					{name: "Owen", email: "Omail"}
-				]);
-				//document.getElementById("jsontest").innerHTML = (infojson);
-				document.getElementById("postsendDB").value = infojson;
-				*/
-		</script>
-		
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,
 			<small>and</small> Paige Su &mdash; 2024.

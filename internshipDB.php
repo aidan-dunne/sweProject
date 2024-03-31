@@ -44,13 +44,17 @@
 			//Do nothing -- database has already been loaded during the current browser session
 		}
 		else {
+			//Retrieving the number of items in our database's "internships" table
+			const sizeSnapshot = await get(ref(db, "internships"));
+			const tableSize = sizeSnapshot.size;
+			
 			/*
 			Each time the get() method is called, the "await" keyword must be used in order to force the storing variable to wait until the object is loaded.
 			The get() method is asynchronous, meaning that if the "await" keyword is not used, it will return an object Promise rather than the desired data
 			(an object Promise is essentially a reference to an object which as not yet loaded). This step is what allows the actual info returned to be 
 			accessed throughout the program (the onValue method returns a value only usable within its scope).
 			*/
-			for (let i = 0; i < 8; i++) { //Retrieving all database data and storing it for later conversion to json format
+			for (let i = 0; i < tableSize; i++) { //Retrieving all database data and storing it for later conversion to json format
 				let company = (await get(ref(db, "internships/" + i + "/company"))).val();
 				let name = (await get(ref(db, "internships/" + i + "/job name"))).val();
 				let citizenship = (await get(ref(db, "internships/" + i + "/citizenship"))).val();
@@ -160,6 +164,7 @@
 					
 					//Finish creating filter selection form
 					echo <<< MULTILINE
+						<br>
 						<input type='submit' value='Apply Filters'>
 						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
 						</form>
@@ -167,7 +172,7 @@
 					MULTILINE;
 				}
 				else { //If the database has not been loaded during the current browser session, a loading indicator is displayed
-					echo "<p id='dbPageLoading'>Loading...</p>";
+					echo "<img src='images/loadingTest.gif'></img>";
 				}
 			
 				//Sorting internships alphabetically by company name
@@ -274,16 +279,29 @@
 								echo <<< MULTILINE
 									<table class='dbTable'>
 										<tr>
-											<td colspan='2'><h3>$com</h3></td>
+											<td><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 										</tr>
 										<tr>
-											<td colspan='2'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+											<td class='linkRow'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
 										</tr>
 										<tr>
-											<td><b>Position:</b> $nam</td>
 											<td><b>Location:</b> $loc</td>
 										</tr>
-									</table>
+										<tr>
+											<td class='filterSat'>
+								MULTILINE;
+								
+								//Displaying whether or not each internship satisfied certain selected filters
+								if (isset($_POST['filterINTL']) and $displayData[$i]['INTL']) {
+									echo "<p class='INTL'>Open to International Students</p>";
+								}
+								
+								if (isset($_POST['filterUCLASS']) and $displayData[$i]['UCLASS']) {
+									echo "<p class='UCLASS'>Open to Underclassmen</p>";
+								}
+								
+								echo <<< MULTILINE
+									</td></tr></table>
 								MULTILINE;
 							}
 						}
@@ -298,20 +316,18 @@
 							echo <<< MULTILINE
 								<table class='dbTable'>
 									<tr>
-										<td colspan='2'><h3>$com</h3></td>
+										<td><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 									</tr>
 									<tr>
-										<td colspan='2'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+										<td class='linkRow'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
 									</tr>
 									<tr>
-										<td><b>Position:</b> $nam</td>
 										<td><b>Location:</b> $loc</td>
 									</tr>
 								</table>
 							MULTILINE;
 						}
 					}
-					
 					echo "</section>";
 				}
 			?>

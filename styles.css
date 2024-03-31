@@ -187,7 +187,7 @@ tr.noPad td {
 	background-color: #8229a8;
 	border-radius: 30px;
 	color: #e2e2e2;
-	font-size: 16pt;
+	font-size: 18pt;
 	font-family: Calibri, sans-serif;
 	padding: 20px 30px 20px 30px;
 	margin: 0;
@@ -247,6 +247,63 @@ tr.noPad td {
 	padding: 0;
 }
 
-.dbTable tr td {
-	width: 50%;
+.dbTable tr td.linkRow {
+	padding-bottom: 15px;
+}
+
+.internshipPosition {
+	font-weight: normal;
+	font-size: 16pt;
+}
+
+.filterSat {
+	display: flex;
+	flex-direction: row;
+}
+
+.filterSat p {
+	border-radius: 20px;
+	color: #ffffff;
+	font-family: Calibri, sans-serif;
+	font-size: 14pt;
+	letter-spacing: -1px;
+	padding: 2px 6px 2px 6px;
+	margin: 5px 15px 0 0;
+	user-select: none;
+}
+
+.INTL {
+	background-color: #ff8484;
+}
+
+.UCLASS {
+	background-color: #ffac4d;
+}
+
+/*Database filter checkbox and button styles*/
+#dbFilters input[type="submit"] {
+	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	margin-top: 20px;
+}
+
+#dbFilters input[type="submit"]:hover {
+	background-color: #ffffff;
+}
+
+input[type="checkbox"] {
+	accent-color: #66dfff;
+	height: 18px;
+	width: 18px;
+}
+
+#dbFilters label:hover {
+	color: #ffffff;
 }

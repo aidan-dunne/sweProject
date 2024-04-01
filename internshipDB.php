@@ -172,7 +172,7 @@
 					MULTILINE;
 				}
 				else { //If the database has not been loaded during the current browser session, a loading indicator is displayed
-					echo "<img src='images/loadingTest.gif'></img>";
+					echo "<img src='images/loadingGraphic.gif' height='150px' width='150px'>";
 				}
 			
 				//Sorting internships alphabetically by company name

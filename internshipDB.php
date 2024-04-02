@@ -44,34 +44,34 @@
 			//Do nothing -- database has already been loaded during the current browser session
 		}
 		else {
-			//Retrieving the number of items in our database's "internships" table
-			const sizeSnapshot = await get(ref(db, "internships"));
-			const tableSize = sizeSnapshot.size;
+			//Retrieving a reference to our database's "internships" table
+			const snapshot = await get(ref(db, "internships"));
 			
-			/*
-			Each time the get() method is called, the "await" keyword must be used in order to force the storing variable to wait until the object is loaded.
-			The get() method is asynchronous, meaning that if the "await" keyword is not used, it will return an object Promise rather than the desired data
-			(an object Promise is essentially a reference to an object which as not yet loaded). This step is what allows the actual info returned to be 
-			accessed throughout the program (the onValue method returns a value only usable within its scope).
-			*/
-			for (let i = 0; i < tableSize; i++) { //Retrieving all database data and storing it for later conversion to json format
-				let company = (await get(ref(db, "internships/" + i + "/company"))).val();
-				let name = (await get(ref(db, "internships/" + i + "/job name"))).val();
-				let citizenship = (await get(ref(db, "internships/" + i + "/citizenship"))).val();
-				let underclassman = (await get(ref(db, "internships/" + i + "/underclassman"))).val();
-				let location = (await get(ref(db, "internships/" + i + "/location"))).val();
-				let link = (await get(ref(db, "internships/" + i + "/link"))).val();
+			//Index variable used for building array of retrieved database information
+			let dbArrIndex = 0;
+			
+			//Using "internships" database table reference to retrieve the value stored in each field of each item in the table. Then, the value in each
+			//field is written as a key-value pair to an object in an array which will be converted to json format to be displayed.
+			snapshot.forEach(function(childSnapshot) {
+				let company = childSnapshot.child("company").val();
+				let name = childSnapshot.child("job name").val();
+				let citizenship = childSnapshot.child("citizenship").val();
+				let underclassman = childSnapshot.child("underclassman").val();
+				let location = childSnapshot.child("location").val();
+				let link = childSnapshot.child("link").val();
 				
-				dbInfoArr[i]= {};
-				dbInfoArr[i]["company"] = company;
-				dbInfoArr[i]["name"] = name;
-				dbInfoArr[i]["INTL"] = citizenship;
-				dbInfoArr[i]["UCLASS"] = underclassman;
-				dbInfoArr[i]['location'] = location;
-				dbInfoArr[i]['link'] = link;
-			}
+				dbInfoArr[dbArrIndex]= {};
+				dbInfoArr[dbArrIndex]["company"] = company;
+				dbInfoArr[dbArrIndex]["name"] = name;
+				dbInfoArr[dbArrIndex]["INTL"] = citizenship;
+				dbInfoArr[dbArrIndex]["UCLASS"] = underclassman;
+				dbInfoArr[dbArrIndex]['location'] = location;
+				dbInfoArr[dbArrIndex]['link'] = link;
+				dbArrIndex++;
+			});
 			
-			//Converting the database info array to json format so that it may be properly parsed and displayed later
+			//Converting the database info array to json format so that it may be properly parsed and displayed later and writing it into the hidden
+			//input field of a form which will be submitted, allowing database information to be displayed with php.
 			let sendjson = JSON.stringify(dbInfoArr);
 			document.getElementById("postsendDB").value = (sendjson);
 			

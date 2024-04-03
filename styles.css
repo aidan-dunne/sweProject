@@ -152,7 +152,7 @@ Styles specific to certain individual elements listed below:
 	background-color: #e2e2e2;
 	border-left: 10px solid #8229a8;
 	border-radius: 10px;
-	font-size: 16pt;
+	font-size: 14pt;
 	padding: 18px 18px 18px 15px;
 	margin: 30px 10px 30px 10px;
 }
@@ -174,7 +174,7 @@ Styles specific to certain individual elements listed below:
 }
 
 .pastSmallText {
-	font-size: 14pt;
+	font-size: 12pt;
 	font-style: italic;
 }
 

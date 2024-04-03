@@ -1,3 +1,6 @@
+<?php 
+session_start();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,7 +22,12 @@
 			<a href="index.php" class="currentPage">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php">REU Information</a>
+			<a href="REUTab.php">REUs</a>
+			<?php 
+				if ($_SESSION['loggedIn']) {
+					echo '<a href="logout.php">Logout</a>';
+				}
+			?>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>

@@ -44,7 +44,12 @@
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php">REU Information</a>
+			<a href="REUTab.php">REUs</a>
+			<?php 
+				if ($_SESSION['loggedIn']) {
+					echo '<a href="logout.php">Logout</a>';
+				}
+			?>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
@@ -58,6 +63,9 @@
 				echo "<p>User has logged in!</p>";
 			}
 			else { //If the user has not logged in, display either the signup or login page depending on which submit button in the below form is selected
+				if (isset($_COOKIE["loggedOut"])) {
+					echo "Logged out successfully!";
+				}
 				echo <<< MULTILINE
 					<form method='post' action='userProfile.php'>
 						<input type='submit' name='loadPageSignUp' value='Sign Up Here'>
@@ -143,12 +151,18 @@
 				else { //Otherwise, pull other fields from submitted form and write them to the database
 					let nameSU = document.getElementById("nameSU").value;
 					let passwordSU = document.getElementById("passwordSU").value;
+
+					set(ref(db, "users/"+usernameSU), {
+						username: usernameSU,
+						password: passwordSU,
+						name_of_user: nameSU,
+					});
 				}
 			});
 			
 			//Syntax for writing to database
 			/*
-			set(ref(db, "users/testUser"), {co
+			set(ref(db, "users/testUser"), {
 				username: "test",
 				password: "test",
 				name_of_user: "test_person",

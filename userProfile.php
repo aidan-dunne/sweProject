@@ -151,6 +151,12 @@
 				else { //Otherwise, pull other fields from submitted form and write them to the database
 					let nameSU = document.getElementById("nameSU").value;
 					let passwordSU = document.getElementById("passwordSU").value;
+
+					set(ref(db, "users/"+usernameSU), {
+						username: usernameSU,
+						password: passwordSU,
+						name_of_user: nameSU,
+					});
 				}
 			});
 			

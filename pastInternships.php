@@ -24,7 +24,7 @@ session_start();
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php" class="currentPage">Companies and Programs</a>
-			<a href="REUTab.php">REUs</a>
+			<a href="REUTab.php">REU Information</a>
 			<?php 
 				if ($_SESSION['loggedIn']) {
 					echo '<a href="logout.php">Logout</a>';

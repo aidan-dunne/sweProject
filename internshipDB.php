@@ -90,7 +90,7 @@
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php" class="currentPage">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php">REUs</a>
+			<a href="REUTab.php">REU Information</a>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
@@ -333,6 +333,18 @@
 			?>
 			<h2>Filters</h2>
 			<h3>International Student Filter</h3>
+			<p>Our international students filter is very straightforward. This filter may be applied by selecting the box to the left of the "Open to
+			International Students" text in the filters bar and clicking the "Apply Filters" button. When this filter is applied, only internships
+			which do not list U.S. citizenship/no need for visa support as application requirements. Additionally, each internship which satisfies this
+			filter will be displayed along with this tag to indicate that the internship position is open to international students:</p>
+			<span class="filterSat"><p class="INTL">Open to International Students</p></span>
+			<h3>Underclassman Filter</h3>
+			<p>Like our international students filter, our underclassman filter is equally simple. This filter may be applied by selecting the box to the
+			left of the "Open to Underclassmen" text in the filters bar and clicking the "Apply Filters" button. When this filter is applied, only
+			internships which do not list being a rising senior as a requirement or otherwise specify that applications from freshmen and sophomores 
+			will be considered. Each internship which satisfies this filter will be displayed along with this tag to indicate that the internship
+			position is open to underclassmen:</p>
+			<span class="filterSat"><p class="UCLASS">Open to Underclassmen</p></span>
 		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,

@@ -14,13 +14,13 @@
 	models apporoved by end users -->
 	<div class="headerTopBG"></div>
 	<header>
-		<h1>REUs</h1>
+		<h1>Research Experiences for Undergraduates</h1>
 		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php" class="currentPage">REUs</a>
+			<a href="REUTab.php" class="currentPage">REU Information</a>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>

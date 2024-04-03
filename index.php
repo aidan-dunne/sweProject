@@ -19,7 +19,7 @@
 			<a href="index.php" class="currentPage">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php">REUs</a>
+			<a href="REUTab.php">REU Information</a>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
@@ -36,7 +36,14 @@
 			and more efficiently find internships that are perfect for you. Additionally, our <a href="pastInternships.php">Companies and Programs</a> 
 			page provides a list of companies that offer internship programs at which Truman students have been successful at in the past.</p>
 			<p>Our <a href="REUTab.php">Research Experiences for Undergraduates (REU)</a> page offers an explanation of what REUs are, why you 
-			may want to consider one over an internship, and provides a link to the National Science Foundation's REU database.</p>
+			may want to consider one over an internship, and provides a link to the National Science Foundation's REU database &mdash; an expansive and
+			complete database in which you are sure to find many REUs suited to you.</p>
+			<h3>Accounts</h3>
+			<p>While you are not required to create an account to use our website, it does unlock a very useful feature &mdash; bookmarking internships.
+			When searching through our intership database, you will be provided the option to bookmark internships or mark internships as "applied."
+			Both your bookmarked list and your "applied" list can be viewed on your profile page and will help you keep track of internships you are
+			interested in or have previously applied to during your intership searching process. You may create or log into your account by navigating to
+			our <a href="userProfile.php">User Profile Page.</a></p>
 			<h3>Whatever it is you're looking for, we hope we can help you find it!</h3>
 		</section>
 		<footer>

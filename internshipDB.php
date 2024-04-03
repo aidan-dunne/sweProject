@@ -9,7 +9,7 @@
 	<style>
 		<?php include 'styles.css' ?>
 	</style>
-	<title>Internship Database - Database</title>
+	<title id="test">Internship Database - Database</title>
 </head>
 
 <body>
@@ -77,6 +77,24 @@
 			
 			//Submit form containing json format database data if the database has not been loaded during the current browser session
 			document.getElementById("dbLoad").submit();
+
+		}
+		/* function updateHistory(link, isLogged, username) {
+			set(ref(db, "users/testFromDB"), {
+				test: "succ",
+			});
+			/* if (isLogged) {
+				set(ref(db, "users/testFromDB"), {
+					test: "succ"
+				});
+			} 
+			// document.getElementById("test").innerHTML="StillNoCrash";
+		} */
+		document.getElementById("test").innerHTML="noCrash";
+		function updateHistory() {
+			set(ref(db, "users/testfromdb"), {
+				test: true,
+			});
 		}
 	</script>
 	
@@ -253,7 +271,9 @@
 				
 				//Formatting and displaying database data
 				if (isset($_SESSION['alphabetical'])) {
-					
+
+					$logged = $_SESSION['loggedIn'];
+					$currentUser = $_SESSION['$usernameDisplay'];
 					//Assigning each internship a filter attribute number (FAN)
 					$filterAttributeNumbers = array();
 					$displayData = $_SESSION['alphabetical']; //$displayData will contain all database data formatted for display
@@ -282,7 +302,7 @@
 											<td><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 										</tr>
 										<tr>
-											<td class='linkRow'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+											<td class='linkRow'><a href='$lnk' onclick='updateHistory();' target='_blank' rel='noreferrer noopener'>$com</a></td>
 										</tr>
 										<tr>
 											<td><b>Location:</b> $loc</td>
@@ -319,7 +339,7 @@
 										<td><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 									</tr>
 									<tr>
-										<td class='linkRow'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+										<td class='linkRow'><a href='$lnk' onclick='updateHistory();' target='_blank' rel='noreferrer noopener'>$com</a></td>
 									</tr>
 									<tr>
 										<td><b>Location:</b> $loc</td>

@@ -12,6 +12,7 @@
 	if(isset($_POST['signUpSubmit'])) {
 		$_SESSION['loggedIn'] = true;
 		$_SESSION['usernameDisplay'] = $_POST['usernameSU'];
+		$_SESSION['nameDisplay'] = $_POST['nameSU'];
 	}
 ?>
 
@@ -33,7 +34,7 @@
 		<!-- User's username will be retrieved and displayed in header if the user has logged in -->
 		<?php
 			if ($_SESSION['loggedIn']) {
-				$usernameDisplay = $_SESSION['usernameDisplay'];
+				$usernameDisplay = $_SESSION['nameDisplay'];
 				echo "<h1>Profile - $usernameDisplay</h1>";
 			}
 			else { //A default profile page header will be displayed if the user has not logged in

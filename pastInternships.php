@@ -47,7 +47,6 @@ session_start();
 			the student performed, and some information about the student themselves.</p>
 			<p>Some students' have also allowed thier contact information to be listed in case you'd like to talk to them about their internship
 			experience or would like to seek their help with the application process.</p>
-			<br>
 		<?php 
 		$intern_json = file_get_contents('past_interns_list.json');
 		$decoded_json = json_decode($intern_json, true);

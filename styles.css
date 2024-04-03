@@ -176,7 +176,7 @@ Styles specific to certain individual elements listed below:
 	border-left: 10px solid #8229a8;
 	border-radius: 10px;
 	font-size: 14pt;
-	padding: 18px 18px 18px 15px;
+	padding: 18px 18px 10px 15px;
 	margin: 30px 10px 30px 10px;
 }
 
@@ -184,16 +184,16 @@ Styles specific to certain individual elements listed below:
 	background-color: #ffffff;
 	border: 3px solid #23a1f6;
 	border-left: 10px solid #23a1f6;
-	padding: 15px;
+	padding: 15px 15px 7px 15px;
 }
 
-.pastTable tr td h2, .pastTable tr td h3 {
+.pastTable h2, .pastTable h3 {
 	margin: 0;
 	padding: 0;
 }
 
-.pastTable tr td {
-	padding: 0 0 20px 0;
+.pastTable td {
+	padding: 0 0 10px 0;
 }
 
 .pastSmallText {

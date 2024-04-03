@@ -20,16 +20,17 @@ session_start();
 	<header>
 		<h1>Companies and Programs</h1>
 		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
+		<?php 
+			//Displaying a "Log Out" button in the event that a user has logged in
+			if ($_SESSION['loggedIn']) {
+				echo '<a href="logout.php" class="logout">Log Out</a>';
+			}
+		?>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php" class="currentPage">Companies and Programs</a>
 			<a href="REUTab.php">REU Information</a>
-			<?php 
-				if ($_SESSION['loggedIn']) {
-					echo '<a href="logout.php">Logout</a>';
-				}
-			?>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>

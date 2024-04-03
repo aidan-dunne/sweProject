@@ -48,11 +48,34 @@ header {
 	z-index: 0;
 }
 
+/*Styles for extra interactable elements displayed in the header*/
 .profIcon {
 	width: 85px;
 	position: absolute;
 	top: 30px;
 	right: 30px;
+	z-index: 3;
+}
+
+.logout {
+	background-color: #4f0b74;
+	color: #66dfff;
+	text-decoration: none;
+	font-size: 18pt;
+	font-weight: bold;
+	position: absolute;
+	top: 105px;
+	right: 32px;
+	padding: 3px;
+	z-index: 4;
+}
+
+.logout:hover {
+	color: #ffffff;
+}
+
+div.alignTest {
+	text-align: center;
 }
 
 /*Generic h1 styles -- webpage title in header*/

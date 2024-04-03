@@ -86,6 +86,12 @@
 	<header>
 		<h1>Internship Database</h1>
 		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
+		<?php 
+			//Displaying a "Log Out" button in the event that a user has logged in
+			if ($_SESSION['loggedIn']) {
+				echo '<a href="logout.php" class="logout">Log Out</a>';
+			}
+		?>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php" class="currentPage">Internship Database</a>

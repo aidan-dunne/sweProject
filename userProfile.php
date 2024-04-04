@@ -12,7 +12,7 @@
 	if(isset($_POST['signUpSubmit'])) {
 		$_SESSION['loggedIn'] = true;
 		$_SESSION['usernameDisplay'] = $_POST['usernameSU'];
-		$_SESSION['name_of_user'] = $_POST['nameSU'];
+		$_SESSION['nameDisplay'] = $_POST['nameSU'];
 	}
 ?>
 
@@ -34,23 +34,23 @@
 		<!-- User's username will be retrieved and displayed in header if the user has logged in -->
 		<?php
 			if ($_SESSION['loggedIn']) {
-				$usernameDisplay = $_SESSION['name_of_user'];
+				$usernameDisplay = $_SESSION['nameDisplay'];
 				echo "<h1>Profile - $usernameDisplay</h1>";
 			}
 			else { //A default profile page header will be displayed if the user has not logged in
 				echo "<h1>Profile</h1>";
-			}
-			
-			//Displaying a "Log Out" button in the event that a user has logged in
-			if ($_SESSION['loggedIn']) {
-				echo '<a href="logout.php" class="logout">Log Out</a>';
 			}
 		?>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php">REU Information</a>
+			<a href="REUTab.php">REUs</a>
+			<?php 
+				if ($_SESSION['loggedIn']) {
+					echo '<a href="logout.php">Logout</a>';
+				}
+			?>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
@@ -68,7 +68,7 @@
 					echo "Logged out successfully!";
 				}
 				echo <<< MULTILINE
-					<form method='post' action='userProfile.php'>
+					<form method='post' id='loginBox' action='userProfile.php'>
 						<input type='submit' name='loadPageSignUp' value='Sign Up Here'>
 						<input type='submit' name='loadPageLogIn' value='Log In Here'>
 					</form>
@@ -160,15 +160,6 @@
 					});
 				}
 			});
-			
-			//Syntax for writing to database
-			/*
-			set(ref(db, "users/testUser"), {
-				username: "test",
-				password: "test",
-				name_of_user: "test_person",
-			});
-			*/
 		</script>
 		</section>
 		<footer>

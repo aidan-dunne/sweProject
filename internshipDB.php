@@ -110,7 +110,6 @@
 			internships are located, whether internships are remote or in person, and various other critera. Each of our filters is explained in-depth 
 			later in this page.</p>
 			<h2>Internship Database</h2>
-			
 			<!-- 
 				Form used to send pulled database info to the server to be later accessed + displayed by php.
 				

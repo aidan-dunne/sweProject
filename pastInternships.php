@@ -20,16 +20,17 @@ session_start();
 	<header>
 		<h1>Companies and Programs</h1>
 		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
+		<?php 
+			//Displaying a "Log Out" button in the event that a user has logged in
+			if ($_SESSION['loggedIn']) {
+				echo '<a href="logout.php" class="logout">Log Out</a>';
+			}
+		?>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php" class="currentPage">Companies and Programs</a>
-			<a href="REUTab.php">REUs</a>
-			<?php 
-				if ($_SESSION['loggedIn']) {
-					echo '<a href="logout.php">Logout</a>';
-				}
-			?>
+			<a href="REUTab.php">REU Information</a>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
@@ -46,7 +47,6 @@ session_start();
 			the student performed, and some information about the student themselves.</p>
 			<p>Some students' have also allowed thier contact information to be listed in case you'd like to talk to them about their internship
 			experience or would like to seek their help with the application process.</p>
-			<br>
 		<?php 
 		$intern_json = file_get_contents('past_interns_list.json');
 		$decoded_json = json_decode($intern_json, true);

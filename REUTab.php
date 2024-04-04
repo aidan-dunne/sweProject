@@ -19,16 +19,17 @@ session_start();
 	<header>
 		<h1>Research Experiences for Undergraduates</h1>
 		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
+		<?php 
+			//Displaying a "Log Out" button in the event that a user has logged in
+			if ($_SESSION['loggedIn']) {
+				echo '<a href="logout.php" class="logout">Log Out</a>';
+			}
+		?>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php" class="currentPage">REUs</a>
-			<?php 
-				if ($_SESSION['loggedIn']) {
-					echo '<a href="logout.php">Logout</a>';
-				}
-			?>
+			<a href="REUTab.php" class="currentPage">REU Information</a>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>

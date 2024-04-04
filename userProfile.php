@@ -87,7 +87,13 @@
 				
 				if (isset($_POST['loadPageLogIn'])) {
 					//Building the login form which will be validated by javascript later
-					echo "<p>testLogIn</p>"; //(I haven't actually built this form)
+					echo <<< MULTILINE
+						<form method='post' action='userProfile.php' id='logIn'>
+							<input type='text' name='usernameSU' id='usernameLI' placeholder='Username'>
+							<input type='password' name='passwordSU' id= 'passwordLI' placeholder='Password'>
+							<input type='submit' name='logInSubmit' value='Log In'>
+						</form>
+					MULTILINE;
 				}
 			}
 		?>
@@ -133,32 +139,82 @@
 				
 				return flag;
 			}
+
+			function checkUser (userInput) {
+				let flag = false;
+				
+				snapshot.forEach(function(childSnapshot) {
+					let userCompare = childSnapshot.child("username").val();
+					if (userEntered ==  userCompare) {
+						flag = true;
+					}
+				});
+				
+				return flag;
+			}
+
+			function checkPass (passInput, uName) {
+				let flag = false;
+				
+				passCheck = get(ref(db, "users/"+uName+"/password"));
+				if (passCheck == passInput) {
+					flag = true;
+				}
+				
+				return flag;
+			}
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
 			let matchFlagSU = false;
+			let UNameFlagLI = false;
 			
 			//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
 			let signInForm = document.getElementById("signUp");
 			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
 				let usernameSU = document.getElementById("usernameSU").value;
-				
-				//Calling the determineMatch function to check if the user-entered username is available
-				matchFlagSU = determineMatch(usernameSU);
-				if (matchFlagSU) { //If username is unavailable, send alert and prevent form from being submitted
-					alert("Error: that username is already in use!");
+
+				if (usernameSU == "") {
+					alert("Error: Please input a username.");
 					event.preventDefault();
 				}
-				else { //Otherwise, pull other fields from submitted form and write them to the database
-					let nameSU = document.getElementById("nameSU").value;
-					let passwordSU = document.getElementById("passwordSU").value;
+				else {
+					//Calling the determineMatch function to check if the user-entered username is available
+					matchFlagSU = determineMatch(usernameSU);
+					if (matchFlagSU) { //If username is unavailable, send alert and prevent form from being submitted
+						alert("Error: that username is already in use!");
+						event.preventDefault();
+					}
+					else { //Otherwise, pull other fields from submitted form and write them to the database
+						let nameSU = document.getElementById("nameSU").value;
+						let passwordSU = document.getElementById("passwordSU").value;
 
-					set(ref(db, "users/"+usernameSU), {
-						username: usernameSU,
-						password: passwordSU,
-						name_of_user: nameSU,
-					});
+						set(ref(db, "users/"+usernameSU), {
+							username: usernameSU,
+							password: passwordSU,
+							name_of_user: nameSU,
+						});
+					}
 				}
 			});
+
+			let logInForm = document.getElementById("logIn");
+			logInForm.addEventListener("submit", function (event) {
+				let usernameLI = document.getElementById("usernameLI").value;
+				let passwordLI = document.getElementByID("passwordLI").value;
+
+				UNameFlagLI = checkUser(usernameLI);
+
+				if (UNameFlagLI) {
+					alert("Valid Uname test");
+					PWordFlagLI = checkPass(passwordLI);
+				}
+				else {
+					alert("Invalid Username");
+					event.preventDefault();
+				}
+
+
+			})
 			
 			//Syntax for writing to database
 			/*

@@ -11,7 +11,8 @@
 	*/
 	if(isset($_POST['signUpSubmit']) or isset($_POST['logInSubmit'])) {
 		$_SESSION['loggedIn'] = true;
-		$_SESSION['name_of_user'] = $_POST['nameSU'];
+		$_SESSION['usernameDisplay'] = $_POST['usernameSU'];
+		$_SESSION['nameDisplay'] = $_POST['nameSU'];
 	}
 ?>
 
@@ -33,23 +34,23 @@
 		<!-- User's username will be retrieved and displayed in header if the user has logged in -->
 		<?php
 			if ($_SESSION['loggedIn']) {
-				$nameDisplay = $_SESSION['name_of_user'];
-				echo "<h1>Profile - $nameDisplay</h1>";
+				$usernameDisplay = $_SESSION['nameDisplay'];
+				echo "<h1>Profile - $usernameDisplay</h1>";
 			}
 			else { //A default profile page header will be displayed if the user has not logged in
 				echo "<h1>Profile</h1>";
-			}
-			
-			//Displaying a "Log Out" button in the event that a user has logged in
-			if ($_SESSION['loggedIn']) {
-				echo '<a href="logout.php" class="logout">Log Out</a>';
 			}
 		?>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
-			<a href="REUTab.php">REU Information</a>
+			<a href="REUTab.php">REUs</a>
+			<?php 
+				if ($_SESSION['loggedIn']) {
+					echo '<a href="logout.php">Logout</a>';
+				}
+			?>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
@@ -67,7 +68,7 @@
 					echo "Logged out successfully!";
 				}
 				echo <<< MULTILINE
-					<form method='post' action='userProfile.php'>
+					<form method='post' id='loginBox' action='userProfile.php'>
 						<input type='submit' name='loadPageSignUp' value='Sign Up Here'>
 						<input type='submit' name='loadPageLogIn' value='Log In Here'>
 					</form>
@@ -90,9 +91,8 @@
 					//Building the login form which will be validated by javascript later
 					echo <<< MULTILINE
 						<form method='post' action='userProfile.php' id='logIn'>
-							<input type='hidden' id='formLoaded' value='LI'>
-							<input type='text' name='usernameLI' id='usernameLI' placeholder='Username'>
-							<input type='password' name='passwoLI' id= 'passwordLI' placeholder='Password'>
+							<input type='text' name='usernameSU' id='usernameLI' placeholder='Username'>
+							<input type='password' name='passwordSU' id= 'passwordLI' placeholder='Password'>
 							<input type='submit' name='logInSubmit' value='Log In'>
 						</form>
 					MULTILINE;
@@ -141,6 +141,30 @@
 				
 				return flag;
 			}
+
+			function checkUser (userInput) {
+				let flag = false;
+				
+				snapshot.forEach(function(childSnapshot) {
+					let userCompare = childSnapshot.child("username").val();
+					if (userEntered ==  userCompare) {
+						flag = true;
+					}
+				});
+				
+				return flag;
+			}
+
+			function checkPass (passInput, uName) {
+				let flag = false;
+				
+				passCheck = get(ref(db, "users/"+uName+"/password"));
+				if (passCheck == passInput) {
+					flag = true;
+				}
+				
+				return flag;
+			}
 			
 			//When a user attempts to log in, this function will compare the entered password to the password associated with the user's entered username.
 			//Returns true if the database-stored and entered passwords match, returns false otherwise;
@@ -157,23 +181,21 @@
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
 			let matchFlagSU = false;
+			let UNameFlagLI = false;
 			
-			//Flag variables that indicate whether the username/password entered by a user when logging in are correct (match database data)
-			let matchUserLI = false;
-			let matchPassLI = false;
-			
-			let formLoaded = document.getElementById("formLoaded").value;
-			//alert(formLoaded);
-			
-			if (formLoaded == "SU") {
-				//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens for the form being submitted
-				let signInForm = document.getElementById("signUp");
-				signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
-					let usernameSU = document.getElementById("usernameSU").value;
-					
+			//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
+			let signInForm = document.getElementById("signUp");
+			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
+				let usernameSU = document.getElementById("usernameSU").value;
+
+				if (usernameSU == "") {
+					alert("Error: Please input a username.");
+					event.preventDefault();
+				}
+				else {
 					//Calling the determineMatch function to check if the user-entered username is available
 					matchFlagSU = determineMatch(usernameSU);
-					if (matchFlagSU) { //If username is unavailable, send alert and prevent form submission
+					if (matchFlagSU) { //If username is unavailable, send alert and prevent form from being submitted
 						alert("Error: that username is already in use!");
 						event.preventDefault();
 					}
@@ -187,32 +209,27 @@
 							name_of_user: nameSU,
 						});
 					}
-				});
-			}
-			else {
-				//Getting a reference to the login form (built earlier in php) and assigning it an event listener which listens for the form being submitted
-				let logInForm = document.getElementById("logIn");
-				logInForm.addEventListener("submit", function (event) {
-					let usernameLI = document.getElementById("usernameLI").value;
-					let passwordLI = document.getElementById("passwordLI").value;
-					
-					alert(usernameLI);
-					
-					//Calling the determineMatch function to check if the user-entered username is a valid login username (present in our database)
-					matchUserLI = determineMatch(usernameLI);
-					if (matchUserLI) { //If entered username matches with a username in the database, compare passwords for equality
-						passwordLI = correctPassword(usernameLI, passwordLI);
-						if (!passwordLI) { //If entered and stored passwords do not match, send alert and prevent form submission
-							alert("Error: username or password is incorrect!");
-							event.preventDefault();
-						}
-					}
-					else { //If entered username is not present in the database, send alert and prevent form submission
-						alert("Error: username or password is incorrect!");
-						event.preventDefault();
-					}
-				});
-			}
+				}
+			});
+
+			let logInForm = document.getElementById("logIn");
+			logInForm.addEventListener("submit", function (event) {
+				let usernameLI = document.getElementById("usernameLI").value;
+				let passwordLI = document.getElementByID("passwordLI").value;
+
+				UNameFlagLI = checkUser(usernameLI);
+
+				if (UNameFlagLI) {
+					alert("Valid Uname test");
+					PWordFlagLI = checkPass(passwordLI);
+				}
+				else {
+					alert("Invalid Username");
+					event.preventDefault();
+				}
+
+
+			});
 			
 			//Syntax for writing to database
 			/*

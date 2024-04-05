@@ -156,6 +156,45 @@
 				
 				return flag;
 			}
+
+			function userCheck (username) {
+				let flag = false;
+
+				snapshot.forEach(function(childSnapshot) {
+					let userCompare = childSnapshot.child("username").val();
+					if (username ==  userCompare) {
+						flag = true;
+					}
+				});
+
+				return flag;
+			}
+
+			function checkEquals(checkThis, password) {
+				let flag = false;
+				if (password == checkThis) {
+					flag = true;
+					alert("correct pass");
+				}
+
+				return flag;
+			}
+
+			function passCheck (username, password) {
+				let flag = false;
+
+				const passRef = ref(db, 'users/' + username + '/password');
+
+				onValue(passRef, (snapshot) => {
+					const passCompare = snapshot.val();
+					
+					flag = checkEquals(passCompare, password)
+					alert(passCompare);
+					alert(flag);
+					
+				})
+				return flag;
+			}
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
 			let matchFlagSU = false;
@@ -190,13 +229,32 @@
 			});
 
 			let UNameFlagLI = false;
+
 			
 			let logInForm = document.getElementById("logIn");
 			logInForm.addEventListener("submit", function (event) {
+				let userLI = document.getElementById("usernameLI").value;
+				let passwordLI = document.getElementById("passwordLI").value;
 				
-				alert("GOOOOOOOOOOO");
-				event.preventDefault();
-				
+				UNameFlagLI = userCheck(userLI);
+				//alert("here");
+				if (UNameFlagLI) {
+
+					let passFlagLI = false
+					passFlagLI = passCheck(userLI, passwordLI);
+					alert(passFlagLI);
+					if (passFlagLI) {
+						alert("Login Success");
+					}
+					else {
+						alert("Please input the correct password.");
+						event.preventDefault();
+					}
+				}
+				else {
+					alert("Please input a valid username.");
+					event.preventDefault();
+				}				
 			})
 			
 			//Syntax for writing to database

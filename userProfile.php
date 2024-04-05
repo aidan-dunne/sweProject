@@ -73,10 +73,8 @@
 						<input type='submit' name='loadPageLogIn' value='Log In Here'>
 					</form>
 				MULTILINE;
-				
-				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
-					//Building the signup form which will be validated with javascript later
-					echo <<< MULTILINE
+
+				echo <<< MULTILINE
 						<form method='post' action='userProfile.php' id='signUp'>
 							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
 							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
@@ -84,17 +82,35 @@
 							<input type='submit' name='signUpSubmit' value='Sign Up' form='signUp'>
 						</form>
 					MULTILINE;
-				}
-				
-				if (isset($_POST['loadPageLogIn'])) {
-					//Building the login form which will be validated by javascript later
-					echo <<< MULTILINE
+
+				echo <<< MULTILINE
 						<form method='post' action='userProfile.php' id='logIn'>
 							<input type='text' name='usernameSU' id='usernameLI' placeholder='Username'>
 							<input type='password' name='passwordSU' id= 'passwordLI' placeholder='Password'>
 							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
 						</form>
 					MULTILINE;
+				
+				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
+					//Building the signup form which will be validated with javascript later
+					echo <<< MULTILINE
+						Sign Up!
+						<script>
+							document.getElementById('signUp').style.display='block';
+							document.getElementById('logIn').style.display='none';
+						</script>
+						MULTILINE;
+					}
+				
+				if (isset($_POST['loadPageLogIn'])) {
+					//Building the login form which will be validated by javascript later
+					echo <<< MULTILINE
+						Log In!
+						<script>
+							document.getElementById('signUp').style.display='none';
+							document.getElementById('logIn').style.display='block';
+						</script>
+						MULTILINE;
 				}
 			}
 		?>
@@ -176,15 +192,11 @@
 			let UNameFlagLI = false;
 			
 			let logInForm = document.getElementById("logIn");
-			logInForm.addEventListener("submit", function () {
-				let usernameLI = document.getElementById("usernameLI").value;
-				let passwordLI = document.getElementByID("passwordLI").value;
-				if (usernameLI == "") {
-					alert("Error: Please input a username.");
-					event.preventDefault();
-				}
-				event.preventDefault();
+			logInForm.addEventListener("submit", function (event) {
+				
 				alert("GOOOOOOOOOOO");
+				event.preventDefault();
+				
 			})
 			
 			//Syntax for writing to database

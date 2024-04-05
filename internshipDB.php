@@ -173,6 +173,7 @@
 						<br>
 						<input type='submit' value='Apply Filters'>
 						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
+						<input type='submit' value='I`m Feeling Lucky' name='randomShips'>
 						</form>
 						<div id='filtersBottomBG'></div>
 					MULTILINE;
@@ -274,6 +275,38 @@
 					
 					//Displaying data
 					if ($filterSetFlag) { //Displaying data when a filter is set (internships with FANs of 0 are not displayed)
+						if(isset($_POST['randomShips'])) {
+							$tempDisplayData = $displayData;
+							$luckyDisplayData = [];
+							$maxFAN = 0;
+							for ($i = 0; $i < sizeof($displayData); $i++) {
+								if ($filterAttributeNumbers[$i] > $maxFAN) {
+									$maxFAN = $filterAttributeNumbers[$i];
+								}
+							}
+							while ($maxFAN != -1 && sizeof($luckyDisplayData) < 5) {
+								$hasMaxFan = [];
+								for ($i = 0; $i < sizeof($displayData); $i++) {
+									if ($maxFAN < $filterAttributeNumbers[$i]) {
+										$hasMaxFan[] = $displayData[$i];
+									}
+								}
+								
+								while (sizeof($hasMaxFan) != 0 && sizeof($luckyDisplayData) < 5) {
+									$randomIndex = rand(0, sizeof($hasMaxFan));
+									$luckyDisplayData[] = $tempDisplayData[$randomIndex];
+									array_splice($hasMaxFan, $randomIndex, 1);
+									array_splice($tempDisplayData, $randomIndex, 1);
+								}
+
+								$maxFAN = $maxFAN - 1;
+							}
+
+							// echo (sizeof($luckyDisplayData));
+
+							$displayData = $luckyDisplayData;
+
+						}
 						for ($i = 0; $i < sizeof($displayData); $i++) {
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];

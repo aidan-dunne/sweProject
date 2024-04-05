@@ -172,6 +172,7 @@
 						<br>
 						<input type='submit' value='Apply Filters'>
 						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
+						<input type='submit' value='I`m Feeling Lucky' name='randomShips'>
 						</form>
 						<div id='filtersBottomBG'></div>
 					MULTILINE;
@@ -273,6 +274,54 @@
 					
 					//Displaying data
 					if ($filterSetFlag) { //Displaying data when a filter is set (internships with FANs of 0 are not displayed)
+						if(isset($_POST['randomShips'])) { // I'm feeling lucky button
+
+
+							// messing with the global displaydata array at this level causes issues, so I make a copy
+							$tempDisplayData = $displayData;
+							$luckyDisplayData = []; // storing randomly selected internships to be displayed
+
+							/* Finds the max filter number, so we can include only the most relevant internships
+							to applied filters  */
+							$maxFAN = 0; // 
+							for ($i = 0; $i < sizeof($displayData); $i++) {
+								if ($filterAttributeNumbers[$i] > $maxFAN) {
+									$maxFAN = $filterAttributeNumbers[$i];
+								}
+							}
+							/* This is where the magic happens 
+							This acts functionally as a base case. If maxFAN ever hits -1, there are no more internships
+							to check. Could instead be replaced with 'While sizeof luckydisplay < 5, but this stops
+							the website from bricking if the scraper goes down and they click the button with filters applied*/
+							while ($maxFAN != -1) {
+								// the following collects all internships with a FAN equal to the current max and stores them in
+								// hasmaxfan
+								$hasMaxFan = [];
+								for ($i = 0; $i < sizeof($tempDisplayData); $i++) {
+									if ($maxFAN == $filterAttributeNumbers[$i]) {
+										$hasMaxFan[] = $tempDisplayData[$i];
+									}
+								}
+								
+						// then, while there are still internships with the max filters and too many haven't already been collected
+								while (sizeof($hasMaxFan) != 0 && sizeof($luckyDisplayData) < 5) {
+									// Gets a random index, stores the item in that index in our final display array
+									$randomIndex = rand(0, sizeof($hasMaxFan) - 1);
+									$luckyDisplayData[] = $hasMaxFan[$randomIndex];
+
+									// Then deletes the index from both arrays so duplicates don't happen
+									array_splice($hasMaxFan, $randomIndex, 1);
+									array_splice($tempDisplayData, $randomIndex, 1);
+								}
+								// Decrements this for the base case AND so it gets new internships during the hasmaxfan loop
+								$maxFAN = $maxFAN - 1;
+							}
+
+							
+							// Finally, sets displaydata to our luckydisplay to be displayed
+							$displayData = $luckyDisplayData;
+
+						}
 						for ($i = 0; $i < sizeof($displayData); $i++) {
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];
@@ -312,6 +361,27 @@
 						}
 					}
 					else { //Displaying data when no filters are set
+						if(isset($_POST['randomShips'])) { // Feeling lucky
+							// uses a temp, because things break otherwise
+							$tempDisplayData = $displayData;
+
+							// This is where the 5 internships ultimately get stored
+							$luckyDisplayData = [];
+
+							// The first case stops this from bricking if there are less than 5 internships in the database
+							// the second ensures only 5 internships get randomly picked 
+							while (sizeof($tempDisplayData) != 0 && sizeof($luckyDisplayData) < 5) {
+								// Gets a random index, stores the item in that index in our final display array
+								$randomIndex = rand(0, sizeof($tempDisplayData) - 1);
+								$luckyDisplayData[] = $tempDisplayData[$randomIndex];
+
+								// Then deletes the index from tempdisplay, to avoid dupes 
+								array_splice($tempDisplayData, $randomIndex, 1);
+							}
+							// Sets the display array to our randomly generated array of 5
+							$displayData = $luckyDisplayData;
+
+						}
 						for ($i = 0; $i < sizeof($displayData); $i++) {
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];

@@ -74,29 +74,45 @@
 						<input type='submit' name='loadPageLogIn' value='Log In Here'>
 					</form>
 				MULTILINE;
-				
-				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
-					//Building the signup form which will be validated with javascript later
-					echo <<< MULTILINE
+
+				echo <<< MULTILINE
 						<form method='post' action='userProfile.php' id='signUp'>
 							<input type='hidden' id='formLoaded' value='SU'>
 							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
 							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
 							<input type='password' name='passwordSU' id= 'passwordSU' placeholder='Password'>
-							<input type='submit' name='signUpSubmit' value='Sign Up'>
+							<input type='submit' name='signUpSubmit' value='Sign Up' form='signUp'>
 						</form>
 					MULTILINE;
-				}
+
+				echo <<< MULTILINE
+						<form method='post' action='userProfile.php' id='logIn'>
+							<input type='text' name='usernameSU' id='usernameLI' placeholder='Username'>
+							<input type='password' name='passwordSU' id= 'passwordLI' placeholder='Password'>
+							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
+						</form>
+					MULTILINE;
+				
+				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
+					//Building the signup form which will be validated with javascript later
+					echo <<< MULTILINE
+						Sign Up!
+						<script>
+							document.getElementById('signUp').style.display='block';
+							document.getElementById('logIn').style.display='none';
+						</script>
+						MULTILINE;
+					}
 				
 				if (isset($_POST['loadPageLogIn'])) {
 					//Building the login form which will be validated by javascript later
 					echo <<< MULTILINE
-						<form method='post' action='userProfile.php' id='logIn'>
-							<input type='text' name='usernameSU' id='usernameLI' placeholder='Username'>
-							<input type='password' name='passwordSU' id= 'passwordLI' placeholder='Password'>
-							<input type='submit' name='logInSubmit' value='Log In'>
-						</form>
-					MULTILINE;
+						Log In!
+						<script>
+							document.getElementById('signUp').style.display='none';
+							document.getElementById('logIn').style.display='block';
+						</script>
+						MULTILINE;
 				}
 			}
 		?>
@@ -142,30 +158,6 @@
 				
 				return flag;
 			}
-
-			function checkUser (userInput) {
-				let flag = false;
-				
-				snapshot.forEach(function(childSnapshot) {
-					let userCompare = childSnapshot.child("username").val();
-					if (userEntered ==  userCompare) {
-						flag = true;
-					}
-				});
-				
-				return flag;
-			}
-
-			function checkPass (passInput, uName) {
-				let flag = false;
-				
-				passCheck = get(ref(db, "users/"+uName+"/password"));
-				if (passCheck == passInput) {
-					flag = true;
-				}
-				
-				return flag;
-			}
 			
 			//When a user attempts to log in, this function will compare the entered password to the password associated with the user's entered username.
 			//Returns true if the database-stored and entered passwords match, returns false otherwise;
@@ -182,7 +174,6 @@
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
 			let matchFlagSU = false;
-			let UNameFlagLI = false;
 			
 			//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
 			let signInForm = document.getElementById("signUp");
@@ -213,24 +204,13 @@
 				}
 			});
 
+			let UNameFlagLI = false;
+			
 			let logInForm = document.getElementById("logIn");
 			logInForm.addEventListener("submit", function (event) {
-				let usernameLI = document.getElementById("usernameLI").value;
-				let passwordLI = document.getElementByID("passwordLI").value;
-
-				UNameFlagLI = checkUser(usernameLI);
-
-				if (UNameFlagLI) {
-					alert("Valid Uname test");
-					PWordFlagLI = checkPass(passwordLI);
-				}
-				else {
-					alert("Invalid Username");
-					event.preventDefault();
-				}
-
-
-			});
+				alert("GOOOOOOOOOOO");
+				event.preventDefault();
+			})
 			
 			//Syntax for writing to database
 			/*

@@ -40,17 +40,18 @@
 			else { //A default profile page header will be displayed if the user has not logged in
 				echo "<h1>Profile</h1>";
 			}
+			
+			//Displaying a "Log Out" button in the event that a user has logged in
+			if ($_SESSION['loggedIn']) {
+				echo '<a href="logout.php" class="logout">Log Out</a>';
+			}
 		?>
+		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
 			<a href="REUTab.php">REUs</a>
-			<?php 
-				if ($_SESSION['loggedIn']) {
-					echo '<a href="logout.php">Logout</a>';
-				}
-			?>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>

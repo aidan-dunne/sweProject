@@ -81,7 +81,7 @@
 							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
 							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
 							<input type='password' name='passwordSU' id= 'passwordSU' placeholder='Password'>
-							<input type='submit' name='signUpSubmit' value='Sign Up'>
+							<input type='submit' name='signUpSubmit' value='Sign Up' form='signUp'>
 						</form>
 					MULTILINE;
 				}
@@ -92,7 +92,7 @@
 						<form method='post' action='userProfile.php' id='logIn'>
 							<input type='text' name='usernameSU' id='usernameLI' placeholder='Username'>
 							<input type='password' name='passwordSU' id= 'passwordLI' placeholder='Password'>
-							<input type='submit' name='logInSubmit' value='Log In'>
+							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
 						</form>
 					MULTILINE;
 				}
@@ -140,34 +140,9 @@
 				
 				return flag;
 			}
-
-			function checkUser (userInput) {
-				let flag = false;
-				
-				snapshot.forEach(function(childSnapshot) {
-					let userCompare = childSnapshot.child("username").val();
-					if (userEntered ==  userCompare) {
-						flag = true;
-					}
-				});
-				
-				return flag;
-			}
-
-			function checkPass (passInput, uName) {
-				let flag = false;
-				
-				passCheck = get(ref(db, "users/"+uName+"/password"));
-				if (passCheck == passInput) {
-					flag = true;
-				}
-				
-				return flag;
-			}
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
 			let matchFlagSU = false;
-			let UNameFlagLI = false;
 			
 			//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
 			let signInForm = document.getElementById("signUp");
@@ -198,23 +173,18 @@
 				}
 			});
 
+			let UNameFlagLI = false;
+			
 			let logInForm = document.getElementById("logIn");
-			logInForm.addEventListener("submit", function (event) {
+			logInForm.addEventListener("submit", function () {
 				let usernameLI = document.getElementById("usernameLI").value;
 				let passwordLI = document.getElementByID("passwordLI").value;
-
-				UNameFlagLI = checkUser(usernameLI);
-
-				if (UNameFlagLI) {
-					alert("Valid Uname test");
-					PWordFlagLI = checkPass(passwordLI);
-				}
-				else {
-					alert("Invalid Username");
+				if (usernameLI == "") {
+					alert("Error: Please input a username.");
 					event.preventDefault();
 				}
-
-
+				event.preventDefault();
+				alert("GOOOOOOOOOOO");
 			})
 			
 			//Syntax for writing to database

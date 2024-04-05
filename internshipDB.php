@@ -362,6 +362,27 @@
 						}
 					}
 					else { //Displaying data when no filters are set
+						if(isset($_POST['randomShips'])) { // Feeling lucky
+							// uses a temp, because things break otherwise
+							$tempDisplayData = $displayData;
+
+							// This is where the 5 internships ultimately get stored
+							$luckyDisplayData = [];
+
+							// The first case stops this from bricking if there are less than 5 internships in the database
+							// the second ensures only 5 internships get randomly picked 
+							while (sizeof($tempDisplayData) != 0 && sizeof($luckyDisplayData) < 5) {
+								// Gets a random index, stores the item in that index in our final display array
+								$randomIndex = rand(0, sizeof($tempDisplayData) - 1);
+								$luckyDisplayData[] = $tempDisplayData[$randomIndex];
+
+								// Then deletes the index from tempdisplay, to avoid dupes 
+								array_splice($tempDisplayData, $randomIndex, 1);
+							}
+							// Sets the display array to our randomly generated array of 5
+							$displayData = $luckyDisplayData;
+
+						}
 						for ($i = 0; $i < sizeof($displayData); $i++) {
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];

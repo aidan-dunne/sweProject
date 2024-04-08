@@ -158,17 +158,43 @@
 				
 				return flag;
 			}
-			
-			//When a user attempts to log in, this function will compare the entered password to the password associated with the user's entered username.
-			//Returns true if the database-stored and entered passwords match, returns false otherwise;
-			function correctPassword (userEntered, passEntered) {
+
+			function userCheck (username) {
 				let flag = false;
-				
-				let passCompare = snapshot.child(userEntered).child("password").val();
-				if (passEntered == passCompare) {
+
+				snapshot.forEach(function(childSnapshot) {
+					let userCompare = childSnapshot.child("username").val();
+					if (username ==  userCompare) {
+						flag = true;
+					}
+				});
+
+				return flag;
+			}
+
+			function checkEquals(checkThis, password) {
+				let flag = false;
+				if (password == checkThis) {
 					flag = true;
+					alert("correct pass");
 				}
-				
+
+				return flag;
+			}
+
+			function passCheck (username, password) {
+				let flag = false;
+
+				const passRef = ref(db, 'users/' + username + '/password');
+
+				onValue(passRef, (snapshot) => {
+					const passCompare = snapshot.val();
+					
+					flag = checkEquals(passCompare, password)
+					alert(passCompare);
+					alert(flag);
+					
+				})
 				return flag;
 			}
 			
@@ -205,11 +231,32 @@
 			});
 
 			let UNameFlagLI = false;
+
 			
 			let logInForm = document.getElementById("logIn");
 			logInForm.addEventListener("submit", function (event) {
-				alert("GOOOOOOOOOOO");
-				event.preventDefault();
+				let userLI = document.getElementById("usernameLI").value;
+				let passwordLI = document.getElementById("passwordLI").value;
+				
+				UNameFlagLI = userCheck(userLI);
+				//alert("here");
+				if (UNameFlagLI) {
+
+					let passFlagLI = false
+					passFlagLI = passCheck(userLI, passwordLI);
+					alert(passFlagLI);
+					if (passFlagLI) {
+						alert("Login Success");
+					}
+					else {
+						alert("Please input the correct password.");
+						event.preventDefault();
+					}
+				}
+				else {
+					alert("Please input a valid username.");
+					event.preventDefault();
+				}				
 			})
 			
 			//Syntax for writing to database

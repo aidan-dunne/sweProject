@@ -2,6 +2,10 @@ from serpapi import GoogleSearch
 import json
 import os
 from dotenv import load_dotenv
+import requests
+from requests.exceptions import ConnectionError
+import datetime
+from datetime import timedelta
 load_dotenv()
 APIKEY = os.getenv('API_KEY')
 
@@ -52,7 +56,16 @@ def jobScrape():
             companyName = items.get('company_name')
             location = items.get('location')
             qualifications = items.get('job_highlights')[0].get('items')
-            link = items.get('related_links')[0].get('link')
+            apply = items.get('related_links')[0].get('link')
+            date = items.get('detected_extensions').get('posted_at')
+
+            pay = items.get('detected_extensions').get('salary')
+            remoteOption = False
+            part = False
+            full = False
+
+
+
 
             # now, check the qualifications to see if the student needs to be a citizen or can be an underclassman
             # if any of the qualifications have either "citizenship" or anything referring to
@@ -82,6 +95,51 @@ def jobScrape():
             else:
                 underclassman = True
 
+            if (items.get('detected_extensions').get('work_from_home') is None
+                    or 'remote' in items.get('description').lower()):
+                remoteOption = False
+            else:
+                remoteOption = True
+
+
+
+            if ('web' in items.get('related_links')[0].get('text') and
+                     'results' in items.get('related_links')[0].get('text')):
+                 apply1 = 'https://' +(items.get('related_links')[0].get('text').replace('See web results for', '').replace(' ', '').lower()
+                          + '.com')
+
+                 apply2 = 'https://' +(items.get('related_links')[0].get('text').replace('See web results for', '').replace(' ', '_').lower()
+                          + '.com')
+                 apply3 = 'https://' +(items.get('related_links')[0].get('text').replace('See web results for', '').replace(' ', '').lower()
+                          + '.org')
+                 apply4 = 'https://' +(items.get('related_links')[0].get('text').replace('See web results for', '').replace(' ', '_').lower()
+                          + '.org')
+                 try:
+                    status = requests.head(apply1)
+                 except ConnectionError:
+                    apply = apply
+                    try:
+                        status = requests.head(apply2)
+                    except ConnectionError:
+                        apply = apply
+                        try:
+                            status = requests.head(apply3)
+                        except ConnectionError:
+                            apply = apply
+                            try:
+                                status = requests.head(apply4)
+                            except ConnectionError:
+                                apply = apply
+                            else:
+                                apply = apply4
+                        else:
+                            apply = apply3
+
+                    else:
+                        apply = apply2
+                 else:
+                     apply = apply1
+
 
             # printing out for testing reasons
             print(jobTitle)
@@ -89,18 +147,54 @@ def jobScrape():
             print(location)
             print(qualifications)
             print(citizen)
+            print(apply)
             print(underclassman)
-            print(link)
+            if date is None:
+
+                print(date)
+
+
+            else:
+                isTime = date[2:len(date)]
+                date = date[0:2]
+
+                todaysDate = datetime.datetime.now()
+
+                if 'hours' in isTime:
+                    todaysDate = datetime.datetime.now()
+                    fixedDate = todaysDate - timedelta(hours=int(date))
+                else:
+
+                    fixedDate = todaysDate - timedelta(days=int(date))
+
+                print(fixedDate)
+                #date = fixedDate
+                date = str(fixedDate)
+
+
+
+            if pay is None:
+                pay = 0
+                print(pay)
+            else:
+                print(pay)
+            print(remoteOption)
             print(' ')
 
             # after that, make a json formatted object to write to the json file
+            dateFallBack = 0
 
             object = {
                 'job name': jobTitle,
                 'company': companyName,
                 'location': location,
                 'citizenship': citizen,
-                'underclassman': underclassman
+                'underclassman': underclassman,
+                'remote': remoteOption,
+                'pay': pay,
+                'date_posted': date,
+                'link': apply
+
             }
             # then, make a list of json writeable text
 
@@ -112,8 +206,8 @@ def jobScrape():
 
 
     # finally, write the list of jsonable text to the json code to send to the file
-   # with open('database.json', 'w') as f:
-      #  json.dump(objectList, f, indent= 2)
+    with open('database.json', 'w') as f:
+          json.dump(objectList, f, indent= 2)
 
 
     return

@@ -59,6 +59,9 @@
 				let underclassman = childSnapshot.child("underclassman").val();
 				let location = childSnapshot.child("location").val();
 				let link = childSnapshot.child("link").val();
+				let pay = childSnapshot.child("pay").val();
+				let remote = childSnapshot.child("remote").val();
+				let posted = childSnapshot.child("date_posted").val();
 				
 				dbInfoArr[dbArrIndex]= {};
 				dbInfoArr[dbArrIndex]["company"] = company;
@@ -67,6 +70,9 @@
 				dbInfoArr[dbArrIndex]["UCLASS"] = underclassman;
 				dbInfoArr[dbArrIndex]['location'] = location;
 				dbInfoArr[dbArrIndex]['link'] = link;
+				dbInfoArr[dbArrIndex]['pay'] = pay;
+				dbInfoArr[dbArrIndex]['RMT'] = remote;
+				dbInfoArr[dbArrIndex]['posted'] = posted;
 				dbArrIndex++;
 			});
 			
@@ -110,7 +116,6 @@
 			internships are located, whether internships are remote or in person, and various other critera. Each of our filters is explained in-depth 
 			later in this page.</p>
 			<h2>Internship Database</h2>
-			
 			<!-- 
 				Form used to send pulled database info to the server to be later accessed + displayed by php.
 				
@@ -126,6 +131,7 @@
 				if (isset($_POST['filterCLEARALL'])) {
 					unset($_POST['filterINTL']);
 					unset($_POST['filterUCLASS']);
+					unset($_POST['filterRMT']);
 				}
 				
 				//Stores whether the internship database has been loaded during a given session (used for displaying filters)
@@ -168,12 +174,20 @@
 					}
 					echo "<label for='filterUCLASS'>Open to Underclassmen</label>";
 					
+					if (isset($_POST['filterRMT'])) { //Remote positions filter
+						echo "<input type='checkbox' name='filterRMT' id='filterRMT' checked>";
+					}
+					else {
+						echo "<input type='checkbox' name='filterRMT' id='filterRMT'>";
+					}
+					echo "<label for='filterRMT'>Remote</label>";
+					
 					//Finish creating filter selection form
 					echo <<< MULTILINE
 						<br>
 						<input type='submit' value='Apply Filters'>
 						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
-						<input type='submit' value='I`m Feeling Lucky' name='randomShips'>
+						<input type='submit' value="I'm Feeling Lucky" name='randomShips'>
 						</form>
 						<div id='filtersBottomBG'></div>
 					MULTILINE;
@@ -195,7 +209,7 @@
 					}
 				}
 				
-				//Creating an array that contains the number of filters each internship satisfies.
+				//Creating an array that contains the number of currently applied filters each internship satisfies.
 				function createFAN(&$fan, $ref, &$fsFlag) {
 					//Initializing FAN array to be all zeros
 					for ($i = 0; $i < sizeof($ref); $i++) {
@@ -215,6 +229,14 @@
 						$fsFlag = true;
 						for ($i = 0; $i < sizeof($ref); $i++) {
 							if ($ref[$i]['UCLASS']) {
+								$fan[$i]++;
+							}
+						}
+					}
+					if (isset($_POST['filterRMT'])) { //Remote Positions Filter
+						$fsFlag = true;
+						for ($i = 0; $i < sizeof($ref); $i++) {
+							if ($ref[$i]['RMT']) {
 								$fan[$i]++;
 							}
 						}
@@ -277,19 +299,13 @@
 					if ($filterSetFlag) { //Displaying data when a filter is set (internships with FANs of 0 are not displayed)
 						if(isset($_POST['randomShips'])) { // I'm feeling lucky button
 
-
 							// messing with the global displaydata array at this level causes issues, so I make a copy
 							$tempDisplayData = $displayData;
 							$luckyDisplayData = []; // storing randomly selected internships to be displayed
 
-							/* Finds the max filter number, so we can include only the most relevant internships
-							to applied filters  */
-							$maxFAN = 0; // 
-							for ($i = 0; $i < sizeof($displayData); $i++) {
-								if ($filterAttributeNumbers[$i] > $maxFAN) {
-									$maxFAN = $filterAttributeNumbers[$i];
-								}
-							}
+							//Finding largest filter number (required for displaying most relevant internships when "I'm Feeling Lucky" button is clicked)
+							$maxFAN = $filterAttributeNumbers[0];
+							
 							/* This is where the magic happens 
 							This acts functionally as a base case. If maxFAN ever hits -1, there are no more internships
 							to check. Could instead be replaced with 'While sizeof luckydisplay < 5, but this stops
@@ -328,36 +344,60 @@
 							$nam = $displayData[$i]['name'];
 							$loc = $displayData[$i]['location'];
 							$lnk = $displayData[$i]['link'];
+							$pay = $displayData[$i]['pay'];
+							$ptd = $displayData[$i]['posted'];
 							$fan = $filterAttributeNumbers[$i]; //Required for displaying only desired internships
 							
 							if ($fan > 0) {
 								echo <<< MULTILINE
 									<table class='dbTable'>
 										<tr>
-											<td><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+											<td colspan='3'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 										</tr>
 										<tr>
-											<td class='linkRow'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+											<td colspan='3 class='linkRow'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
 										</tr>
 										<tr>
-											<td><b>Location:</b> $loc</td>
-										</tr>
-										<tr>
-											<td class='filterSat'>
+											<td class='locationPayDateInline'><b>Location:</b> $loc</td>
 								MULTILINE;
 								
-								//Displaying whether or not each internship satisfied certain selected filters
+								//Displaying pay rate and date posted information if it is available
+								$extraCellDisplay = 0; //Required to ensure the correct number of table cells are dispalyed inline
+								
+								if ($pay != 0) {
+									echo "<td class='locationPayDateInline'><b>Pay:</b> $$pay</td>";
+								}
+								else {
+									$extraCellDisplay++;
+								}
+								
+								if ($ptd != 0) {
+									echo "<td class='locationPayDateInline'><b>Date Posted:</b> $ptd</td>";
+								}
+								else {
+									$extraCellDisplay++;
+								}
+								
+								//Displays any extra needed table cells inline with location/pay/date posted information
+								while($extraCellDisplay != 0) {
+									echo "<td></td>";
+									$extraCellDisplay--;
+								}
+								
+								echo "</tr><tr><td class='filterSat'>";
+								
+								//Displaying whether or not each internship satisfies certain selected filters
 								if (isset($_POST['filterINTL']) and $displayData[$i]['INTL']) {
 									echo "<p class='INTL'>Open to International Students</p>";
 								}
-								
 								if (isset($_POST['filterUCLASS']) and $displayData[$i]['UCLASS']) {
 									echo "<p class='UCLASS'>Open to Underclassmen</p>";
 								}
+								if (isset($_POST['filterRMT']) and $displayData[$i]['RMT']) {
+									echo "<p class='RMT'>Remote</p>";
+								} 
 								
-								echo <<< MULTILINE
-									</td></tr></table>
-								MULTILINE;
+								echo "</td></tr></table>";
 							}
 						}
 					}
@@ -388,6 +428,9 @@
 							$nam = $displayData[$i]['name'];
 							$loc = $displayData[$i]['location'];
 							$lnk = $displayData[$i]['link'];
+							$pay = $displayData[$i]['pay'];
+							$pay = $displayData[$i]['pay'];
+							$ptd = $displayData[$i]['posted'];
 							
 							echo <<< MULTILINE
 								<table class='dbTable'>
@@ -399,9 +442,32 @@
 									</tr>
 									<tr>
 										<td><b>Location:</b> $loc</td>
-									</tr>
-								</table>
 							MULTILINE;
+							
+							//Displaying pay rate and date posted information if it is available
+							$extraCellDisplay = 0; //Required to ensure the correct number of table cells are dispalyed inline
+							
+							if ($pay != 0) {
+								echo "<td class='locationPayDateInline'><b>Pay:</b> $$pay</td>";
+							}
+							else {
+								$extraCellDisplay++;
+							}
+							
+							if ($ptd != 0) {
+								echo "<td class='locationPayDateInline'><b>Date Posted:</b> $ptd</td>";
+							}
+							else {
+								$extraCellDisplay++;
+							}
+							
+							//Displays any extra needed table cells inline with location/pay/date posted information
+							while($extraCellDisplay != 0) {
+								echo "<td></td>";
+								$extraCellDisplay--;
+							}
+								
+							echo "</tr></table>";
 						}
 					}
 					echo "</section>";
@@ -411,8 +477,8 @@
 			<h3>International Student Filter</h3>
 			<p>Our international students filter is very straightforward. This filter may be applied by selecting the box to the left of the "Open to
 			International Students" text in the filters bar and clicking the "Apply Filters" button. When this filter is applied, only internships
-			which do not list U.S. citizenship/no need for visa support as application requirements. Additionally, each internship which satisfies this
-			filter will be displayed along with this tag to indicate that the internship position is open to international students:</p>
+			which do not list U.S. citizenship/the lack of need for visa support as application requirements. Additionally, each internship which 
+			satisfies this filter will be displayed along with this tag to indicate that the internship position is open to international students:</p>
 			<span class="filterSat"><p class="INTL">Open to International Students</p></span>
 			<h3>Underclassman Filter</h3>
 			<p>Like our international students filter, our underclassman filter is equally simple. This filter may be applied by selecting the box to the
@@ -421,6 +487,12 @@
 			will be considered. Each internship which satisfies this filter will be displayed along with this tag to indicate that the internship
 			position is open to underclassmen:</p>
 			<span class="filterSat"><p class="UCLASS">Open to Underclassmen</p></span>
+			<h3>Remote Filter</h3>
+			<p>Our remote positions filter is yet another simple filter and may be applied by selecting the box to the left of the "Remote" text in the
+			filters bar and clicking the "Apply Filters" button. When this filter is applied, only internships which specify that the listed position
+			is remote (not in-person or on-location) or has the option of being remote are listed. Each internship which satisfies this filter will be
+			displayed along with this tag to indicate that the internship position is remote:</p>
+			<span class="filterSat"><p class="RMT">Remote</p></span>
 		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,

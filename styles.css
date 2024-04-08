@@ -248,6 +248,7 @@ tr.noPad td {
 	padding: 20px 30px 20px 30px;
 	margin: 0;
 	table-layout: fixed;
+	width: 100%;
 }
 
 .dbtable:nth-child(2n) {
@@ -279,6 +280,12 @@ tr.noPad td {
 	font-size: 16pt;
 }
 
+/*
+td.locationPayDateInline {
+	table-layout: fixed;
+}
+*/
+
 .filterSat {
 	display: flex;
 	flex-direction: row;
@@ -301,6 +308,10 @@ tr.noPad td {
 
 .UCLASS {
 	background-color: #ffac4d;
+}
+
+.RMT {
+	background-color: #14b840;
 }
 
 /*Database filter checkbox and button styles*/

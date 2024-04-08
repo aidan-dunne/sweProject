@@ -7,9 +7,9 @@
 	If the form has been submitted (user has successfully logged in/signed up), a session variable indicating that the user has logged in is set to true.
 	This variable is later used to load the user's profile page rather than the login/signup pages.
 	
-	Additionally, a "usernameDisplay" session variable is set which allows the user's username to be easily displayed in the profile page's header.
+	Additionally, a "name_of_user" session variable is set which allows the user's name to be easily displayed in the profile page's header.
 	*/
-	if(isset($_POST['signUpSubmit'])) {
+	if(isset($_POST['signUpSubmit']) or isset($_POST['logInSubmit'])) {
 		$_SESSION['loggedIn'] = true;
 		$_SESSION['usernameDisplay'] = $_POST['usernameSU'];
 		$_SESSION['nameDisplay'] = $_POST['nameSU'];
@@ -40,17 +40,18 @@
 			else { //A default profile page header will be displayed if the user has not logged in
 				echo "<h1>Profile</h1>";
 			}
+			
+			//Displaying a "Log Out" button in the event that a user has logged in
+			if ($_SESSION['loggedIn']) {
+				echo '<a href="logout.php" class="logout">Log Out</a>';
+			}
 		?>
+		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Companies and Programs</a>
 			<a href="REUTab.php">REUs</a>
-			<?php 
-				if ($_SESSION['loggedIn']) {
-					echo '<a href="logout.php">Logout</a>';
-				}
-			?>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
@@ -76,6 +77,7 @@
 
 				echo <<< MULTILINE
 						<form method='post' action='userProfile.php' id='signUp'>
+							<input type='hidden' id='formLoaded' value='SU'>
 							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
 							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
 							<input type='password' name='passwordSU' id= 'passwordSU' placeholder='Password'>
@@ -139,17 +141,17 @@
 			const snapshot = await get(ref(db, "users"));
 			
 			/*
-			When a user attempts to sign up for the first time, this function will compare the entered username to all other usernames stored in the
-			database to ensure that the entered username is available (does not match an existing username).
+			When a user attempts to sign up or log in, this function will compare the entered username to all other usernames stored in the database.
 			
-			Returns true if the entered username is unavailable (matches a pre-existing username), returns false if the entered username is available.
+			Returns true if the entered username matches an existing username in the database (username is unavailable when signing up/username is
+			correct whenn logging in), returns false otherwise (username is available when signing up/username is incorrect when logging in).
 			*/
 			function determineMatch (userEntered) {
 				let flag = false;
 				
 				snapshot.forEach(function(childSnapshot) {
 					let userCompare = childSnapshot.child("username").val();
-					if (userEntered ==  userCompare) {
+					if (userEntered == userCompare) {
 						flag = true;
 					}
 				});

@@ -1,5 +1,17 @@
 <?php
 	session_start();
+	$currentPage;
+	define("PERPAGE", 5); //Creating a constant for the amount of internships that may be displayed on a page
+	
+	if(!isset($_POST['page'])) {
+		$currentPage = 1;
+	}
+	else if(isset($_POST['next'])) {
+		$currentPage = ++$_POST['page'];
+	}
+	else if(isset($_POST['previous'])) {
+		$currentPage = --$_POST['page'];
+	}
 ?>
 
 <!DOCTYPE html>
@@ -182,7 +194,7 @@
 					}
 					echo "<label for='filterRMT'>Remote</label>";
 					
-					//Finish creating filter selection form
+					//Creating filter selection form buttons
 					echo <<< MULTILINE
 						<br>
 						<input type='submit' value='Apply Filters'>
@@ -289,10 +301,107 @@
 					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data
 					createFAN($filterAttributeNumbers, $displayData, $filterSetFlag);
 					
+					$fanCounter; //Used for proper calculation of maxPages and proper display of page option buttons when filters are applied
+					
+					//Calculating the highest number of pages that may be dislayed based on the number of internships that must be displayed and the
+					//assumption that PERPAGE internships will be displayed per page
+					if ($filterSetFlag) { //If a filter is set, maxPages is calculated based on the number of internships with a FAN of greater than 0
+						$fanCounter = 0;
+						for ($i = 0; $i < sizeOf($filterAttributeNumbers); $i++) {
+							if ($filterAttributeNumbers[$i] == 0) {
+								break;
+							}
+							$fanCounter++;
+						}
+						
+						$_SESSION['maxPages'] = ceil($fanCounter / PERPAGE);
+					}
+					else { //Otherwise, maxPages is calculated based on total number of internships
+						$_SESSION['maxPages'] = ceil(sizeOf($displayData) / PERPAGE);
+					}
+					
 					//Sorting FAN and database data arrays at the same time so that the database data array will be properly formatted for output
 					//(internships will be listed in descending order according to each of their FANs)
 					if ($filterSetFlag) { //Sorting of internships by FAN will not occur if no filters are currently selected (all FANs are 0)
 						sortFAN($filterAttributeNumbers, $displayData);
+					}
+					
+					/*
+					Creating previous/next page form
+					
+					The previous/next page buttons will only appear in the event that the "I'm Feeling Lucky" button has not been clicked (it is assumed
+					that the number of internships that may be displayed per page is always 5 or greater) and in the event that there are enough
+					internships (number of internships > PERPAGE) in the database or that satisfy selected filters that displaying them will require more
+					than one page.
+					*/
+					if (!isset($_POST['randomShips']) and sizeof($displayData) > PERPAGE) {
+						if (!$filterSetFlag or ($filterSetFlag and $fanCounter > PERPAGE)) {
+							echo "<form method='post' action='internshipDB.php'>";
+							
+							if ($currentPage == 1) { //Only the "Next Nage" option displayed when no previous page exists
+								//Ensuring correct filters are still applied upon moving to a new page (filters should only change when "Clear Filters" is
+								//selected or when filters are deselected and "Apply Filters" is clicked)
+								if (isset($_POST['filterINTL'])) {
+									echo "<input type='hidden' name='filterINTL' value='true'>";
+								}
+								if (isset($_POST['filterUCLASS'])) {
+									echo "<input type='hidden' name='filterUCLASS' value='true'>";
+								}
+								if (isset($_POST['filterRMT'])) {
+									echo "<input type='hidden' name='filterRMT' value='true'>";
+								}
+								
+								echo <<< MULTILINE
+									<input type='hidden' name='page' value=$currentPage>
+									<section id='pageOptionsFirst'>
+										<input type='submit' name='next' value='Next Page ►'>
+									</section>
+								MULTILINE;
+							}
+							else if ($currentPage == $_SESSION['maxPages']) { //Only the "Previous Page" option displayed when no next page exists
+								//Ensuring correct filters are still applied upon moving to a new page
+								if (isset($_POST['filterINTL'])) {
+									echo "<input type='hidden' name='filterINTL' value='true'>";
+								}
+								if (isset($_POST['filterUCLASS'])) {
+									echo "<input type='hidden' name='filterUCLASS' value='true'>";
+								}
+								if (isset($_POST['filterRMT'])) {
+									echo "<input type='hidden' name='filterRMT' value='true'>";
+								}
+								
+								echo <<< MULTILINE
+									<input type='hidden' name='page' value=$currentPage>
+									<section id='pageOptionsLast'>
+										<input type='submit' name='previous' value='◄ Previous Page'>
+									</section>
+								MULTILINE;
+							}
+							else {
+								//Ensuring correct filters are still applied upon moving to a new page
+								if (isset($_POST['filterINTL'])) { //Otherwise, display both "Previous Page" and "Next Page" options
+									echo "<input type='hidden' name='filterINTL' value='true'>";
+								}
+								if (isset($_POST['filterUCLASS'])) {
+									echo "<input type='hidden' name='filterUCLASS' value='true'>";
+								}
+								if (isset($_POST['filterRMT'])) {
+									echo "<input type='hidden' name='filterRMT' value='true'>";
+								}
+								
+								echo <<< MULTILINE
+									<input type='hidden' name='page' value=$currentPage>
+									<section id='pageOptions'>
+										<input type='submit' name='previous' value='◄ Previous Page'>
+										<input type='submit' name='next' value='Next Page ►'>
+									</section>
+								MULTILINE;
+							}
+							echo "</form>";
+						}
+						else if ($fanCounter == 0) {
+							echo "<p>Nothing to display here :(</p>";
+						}
 					}
 					
 					//Displaying data
@@ -333,19 +442,18 @@
 								// Decrements this for the base case AND so it gets new internships during the hasmaxfan loop
 								$maxFAN = $maxFAN - 1;
 							}
-
 							
 							// Finally, sets displaydata to our luckydisplay to be displayed
 							$displayData = $luckyDisplayData;
 
 						}
-						for ($i = 0; $i < sizeof($displayData); $i++) {
+						for ($i = ($currentPage * PERPAGE) - PERPAGE; $i < $currentPage * PERPAGE; $i++) {
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];
 							$loc = $displayData[$i]['location'];
 							$lnk = $displayData[$i]['link'];
 							$pay = $displayData[$i]['pay'];
-							$ptd = $displayData[$i]['posted'];
+							$ptd = substr($displayData[$i]['posted'], 0, 10);
 							$fan = $filterAttributeNumbers[$i]; //Required for displaying only desired internships
 							
 							if ($fan > 0) {
@@ -371,7 +479,7 @@
 									$extraCellDisplay++;
 								}
 								
-								if ($ptd != 0) {
+								if (strlen($ptd) != 0) {
 									echo "<td class='locationPayDateInline'><b>Date Posted:</b> $ptd</td>";
 								}
 								else {
@@ -384,7 +492,7 @@
 									$extraCellDisplay--;
 								}
 								
-								echo "</tr><tr><td class='filterSat'>";
+								echo "</tr><tr><td colspan='3'><section class='filterSat'>";
 								
 								//Displaying whether or not each internship satisfies certain selected filters
 								if (isset($_POST['filterINTL']) and $displayData[$i]['INTL']) {
@@ -397,7 +505,7 @@
 									echo "<p class='RMT'>Remote</p>";
 								} 
 								
-								echo "</td></tr></table>";
+								echo "</section></td></tr></table>";
 							}
 						}
 					}
@@ -423,22 +531,26 @@
 							$displayData = $luckyDisplayData;
 
 						}
-						for ($i = 0; $i < sizeof($displayData); $i++) {
+						
+						for ($i = ($currentPage * PERPAGE) - PERPAGE; $i < $currentPage * PERPAGE; $i++) {
+							if ($i >= sizeOf($displayData)) {
+								break;
+							}
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];
 							$loc = $displayData[$i]['location'];
 							$lnk = $displayData[$i]['link'];
 							$pay = $displayData[$i]['pay'];
 							$pay = $displayData[$i]['pay'];
-							$ptd = $displayData[$i]['posted'];
+							$ptd = substr($displayData[$i]['posted'], 0, 10);
 							
 							echo <<< MULTILINE
 								<table class='dbTable'>
 									<tr>
-										<td><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+										<td colspan='3'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 									</tr>
 									<tr>
-										<td class='linkRow'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
 									</tr>
 									<tr>
 										<td><b>Location:</b> $loc</td>
@@ -454,7 +566,7 @@
 								$extraCellDisplay++;
 							}
 							
-							if ($ptd != 0) {
+							if (strlen($ptd) != 0) {
 								echo "<td class='locationPayDateInline'><b>Date Posted:</b> $ptd</td>";
 							}
 							else {

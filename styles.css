@@ -382,7 +382,7 @@ input[type="checkbox"] {
 }
 
 #logIn input[type="submit"]:hover {
-	background-color: #8229a8;
+	background-color: #ffffff;
 }
 
 #signUp input[type="submit"] {
@@ -399,5 +399,5 @@ input[type="checkbox"] {
 }
 
 #signUp input[type="submit"]:hover {
-	background-color: #8229a8;
+	background-color: #ffffff;
 }

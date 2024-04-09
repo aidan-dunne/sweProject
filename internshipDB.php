@@ -416,8 +416,16 @@
 						}
 					}
 					
-					//Displaying data
-					if ($filterSetFlag) { //Displaying data when a filter is set (internships with FANs of 0 are not displayed)
+					if (sizeof($displayData) == 0) {
+						echo <<< MULTILINE
+						No interships found :( </br>
+						If you made a search, we regret to inform it didn't find anything.</br>
+						If you applied too many filters, it seems like we don't have what you're looking for for now. Check back later!</br>
+						If there's a mistake on our end, feel free to contact us at andybernato@gmail.com.</br>
+						Best of luck in your search!
+						MULTILINE;
+					}
+					else if ($filterSetFlag) { //Displaying data when a filter is set (internships with FANs of 0 are not displayed)
 						if(isset($_POST['randomShips'])) { // I'm feeling lucky button
 
 							// messing with the global displaydata array at this level causes issues, so I make a copy

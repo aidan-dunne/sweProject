@@ -367,3 +367,37 @@ input[type="checkbox"] {
 #loginBox input[type="submit"]:hover {
 	background-color: #ffffff;
 }
+
+#logIn input[type="submit"] {
+	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	-ms-flex-align: center;
+}
+
+#logIn input[type="submit"]:hover {
+	background-color: #8229a8;
+}
+
+#signUp input[type="submit"] {
+	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	-ms-flex-align: center;
+}
+
+#signUp input[type="submit"]:hover {
+	background-color: #8229a8;
+}

@@ -20,7 +20,9 @@ body {
 /*Generic header styles*/
 header {
 	background-color: #4f0b74;
-	border-radius: 50px;
+	background-image: url("images/bgHeader.png");
+	border-bottom-left-radius: 50px;
+	border-bottom-right-radius: 50px;
 	font-family: Calibri, sans-serif;
 	padding: 30px;
 	margin: 0 0 30px 0;
@@ -223,7 +225,7 @@ tr.noPad td {
 	position: relative;
 	height: 80px;
 	top: -60px;
-	margin-bottom: -30px;
+	margin-bottom: -40px;
 	z-index: 1;
 }
 
@@ -309,6 +311,10 @@ tr.noPad td {
 	background-color: #14b840;
 }
 
+.LOC {
+	background-color: #49a3e4;
+}
+
 /*Database filter checkbox and button styles*/
 #dbFilters input[type="submit"] {
 	background-color: #66dfff;
@@ -337,12 +343,66 @@ input[type="checkbox"] {
 	color: #ffffff;
 }
 
+/*Locations filter dropdown list styles*/
+.filterLOC {
+	display: inline-block;
+}
+
+.filterLOC .locationsAnchor {
+	display: inline-block;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+}
+
+.filterLOC .locationsAnchor:hover {
+	color: #ffffff;
+}
+
+.filterLOC .locationsAnchor::after {
+	content: " ▼";
+	user-select: none;
+}
+
+.filterLOC.visible .locationsAnchor::after {
+	content: " ▲";
+}
+
+.filterLOC .itemsLOC {
+	list-style: none;
+	display: none;
+	position: absolute;
+}
+
+.filterLOC.visible .locationsAnchor {
+	color: #ffffff;
+}
+
+.filterLOC.visible .itemsLOC {
+	display: block;
+	background-color: #ffffff;
+	border-radius: 25px;
+	color: #594f5b;
+	margin-top: 5px;
+	padding: 15px;
+}
+
+.filterLOC.visible .itemsLOC li:hover, #dbFilters label.dropdownLabel:hover {
+	color: #23a1f6;
+}
+
+
 #pageOptionsFirst, #pageOptionsLast, #pageOptions {
 	display: flex;
 	flex-direction: row;
-	border-bottom: 3px solid #8229a8;
-	padding-bottom: 25px;
-	margin: 0 30px 15px 30px;
+	border-bottom: 5px solid #8229a8;
+	padding-bottom: 20px;
+	margin: 0 30px 0 30px;
+}
+
+#pageOptionsFirst h2, #pageOptionsLast h2, #pageOptions h2{
+	color: #8229a8;
+	margin: 10px 0 0 0;
 }
 
 #pageOptionsFirst {
@@ -350,11 +410,11 @@ input[type="checkbox"] {
 }
 
 #pageOptionsLast {
-	justify-content: flex-start;
+	justify-content: flex-start
 }
 
 #pageOptions {
-	justify-content: space-between;
+	justify-content: space-between
 }
 
 input[name="next"], input[name="previous"] {

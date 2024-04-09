@@ -1,7 +1,7 @@
 <?php
 	session_start();
 	$currentPage;
-	define("PERPAGE", 5); //Creating a constant for the amount of internships that may be displayed on a page
+	define("PERPAGE", 10); //Creating a constant for the amount of internships that may be displayed on a page
 	
 	if(!isset($_POST['page'])) {
 		$currentPage = 1;
@@ -144,6 +144,13 @@
 					unset($_POST['filterINTL']);
 					unset($_POST['filterUCLASS']);
 					unset($_POST['filterRMT']);
+					if (isset($_SESSION['allLocations'])) {
+						$removeLocations = $_SESSION['allLocations'];
+						for ($i = 0; $i < sizeof($removeLocations); $i++) {
+							$removeFormLocation = preg_replace('/[\W]/', '', $removeLocations[$i]);
+							unset($_POST[$removeFormLocation]);
+						}
+					}
 				}
 				
 				//Stores whether the internship database has been loaded during a given session (used for displaying filters)
@@ -164,47 +171,8 @@
 					</form>
 				MULTILINE;
 				
-				//Creating filter selection form (the form used to apply any filters)
-				if (isset($_SESSION['dbLoaded'])) { //Filter selection form is only displayed if database has been loaded
-					echo "<section id='dbContainer'>";
-					echo "<form method='post' action='internshipDB.php' id='dbFilters'>";
-					
-					//Determining which filters should be pre-selected when the page reloads based on which filters are currently applied
-					if (isset($_POST['filterINTL'])) { //Open to International Students filter
-						echo "<input type='checkbox' name='filterINTL' id='filterINTL' checked>";
-					}
-					else {
-						echo "<input type='checkbox' name='filterINTL' id='filterINTL'>";
-					}
-					echo "<label for='filterINTL'>Open to International Students</label>";
-					
-					if (isset($_POST['filterUCLASS'])) { //Open to Underclassmen filter
-						echo "<input type='checkbox' name='filterUCLASS' id='filterUCLASS' checked>";
-					}
-					else {
-						echo "<input type='checkbox' name='filterUCLASS' id='filterUCLASS'>";
-					}
-					echo "<label for='filterUCLASS'>Open to Underclassmen</label>";
-					
-					if (isset($_POST['filterRMT'])) { //Remote positions filter
-						echo "<input type='checkbox' name='filterRMT' id='filterRMT' checked>";
-					}
-					else {
-						echo "<input type='checkbox' name='filterRMT' id='filterRMT'>";
-					}
-					echo "<label for='filterRMT'>Remote</label>";
-					
-					//Creating filter selection form buttons
-					echo <<< MULTILINE
-						<br>
-						<input type='submit' value='Apply Filters'>
-						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
-						<input type='submit' value="I'm Feeling Lucky" name='randomShips'>
-						</form>
-						<div id='filtersBottomBG'></div>
-					MULTILINE;
-				}
-				else { //If the database has not been loaded during the current browser session, a loading indicator is displayed
+				//If the database has not been loaded during the current browser session, a loading indicator is displayed
+				if (!isset($_SESSION['dbLoaded'])){
 					echo "<img src='images/loadingGraphic.gif' height='150px' width='150px'>";
 				}
 			
@@ -219,6 +187,39 @@
 							}
 						}
 					}
+				}
+				
+				//Creating an array of all internships' corresponding locations with no diuplicates
+				function determineLocations (&$ref) {
+					$allLocations = array();
+					
+					//Finding each internship's location
+					for ($i = 0; $i < sizeof($ref); $i++) {
+						$newLoc = $ref[$i]['location'];
+						$duplicate = false;
+						
+						//Storing each internship's location in an array if it is not already present (a duplicate)
+						for ($j = 0; $j < sizeof($allLocations); $j++) {
+							if ($newLoc == $allLocations[$j]) {
+								$duplicate = true;
+							}
+						}
+						if (!$duplicate) {
+							array_push($allLocations, $newLoc);
+						}
+					}
+					
+					//Sorting locations array alphabetically for display
+					for ($i = 0; $i < sizeof($allLocations) - 1; $i++) {
+						for ($j = $i + 1; $j < sizeof($allLocations); $j++) {
+							if (strcmp(strtolower(preg_replace('/[\W]/', '', $allLocations[$i])), strtolower(preg_replace('/[\W]/', '', $allLocations[$j]))) > 0) {
+								$temp = $allLocations[$i];
+								$allLocations[$i] = $allLocations[$j];
+								$allLocations[$j] = $temp;
+							}
+						}
+					}
+					$_SESSION['allLocations'] = $allLocations;
 				}
 				
 				//Creating an array that contains the number of currently applied filters each internship satisfies.
@@ -253,6 +254,21 @@
 							}
 						}
 					}
+					
+					//Locations filter
+					$fanLocations = $_SESSION['allLocations'];
+					for ($i = 0; $i < sizeof($fanLocations); $i++) {
+						$fanFieldLocation = $fanLocations[$i]; //Used to check if a certain internship satisfies a certain location filter selection
+						$fanFormLocation = preg_replace('/[\W]/', '', $fanLocations[$i]); //Used to check if certain location is selected
+						if (isset($_POST[$fanFormLocation])) {
+							$fsFlag = true;
+							for ($j = 0; $j < sizeof($ref); $j++) {
+								if ($fanFieldLocation == $ref[$j]['location']) {
+									$fan[$j]++;
+								}
+							}
+						}
+					}
 				}
 				
 				//Sorting FAN array in descending order and database info array concurrently
@@ -278,7 +294,8 @@
 					}
 				}
 				
-				/*************************************************************************************************************/
+//RETRIEVING AND SORTING DATA
+/*****************************************************************************************************************************/
 				
 				$_SESSION['alphabetical']; //Session variable for alphabetically-sorted database data is currently unset
 				
@@ -290,6 +307,9 @@
 					//Sorting received data alphabetically and storing in a session variable
 					sortAlpha($decode);
 					$_SESSION['alphabetical'] = $decode;
+					
+					//Recording in a session variable all locations that should appear in the locations filter
+					determineLocations($decode);
 				}
 				
 				//Formatting and displaying database data
@@ -301,17 +321,22 @@
 					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data
 					createFAN($filterAttributeNumbers, $displayData, $filterSetFlag);
 					
-					$fanCounter; //Used for proper calculation of maxPages and proper display of page option buttons when filters are applied
+					//Sorting FAN and database data arrays at the same time so that the database data array will be properly formatted for output
+					//(internships will be listed in descending order according to each of their FANs)
+					if ($filterSetFlag) { //Sorting of internships by FAN will not occur if no filters are currently selected (all FANs are 0)
+						sortFAN($filterAttributeNumbers, $displayData);
+					}
+					
+					//$fanCounter; //Used for proper calculation of maxPages and proper display of page option buttons when filters are applied
 					
 					//Calculating the highest number of pages that may be dislayed based on the number of internships that must be displayed and the
 					//assumption that PERPAGE internships will be displayed per page
 					if ($filterSetFlag) { //If a filter is set, maxPages is calculated based on the number of internships with a FAN of greater than 0
 						$fanCounter = 0;
 						for ($i = 0; $i < sizeOf($filterAttributeNumbers); $i++) {
-							if ($filterAttributeNumbers[$i] == 0) {
-								break;
+							if ($filterAttributeNumbers[$i] != 0) {
+								$fanCounter++;
 							}
-							$fanCounter++;
 						}
 						
 						$_SESSION['maxPages'] = ceil($fanCounter / PERPAGE);
@@ -320,11 +345,80 @@
 						$_SESSION['maxPages'] = ceil(sizeOf($displayData) / PERPAGE);
 					}
 					
-					//Sorting FAN and database data arrays at the same time so that the database data array will be properly formatted for output
-					//(internships will be listed in descending order according to each of their FANs)
-					if ($filterSetFlag) { //Sorting of internships by FAN will not occur if no filters are currently selected (all FANs are 0)
-						sortFAN($filterAttributeNumbers, $displayData);
+//DISPLAYING FILTERS, PAGE BUTTONS, AND DATA
+/*****************************************************************************************************************************/
+					
+					//Creating filter selection form (the form used to apply any filters)
+					echo "<section id='dbContainer'>";
+					echo "<form method='post' action='internshipDB.php' id='dbFilters'>";
+					
+					//Determining which filters should be pre-selected when the page reloads based on which filters are currently applied
+					if (isset($_POST['filterINTL'])) { //Open to International Students filter
+						echo "<input type='checkbox' name='filterINTL' id='filterINTL' checked>";
 					}
+					else {
+						echo "<input type='checkbox' name='filterINTL' id='filterINTL'>";
+					}
+					echo "<label for='filterINTL'>Open to International Students</label>";
+					
+					if (isset($_POST['filterUCLASS'])) { //Open to Underclassmen filter
+						echo "<input type='checkbox' name='filterUCLASS' id='filterUCLASS' checked>";
+					}
+					else {
+						echo "<input type='checkbox' name='filterUCLASS' id='filterUCLASS'>";
+					}
+					echo "<label for='filterUCLASS'>Open to Underclassmen</label>";
+					
+					if (isset($_POST['filterRMT'])) { //Remote positions filter
+						echo "<input type='checkbox' name='filterRMT' id='filterRMT' checked>";
+					}
+					else {
+						echo "<input type='checkbox' name='filterRMT' id='filterRMT'>";
+					}
+					echo "<label for='filterRMT'>Remote</label>";
+					
+					//Locations filter
+					echo "<section class='filterLOC' id='filterLOC'><span class='locationsAnchor' onclick='displayListLOC()'>Select a Location</span>";
+					echo "<ul class='itemsLOC'>";
+					
+					$allLocationsDisplay = $_SESSION['allLocations'];
+					for ($i = 0; $i < sizeof($allLocationsDisplay); $i++) {
+						$displayLocation = $allLocationsDisplay[$i]; //Used for display, contains original location string
+						$formLocation = preg_replace('/[\W]/', '', $allLocationsDisplay[$i]);//Used for filtering, removes certain chars
+						if (isset($_POST[$formLocation])) {
+							echo "<li><input type='checkbox' checked name=$formLocation id=$formLocation>";
+							echo "<label for=$formLocation class='dropdownLabel'>$displayLocation</label></li>";
+						}
+						else {
+							echo "<li><input type='checkbox' name=$formLocation id=$formLocation>";
+							echo "<label for=$formLocation class='dropdownLabel'>$displayLocation</label></li>";
+						}
+					}
+					
+					echo "</ul></section>";
+				?>
+				<script>
+					//Displaying locations list when "Select a Location" option is clicked
+					let filterLOC = document.getElementById("filterLOC");
+					function displayListLOC() {
+						if (filterLOC.classList.contains("visible")) {
+							filterLOC.classList.remove("visible");
+						}
+						else {
+							filterLOC.classList.add("visible");
+						}
+					}
+				</script>	
+				<?php
+					//Creating filter selection form buttons
+					echo <<< MULTILINE
+						<br>
+						<input type='submit' value='Apply Filters'>
+						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
+						<input type='submit' value="I'm Feeling Lucky" name='randomShips'>
+						</form>
+						<div id='filtersBottomBG'></div>
+					MULTILINE;
 					
 					/*
 					Creating previous/next page form
@@ -338,19 +432,27 @@
 						if (!$filterSetFlag or ($filterSetFlag and $fanCounter > PERPAGE)) {
 							echo "<form method='post' action='internshipDB.php'>";
 							
+							//Ensuring correct filters are still applied upon moving to a new page (filters should only change when "Clear Filters" is
+							//selected or when filters are deselected and "Apply Filters" is clicked)
+							if (isset($_POST['filterINTL'])) {
+								echo "<input type='hidden' name='filterINTL' value='true'>";
+							}
+							if (isset($_POST['filterUCLASS'])) {
+								echo "<input type='hidden' name='filterUCLASS' value='true'>";
+							}
+							if (isset($_POST['filterRMT'])) {
+								echo "<input type='hidden' name='filterRMT' value='true'>";
+							}
+							
+							$reselectLocations = $_SESSION['allLocations'];
+							for ($i = 0; $i < sizeof($reselectLocations); $i++) {
+								$formLocation = preg_replace('/[\W]/', '', $reselectLocations[$i]);
+								if (isset($_POST[$formLocation])) {
+									echo "<input type='hidden' name=$formLocation value='true'>";
+								}
+							}
+							
 							if ($currentPage == 1) { //Only the "Next Nage" option displayed when no previous page exists
-								//Ensuring correct filters are still applied upon moving to a new page (filters should only change when "Clear Filters" is
-								//selected or when filters are deselected and "Apply Filters" is clicked)
-								if (isset($_POST['filterINTL'])) {
-									echo "<input type='hidden' name='filterINTL' value='true'>";
-								}
-								if (isset($_POST['filterUCLASS'])) {
-									echo "<input type='hidden' name='filterUCLASS' value='true'>";
-								}
-								if (isset($_POST['filterRMT'])) {
-									echo "<input type='hidden' name='filterRMT' value='true'>";
-								}
-								
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
 									<section id='pageOptionsFirst'>
@@ -359,17 +461,6 @@
 								MULTILINE;
 							}
 							else if ($currentPage == $_SESSION['maxPages']) { //Only the "Previous Page" option displayed when no next page exists
-								//Ensuring correct filters are still applied upon moving to a new page
-								if (isset($_POST['filterINTL'])) {
-									echo "<input type='hidden' name='filterINTL' value='true'>";
-								}
-								if (isset($_POST['filterUCLASS'])) {
-									echo "<input type='hidden' name='filterUCLASS' value='true'>";
-								}
-								if (isset($_POST['filterRMT'])) {
-									echo "<input type='hidden' name='filterRMT' value='true'>";
-								}
-								
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
 									<section id='pageOptionsLast'>
@@ -377,18 +468,7 @@
 									</section>
 								MULTILINE;
 							}
-							else {
-								//Ensuring correct filters are still applied upon moving to a new page
-								if (isset($_POST['filterINTL'])) { //Otherwise, display both "Previous Page" and "Next Page" options
-									echo "<input type='hidden' name='filterINTL' value='true'>";
-								}
-								if (isset($_POST['filterUCLASS'])) {
-									echo "<input type='hidden' name='filterUCLASS' value='true'>";
-								}
-								if (isset($_POST['filterRMT'])) {
-									echo "<input type='hidden' name='filterRMT' value='true'>";
-								}
-								
+							else { //Otherwise, display both "Previous Page" and "Next Page" options
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
 									<section id='pageOptions'>
@@ -505,6 +585,15 @@
 									echo "<p class='RMT'>Remote</p>";
 								} 
 								
+								$tagLocations = $_SESSION['allLocations'];
+								for ($j = 0; $j < sizeof($tagLocations); $j++) {
+									$tagDisplayLocation = $tagLocations[$j]; //Used to select internships on which the location tag should be displayed
+									$tagFormLocation = preg_replace('/[\W]/', '', $tagLocations[$j]); //Checks which locations selected
+									if (isset($_POST[$tagFormLocation]) and $tagDisplayLocation == $displayData[$i]['location']) {
+										echo "<p class='LOC'>Location Match</p>";
+									}
+								}
+								
 								echo "</section></td></tr></table>";
 							}
 						}
@@ -600,11 +689,17 @@
 			position is open to underclassmen:</p>
 			<span class="filterSat"><p class="UCLASS">Open to Underclassmen</p></span>
 			<h3>Remote Filter</h3>
-			<p>Our remote positions filter is yet another simple filter and may be applied by selecting the box to the left of the "Remote" text in the
+			<p>Our remote positions filter is another simple filter and may be applied by selecting the box to the left of the "Remote" text in the
 			filters bar and clicking the "Apply Filters" button. When this filter is applied, only internships which specify that the listed position
 			is remote (not in-person or on-location) or has the option of being remote are listed. Each internship which satisfies this filter will be
 			displayed along with this tag to indicate that the internship position is remote:</p>
 			<span class="filterSat"><p class="RMT">Remote</p></span>
+			<h3>Filter by Location</h3>
+			<p>Our locations filter may be applied by selecting one or more options from the "Select a Location" dropdown list and clicking the "Apply
+			Filters" button. When the locations filter is applied, only internships which are offered in your selected locations are listed. Each 
+			internship which satisfies this filter will be displayed along with this tag to indicate that the internship is offered in a location you've
+			selected:</p>
+			<span class='filterSat'><p class='LOC'>Location Match</p></span>
 		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,

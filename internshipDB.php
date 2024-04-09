@@ -200,6 +200,8 @@
 						<input type='submit' value='Apply Filters'>
 						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
 						<input type='submit' value="I'm Feeling Lucky" name='randomShips'>
+						<input type='text' name='dbSearch' id='dbSearch'>
+						<input type='submit' value='Search the Database!' name='dbSearch'>
 						</form>
 						<div id='filtersBottomBG'></div>
 					MULTILINE;
@@ -298,6 +300,16 @@
 					//Assigning each internship a filter attribute number (FAN)
 					$filterAttributeNumbers = array();
 					$displayData = $_SESSION['alphabetical']; //$displayData will contain all database data formatted for display
+					if (isset($_POST['dbSearch'])) { // If search is made
+						$searchDisplayData = []; // to store correct results
+						$searchValue = strtolower($_POST['dbSearch']); // to store 
+						for ($i = 0; $i < sizeOf($displayData); $i++) {
+							if (str_contains(strtolower($displayData[$i]['company']), $searchValue) || str_contains(strtolower($displayData[$i]['name']), $searchValue)) {
+								$searchDisplayData[] = $displayData[$i];
+							}
+						}
+						$displayData = $searchDisplayData;
+					}
 					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data
 					createFAN($filterAttributeNumbers, $displayData, $filterSetFlag);
 					

@@ -172,9 +172,14 @@
 			let signInForm = document.getElementById("signUp");
 			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
 				let usernameSU = document.getElementById("usernameSU").value;
+				let passwordSU = document.getElementById("passwordSU").value;
 
 				if (usernameSU == "") {
 					alert("Error: Please input a username.");
+					event.preventDefault();
+				}
+				else if (passwordSU == "") {
+					alert("Error: Please input a password.");
 					event.preventDefault();
 				}
 				else {
@@ -204,7 +209,11 @@
 			logInForm.addEventListener("submit", async function (event) {
 				let userLI = document.getElementById("usernameLI").value;
 				let passwordLI = document.getElementById("passwordLI").value;
-				
+				const passRef = ref(db, '/users/' + userLI + '/password');
+				onValue(passRef, (snapshot) => {
+					const passCompare = snapshot.val();
+					alert(passCompare.value);
+				});
 				
 				let UNameFlagLI = false;
 				let passFlagLI = false;
@@ -215,12 +224,9 @@
 						UNameFlagLI = true;
 					}
 				});
-				const passRef = ref(db, 'users/' + userLI + '/password');
+				
 				alert("preCheck");
-				onValue(passRef, (snapshot) => {
-					const passCompare = snapshot.val();
-					alert(passCompare.value);
-				});
+				
 				
 				alert(passwordLI);
 				if (UNameFlagLI) {	

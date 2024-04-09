@@ -17,7 +17,7 @@ session_start();
 	models apporoved by end users -->
 	<div class="headerTopBG"></div>
 	<header>
-		<h1>Research Experiences for Undergraduates</h1>
+		<h1>REU Information</h1>
 		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
 		<?php 
 			//Displaying a "Log Out" button in the event that a user has logged in

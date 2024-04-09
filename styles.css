@@ -251,12 +251,12 @@ tr.noPad td {
 	width: 100%;
 }
 
-.dbtable:nth-child(2n) {
-	background-color: #e2e2e2;
+.dbTable:nth-child(2n) {
+	background-color: #ffffff;
 }
 
-.dbTable:nth-child(2n+1) {
-	background-color: #ffffff;
+.dbtable:nth-child(2n+1) {
+	background-color: #e2e2e2;
 }
 
 .dbTable:hover {
@@ -280,15 +280,10 @@ tr.noPad td {
 	font-size: 16pt;
 }
 
-/*
-td.locationPayDateInline {
-	table-layout: fixed;
-}
-*/
-
 .filterSat {
 	display: flex;
 	flex-direction: row;
+	flex-wrap: wrap;
 }
 
 .filterSat p {
@@ -342,6 +337,41 @@ input[type="checkbox"] {
 	color: #ffffff;
 }
 
+#pageOptionsFirst, #pageOptionsLast, #pageOptions {
+	display: flex;
+	flex-direction: row;
+	border-bottom: 3px solid #8229a8;
+	padding-bottom: 25px;
+	margin: 0 30px 15px 30px;
+}
+
+#pageOptionsFirst {
+	justify-content: flex-end;
+}
+
+#pageOptionsLast {
+	justify-content: flex-start;
+}
+
+#pageOptions {
+	justify-content: space-between;
+}
+
+input[name="next"], input[name="previous"] {
+	background-color: #ffffff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	padding: 10px;
+}
+
+input[name="next"]:hover, input[name="previous"]:hover {
+	border: 3px solid #23a1f6;
+	padding: 7px;
+}
+
 /* Styles for the account page */
 #loginBox {
 	background-color: #8229a8;
@@ -365,5 +395,39 @@ input[type="checkbox"] {
 }
 
 #loginBox input[type="submit"]:hover {
+	background-color: #ffffff;
+}
+
+#logIn input[type="submit"] {
+	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	-ms-flex-align: center;
+}
+
+#logIn input[type="submit"]:hover {
+	background-color: #ffffff;
+}
+
+#signUp input[type="submit"] {
+	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	-ms-flex-align: center;
+}
+
+#signUp input[type="submit"]:hover {
 	background-color: #ffffff;
 }

@@ -1,6 +1,9 @@
 <?php
 	session_start();
-	/*
+	/*ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
+	
 	When page loads, check if the user has logged in or signed up (in this particular case, the login or signup forms can only be submitted if all the
 	entered info is correct, so whether the $_POST variable corresponding to the form submit button is checked).
 	
@@ -11,8 +14,15 @@
 	*/
 	if(isset($_POST['signUpSubmit']) or isset($_POST['logInSubmit'])) {
 		$_SESSION['loggedIn'] = true;
-		$_SESSION['usernameDisplay'] = $_POST['usernameSU'];
-		$_SESSION['nameDisplay'] = $_POST['nameSU'];
+		if(isset($_POST['signUpSubmit'])) {
+			$_SESSION['usernameDisplay'] = $_POST['usernameSU'];
+			$_SESSION['nameDisplay'] = $_POST['nameSU'];
+		}
+		else if(isset($_POST['logInSubmit'])) {
+			$_SESSION['usernameDisplay'] = $_POST['usernameLI'];
+			$_SESSION['nameDisplay'] = $_POST['usernameLI'];
+		}
+		
 	}
 ?>
 
@@ -87,8 +97,8 @@
 
 				echo <<< MULTILINE
 						<form method='post' action='userProfile.php' id='logIn'>
-							<input type='text' name='usernameSU' id='usernameLI' placeholder='Username'>
-							<input type='password' name='passwordSU' id= 'passwordLI' placeholder='Password'>
+							<input type='text' name='usernameLI' id='usernameLI' placeholder='Username'>
+							<input type='password' name='passwordLI' id= 'passwordLI' placeholder='Password'>
 							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
 						</form>
 					MULTILINE;
@@ -186,6 +196,8 @@
 					else { //Otherwise, pull other fields from submitted form and write them to the database
 						let nameSU = document.getElementById("nameSU").value;
 						let passwordSU = document.getElementById("passwordSU").value;
+						$_SESSION['nameDisplay'] = nameSU;
+						$_SESSION['usernameDisplay'] = usernameSU;
 
 						set(ref(db, "users/"+usernameSU), {
 							username: usernameSU,
@@ -208,7 +220,8 @@
 				let dbEntry = snapshot.child(userLI);
 				let dbUname = dbEntry.child("username").val();
 				let dbPass = dbEntry.child("password").val();
-				let dbName = dbEntry.child("name_of_user").val();			
+				let dbName = dbEntry.child("name_of_user").val();
+							
 				
 				let UNameFlagLI = false;
 
@@ -216,13 +229,8 @@
 					UNameFlagLI = true;
 				}
 				
-				//let passSnapshot = await get(ref(db, passRef));
 				if (UNameFlagLI) {	
-					if (dbPass == passwordLI) {
-						
-						$_SESSION['loggedIn'] = true;
-						
-						$_SESSION['nameDisplay'] = dbName;
+					if (dbPass == passwordLI) {						
 						
 					}
 					else {

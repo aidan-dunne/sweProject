@@ -237,6 +237,17 @@ tr.noPad td {
 	margin-right: 20px;
 }
 
+.dbSubmitContainer {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.noResults {
+	padding: 0 30px 0 30px;
+	width: 33%;
+}
+
 #dbContainer {
 	display: flex;
 	flex-direction: column;
@@ -335,12 +346,41 @@ tr.noPad td {
 
 input[type="checkbox"] {
 	accent-color: #66dfff;
-	height: 18px;
-	width: 18px;
+	height: 20px;
+	width: 20px;
 }
 
 #dbFilters label:hover {
 	color: #ffffff;
+}
+
+/*Could possibly apply this and the next set of styles to all input type=text elements*/
+.dbSubmitContainer input[type="text"] {
+	background-color: #e2e2e2;
+	border: none;
+	border-radius: 20px;
+	font-family: Georgia, serif;
+	font-size: 14pt;
+	padding: 10px 20px 10px 20px;
+	margin-top: 20px;
+	min-width: 320px;
+}
+
+.dbSubmitContainer input[type="text"]:focus {
+	background-color: #ffffff;
+	border: 3px solid #66dfff;
+	padding: 7px 17px 7px 17px;
+}
+
+.dbSubmitContainer section {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+#dbFilters label[for="dbSearch"] {
+	margin-top: 20px;
+	margin-right: 10px;
 }
 
 /*Locations filter dropdown list styles*/
@@ -455,5 +495,39 @@ input[name="next"]:hover, input[name="previous"]:hover {
 }
 
 #loginBox input[type="submit"]:hover {
+	background-color: #ffffff;
+}
+
+#logIn input[type="submit"] {
+	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	-ms-flex-align: center;
+}
+
+#logIn input[type="submit"]:hover {
+	background-color: #ffffff;
+}
+
+#signUp input[type="submit"] {
+	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	-ms-flex-align: center;
+}
+
+#signUp input[type="submit"]:hover {
 	background-color: #ffffff;
 }

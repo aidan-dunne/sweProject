@@ -159,43 +159,10 @@
 				return flag;
 			}
 
-			function userCheck (username) {
-				let flag = false;
-
-				snapshot.forEach(function(childSnapshot) {
-					let userCompare = childSnapshot.child("username").val();
-					if (username ==  userCompare) {
-						flag = true;
-					}
+			function gap(time) {
+				return new Promise(resolve => {
+					setTimeout(resolve, time);
 				});
-
-				return flag;
-			}
-
-			function checkEquals(checkThis, password) {
-				let flag = false;
-				if (password == checkThis) {
-					flag = true;
-					alert("correct pass");
-				}
-
-				return flag;
-			}
-
-			function passCheck (username, password) {
-				let flag = false;
-
-				const passRef = ref(db, 'users/' + username + '/password');
-
-				onValue(passRef, (snapshot) => {
-					const passCompare = snapshot.val();
-					
-					flag = checkEquals(passCompare, password)
-					alert(passCompare);
-					alert(flag);
-					
-				})
-				return flag;
 			}
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
@@ -205,9 +172,14 @@
 			let signInForm = document.getElementById("signUp");
 			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
 				let usernameSU = document.getElementById("usernameSU").value;
+				let passwordSU = document.getElementById("passwordSU").value;
 
 				if (usernameSU == "") {
 					alert("Error: Please input a username.");
+					event.preventDefault();
+				}
+				else if (passwordSU == "") {
+					alert("Error: Please input a password.");
 					event.preventDefault();
 				}
 				else {
@@ -234,24 +206,32 @@
 
 			
 			let logInForm = document.getElementById("logIn");
-			logInForm.addEventListener("submit", function (event) {
+			logInForm.addEventListener("submit", async function (event) {
 				let userLI = document.getElementById("usernameLI").value;
 				let passwordLI = document.getElementById("passwordLI").value;
+				const passRef = ref(db, '/users/' + userLI + '/password');
+				onValue(passRef, (snapshot) => {
+					const passCompare = snapshot.val();
+					alert(passCompare.value);
+				});
 				
-				UNameFlagLI = userCheck(userLI);
-				//alert("here");
-				if (UNameFlagLI) {
+				let UNameFlagLI = false;
+				let passFlagLI = false;
 
-					let passFlagLI = false
-					passFlagLI = passCheck(userLI, passwordLI);
-					alert(passFlagLI);
-					if (passFlagLI) {
-						alert("Login Success");
+				snapshot.forEach(function(childSnapshot) {
+					let userCompare = childSnapshot.child("username").val();
+					if (userLI ==  userCompare) {
+						UNameFlagLI = true;
 					}
-					else {
-						alert("Please input the correct password.");
-						event.preventDefault();
-					}
+				});
+				
+				alert("preCheck");
+				
+				
+				alert(passwordLI);
+				if (UNameFlagLI) {	
+					const passRef = ref(db, 'users/' + userLI + '/password');
+					alert("preCheck");		
 				}
 				else {
 					alert("Please input a valid username.");

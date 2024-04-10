@@ -139,7 +139,30 @@
 				<input type="hidden" name="postsendDB" id="postsendDB">
 			</form>
 			<?php
-				//Unsetting all filter variables if "Clear Filters" button is pressed
+				/*
+				SEARCHING AND FILTERING WORKFLOW:
+				
+				ANY selected filters and any text entered in the database search field will be applied when the "Apply Filters" button is pressed or
+				when the enter key is pressed within the database search field (since the "Apply Filters" submit button is the first listed in the
+				filters form, this button is ALWAYS selected when enter is pressed). 
+				
+				ALL selected filters and text MUST be deselected/cleared when the "Clear Filters" button is pressed.
+				
+				The "I'm Feeling Lucky" button MUST ONLY be able to be selected when pressed (as previously noted, the enter key will NEVER select this
+				button) and must display data which satisfies ALL selected filters and entered text (since the internships which will be displayed when
+				the "I'm Feeling Lucky" button is pressed are determined AFTER internships which do not satisfy entered search text are removed from
+				the display array and filter attribute number are calculated according to all applied filters every time the button is pressed, this
+				will always be the case).
+				
+				ALL applied filters and search terms MUST be displayed when navigating through different database pages. Additionally, the page should
+				be reset to page 1 each time a filter or search term is applied/cleared. This is accomplished through the use of hidden fields in the
+				database page navigation form that share the same names as the filter input fields in the filter form. These hidden fields have values
+				written to them based on what filters are applied and are automatically rewritten to and re-submitted when the next/previous page
+				buttons are pressed. The moment any change is made and submitted in the filter form, the database page navigation form will NOT be
+				submitted and will therefore reset to the first page.
+				*/
+				
+				//Unsetting all filter-correspondant $_POST variables and any entered search textif the "Clear Filters" button is pressed
 				if (isset($_POST['filterCLEARALL'])) {
 					unset($_POST['filterINTL']);
 					unset($_POST['filterUCLASS']);
@@ -151,6 +174,7 @@
 							unset($_POST[$removeFormLocation]);
 						}
 					}
+					unset($_POST['dbSearch']);
 				}
 				
 				//Stores whether the internship database has been loaded during a given session (used for displaying filters)
@@ -171,6 +195,7 @@
 					</form>
 				MULTILINE;
 				
+
 				//If the database has not been loaded during the current browser session, a loading indicator is displayed
 				if (!isset($_SESSION['dbLoaded'])){
 					echo "<img src='images/loadingGraphic.gif' height='150px' width='150px'>";
@@ -318,7 +343,20 @@
 					//Assigning each internship a filter attribute number (FAN)
 					$filterAttributeNumbers = array();
 					$displayData = $_SESSION['alphabetical']; //$displayData will contain all database data formatted for display
-					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data
+					
+					//If the "Search the Database" button is pressed and input is not blank:
+					if (isset($_POST['dbSearch']) and $_POST['dbSearch'] != '') {
+						$searchDisplayData = []; // to store correct results
+						$searchValue = strtolower($_POST['dbSearch']); // to store 
+						for ($i = 0; $i < sizeOf($displayData); $i++) {
+							if (str_contains(strtolower($displayData[$i]['company']), $searchValue) or str_contains(strtolower($displayData[$i]['name']), $searchValue)) {
+								$searchDisplayData[] = $displayData[$i];
+							}
+						}
+						//Ensure $displayData contains only internships which satisfy entered text
+						$displayData = $searchDisplayData;
+					}
+					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data.
 					createFAN($filterAttributeNumbers, $displayData, $filterSetFlag);
 					
 					//Sorting FAN and database data arrays at the same time so that the database data array will be properly formatted for output
@@ -326,8 +364,6 @@
 					if ($filterSetFlag) { //Sorting of internships by FAN will not occur if no filters are currently selected (all FANs are 0)
 						sortFAN($filterAttributeNumbers, $displayData);
 					}
-					
-					//$fanCounter; //Used for proper calculation of maxPages and proper display of page option buttons when filters are applied
 					
 					//Calculating the highest number of pages that may be dislayed based on the number of internships that must be displayed and the
 					//assumption that PERPAGE internships will be displayed per page
@@ -345,7 +381,7 @@
 						$_SESSION['maxPages'] = ceil(sizeOf($displayData) / PERPAGE);
 					}
 					
-//DISPLAYING FILTERS, PAGE BUTTONS, AND DATA
+//DISPLAYING FILTERS AND PAGE BUTTONS
 /*****************************************************************************************************************************/
 					
 					//Creating filter selection form (the form used to apply any filters)
@@ -410,12 +446,30 @@
 					}
 				</script>	
 				<?php
-					//Creating filter selection form buttons
 					echo <<< MULTILINE
 						<br>
-						<input type='submit' value='Apply Filters'>
-						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
-						<input type='submit' value="I'm Feeling Lucky" name='randomShips'>
+						<section class='dbSubmitContainer'>
+							<section>
+								<input type='submit' value='Apply Filters' name='filterAPPLY'>
+								<input type='submit' value='Clear Filters' name='filterCLEARALL'>
+								<input type='submit' value="I'm Feeling Lucky" name='randomShips'>
+							</section>
+							<section>
+							<label for='dbSearch'>Search the Database: </label>
+					MULTILINE;
+					
+					//Only displays entered search text if it is not blank
+					if (isset($_POST['dbSearch']) and $_POST['dbSearch'] != '') {
+						$populateSearch = $_POST['dbSearch'];
+						echo "<input type='text' name='dbSearch' id='dbSearch' value='$populateSearch'>";
+					}
+					else {
+						echo "<input type='text' name='dbSearch' id='dbSearch' placeholder='Press Enter to Search!'>";
+					}
+					
+					echo <<< MULTILINE
+							</section>
+						</section>
 						</form>
 						<div id='filtersBottomBG'></div>
 					MULTILINE;
@@ -452,6 +506,12 @@
 								}
 							}
 							
+							//Ensuring search results are displayed on all pages when a search is performed
+							if (isset($_POST['dbSearch'])) {
+								$populateSearch = $_POST['dbSearch'];
+								echo "<input type='hidden' name='dbSearch' value='$populateSearch'>"; //Required for re-submitting correct search
+							}
+							
 							if ($currentPage == 1) { //Only the "Next Nage" option displayed when no previous page exists
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
@@ -479,20 +539,33 @@
 							}
 							echo "</form>";
 						}
-						else if ($fanCounter == 0) {
-							echo "<p>Nothing to display here :(</p>";
-						}
 					}
 					
-					//Displaying data
-					if ($filterSetFlag) { //Displaying data when a filter is set (internships with FANs of 0 are not displayed)
+//DISPLAYING INTERNSHIPS
+/*****************************************************************************************************************************/
+
+					//Displaying a "no internships found" message if $displayData contains nothing (search has returned no results) or no internships
+					//satisfy an applied filter
+					if (sizeof($displayData) == 0 or ($filterSetFlag and $filterAttributeNumbers[0] == 0)) {
+						echo <<< MULTILINE
+							<section class='noResults'>
+								<h3>Uh Oh &mdash; No Internships Found :(</h3>
+								<p>If you've made a search or have applied some filters, we regret to inform you that we didn't find anything. We're
+								sorry we don't have what you're looking for. We wish you the best of luck in your ongoing search!</p>
+								<p>If you feel there's a mistake on our end, please feel free to contact us at andybernato@gmail.com or
+								aidanmdunne03@gmail.com.</p>
+							</section>
+						MULTILINE;
+					}
+					else if ($filterSetFlag) { //Displaying data when a filter is set (internships with FANs of 0 are not displayed)
 						if(isset($_POST['randomShips'])) { // I'm feeling lucky button
 
 							// messing with the global displaydata array at this level causes issues, so I make a copy
 							$tempDisplayData = $displayData;
 							$luckyDisplayData = []; // storing randomly selected internships to be displayed
 
-							//Finding largest filter number (required for displaying most relevant internships when "I'm Feeling Lucky" button is clicked)
+							//Finding largest filter number (required for displaying most relevant internships when "I'm Feeling Lucky" button is 
+							//clicked)
 							$maxFAN = $filterAttributeNumbers[0];
 							
 							/* This is where the magic happens 
@@ -527,7 +600,10 @@
 							$displayData = $luckyDisplayData;
 
 						}
-						for ($i = ($currentPage * PERPAGE) - PERPAGE; $i < $currentPage * PERPAGE; $i++) {
+						for ($i = ($currentPage * PERPAGE) - PERPAGE; $i < $currentPage * PERPAGE; $i++) { //Displaying PERPAGE internships per page
+							if ($i >= sizeOf($displayData)) {
+								break;
+							}
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];
 							$loc = $displayData[$i]['location'];
@@ -621,7 +697,7 @@
 
 						}
 						
-						for ($i = ($currentPage * PERPAGE) - PERPAGE; $i < $currentPage * PERPAGE; $i++) {
+						for ($i = ($currentPage * PERPAGE) - PERPAGE; $i < $currentPage * PERPAGE; $i++) { //Displaying PERPAGE internships per page
 							if ($i >= sizeOf($displayData)) {
 								break;
 							}
@@ -674,6 +750,7 @@
 					echo "</section>";
 				}
 			?>
+			<!-- Filter use information -->
 			<h2>Filters</h2>
 			<h3>International Student Filter</h3>
 			<p>Our international students filter is very straightforward. This filter may be applied by selecting the box to the left of the "Open to

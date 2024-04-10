@@ -2,6 +2,7 @@
 	session_start();
 	$currentPage;
 	define("PERPAGE", 5); //Creating a constant for the amount of internships that may be displayed on a page
+	define("NULLSEARCH", "");
 	
 	if(!isset($_POST['page'])) {
 		$currentPage = 1;
@@ -146,6 +147,19 @@
 					unset($_POST['filterRMT']);
 				}
 				
+				/* Search session management
+				If a non-trivial search is made, it updates the lastsearch sesson variable 
+				This session variable can then be referenced later, so searches don't clear any time the form is posted
+				(Which happens quite often)*/
+				if (isset($_POST['dbSearch']) && $_POST['dbSearch'] != NULLSEARCH) {
+					$_SESSION['lastSearch'] = $_POST['dbSearch'];
+				} else {
+					// If a search isn't made, *and* no clearing operation is made, it resets the search
+					if (!(isset($_POST['previous']) || isset($_POST['next']))) {
+						$_SESSION['lastSearch'] = NULLSEARCH;
+					}
+				}
+				
 				//Stores whether the internship database has been loaded during a given session (used for displaying filters)
 				if (isset($_POST['postsendDB'])) {
 					$_SESSION['dbLoaded'] = true;
@@ -200,8 +214,7 @@
 						<input type='submit' value='Apply Filters'>
 						<input type='submit' value='Clear Filters' name='filterCLEARALL'>
 						<input type='submit' value="I'm Feeling Lucky" name='randomShips'>
-						<input type='text' name='dbSearch' id='dbSearch'>
-						<input type='submit' value='Search the Database!' name='dbSearch'>
+						<input type='text' name='dbSearch' id='dbSearch' placeholder='Press enter to search!'>
 						</form>
 						<div id='filtersBottomBG'></div>
 					MULTILINE;
@@ -300,15 +313,16 @@
 					//Assigning each internship a filter attribute number (FAN)
 					$filterAttributeNumbers = array();
 					$displayData = $_SESSION['alphabetical']; //$displayData will contain all database data formatted for display
-					if (isset($_POST['dbSearch'])) { // If search is made
+					if (strcmp($_SESSION['lastSearch'], NULLSEARCH) != 0) { // If no clearing operations have been made since last search
 						$searchDisplayData = []; // to store correct results
-						$searchValue = strtolower($_POST['dbSearch']); // to store 
+						$searchValue = strtolower($_SESSION['lastSearch']); // to store 
 						for ($i = 0; $i < sizeOf($displayData); $i++) {
 							if (str_contains(strtolower($displayData[$i]['company']), $searchValue) || str_contains(strtolower($displayData[$i]['name']), $searchValue)) {
 								$searchDisplayData[] = $displayData[$i];
 							}
 						}
 						$displayData = $searchDisplayData;
+						echo (sizeof($displayData));
 					}
 					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data
 					createFAN($filterAttributeNumbers, $displayData, $filterSetFlag);

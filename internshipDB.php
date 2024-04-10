@@ -155,7 +155,7 @@
 					$_SESSION['lastSearch'] = $_POST['dbSearch'];
 				} else {
 					// If a search isn't made, *and* no clearing operation is made, it resets the search
-					if (!(isset($_POST['previous']) || isset($_POST['next']))) {
+					if (!(isset($_POST['previous']) || isset($_POST['next']) || isset($_POST['filterINTL']) || isset($_POST['filterUCLASS']) || isset($_POST['filterRMT']))) {
 						$_SESSION['lastSearch'] = NULLSEARCH;
 					}
 				}
@@ -322,7 +322,6 @@
 							}
 						}
 						$displayData = $searchDisplayData;
-						echo (sizeof($displayData));
 					}
 					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data
 					createFAN($filterAttributeNumbers, $displayData, $filterSetFlag);

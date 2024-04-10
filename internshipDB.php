@@ -2,6 +2,7 @@
 	session_start();
 	$currentPage;
 	define("PERPAGE", 10); //Creating a constant for the amount of internships that may be displayed on a page
+	define("NULLSEARCH", "");
 	
 	if(!isset($_POST['page'])) {
 		$currentPage = 1;
@@ -162,7 +163,7 @@
 				submitted and will therefore reset to the first page.
 				*/
 				
-				//Unsetting all filter-correspondant $_POST variables and any entered search textif the "Clear Filters" button is pressed
+				//Unsetting all filter-correspondant $_POST variables and any entered search text if the "Clear Filters" button is pressed
 				if (isset($_POST['filterCLEARALL'])) {
 					unset($_POST['filterINTL']);
 					unset($_POST['filterUCLASS']);
@@ -174,7 +175,40 @@
 							unset($_POST[$removeFormLocation]);
 						}
 					}
-					unset($_POST['dbSearch']);
+					//unset($_POST['dbSearch']);
+				}
+				
+				/* Search session management
+				If a non-trivial search is made, it updates the lastsearch sesson variable 
+				This session variable can then be referenced later, so searches don't clear any time the form is posted
+				(Which happens quite often)*/
+				if (isset($_POST['dbSearch']) && $_POST['dbSearch'] != NULLSEARCH) {
+					$_SESSION['lastSearch'] = $_POST['dbSearch'];
+				} else {
+					// If a search isn't made, *and* no clearing operation is made, it resets the search
+					$locationClearFlag = false;
+					if(isset($_SESSION['allLocations'])) { //Checking if any location filters are selected
+						$searchManagementLocations = $_SESSION['allLocations'];
+						$numSelected = 0;
+						for ($i = 0; $i < sizeof($searchManagementLocations); $i++) {
+							$formLocation = preg_replace('/[\W]/', '', $searchManagementLocations[$i]);
+							if (isset($_POST[$formLocation])) {
+								$numSelected++;
+							}
+						}
+						if ($numSelected == 0) {
+							$locationClearFlag = true; //No location filters are selected, lastsearch should be reset to NULLSEARCH
+						}
+						
+						if (!(isset($_POST['previous']) || isset($_POST['next']) || isset($_POST['filterINTL']) || isset($_POST['filterUCLASS']) || isset($_POST['filterRMT']))) {
+							if ($locationClearFlag) {
+								$_SESSION['lastSearch'] = NULLSEARCH;
+							}
+						}
+					}
+					else if (!(isset($_POST['previous']) || isset($_POST['next']) || isset($_POST['filterINTL']) || isset($_POST['filterUCLASS']) || isset($_POST['filterRMT']))) {
+						$_SESSION['lastSearch'] = NULLSEARCH;
+					}
 				}
 				
 				//Stores whether the internship database has been loaded during a given session (used for displaying filters)
@@ -344,18 +378,17 @@
 					$filterAttributeNumbers = array();
 					$displayData = $_SESSION['alphabetical']; //$displayData will contain all database data formatted for display
 					
-					//If the "Search the Database" button is pressed and input is not blank:
-					if (isset($_POST['dbSearch']) and $_POST['dbSearch'] != '') {
+					if (strcmp($_SESSION['lastSearch'], NULLSEARCH) != 0) { // If no clearing operations have been made since last search
 						$searchDisplayData = []; // to store correct results
-						$searchValue = strtolower($_POST['dbSearch']); // to store 
+						$searchValue = strtolower($_SESSION['lastSearch']); // to store 
 						for ($i = 0; $i < sizeOf($displayData); $i++) {
-							if (str_contains(strtolower($displayData[$i]['company']), $searchValue) or str_contains(strtolower($displayData[$i]['name']), $searchValue)) {
+							if (str_contains(strtolower($displayData[$i]['company']), $searchValue) || str_contains(strtolower($displayData[$i]['name']), $searchValue)) {
 								$searchDisplayData[] = $displayData[$i];
 							}
 						}
-						//Ensure $displayData contains only internships which satisfy entered text
 						$displayData = $searchDisplayData;
 					}
+					
 					$filterSetFlag = false; //True if any filter is applied, false if not. Used for displaying data.
 					createFAN($filterAttributeNumbers, $displayData, $filterSetFlag);
 					
@@ -420,7 +453,7 @@
 					$allLocationsDisplay = $_SESSION['allLocations'];
 					for ($i = 0; $i < sizeof($allLocationsDisplay); $i++) {
 						$displayLocation = $allLocationsDisplay[$i]; //Used for display, contains original location string
-						$formLocation = preg_replace('/[\W]/', '', $allLocationsDisplay[$i]);//Used for filtering, removes certain chars
+						$formLocation = preg_replace('/[\W]/', '', $allLocationsDisplay[$i]); //Used for filtering, removes certain special chars
 						if (isset($_POST[$formLocation])) {
 							echo "<li><input type='checkbox' checked name=$formLocation id=$formLocation>";
 							echo "<label for=$formLocation class='dropdownLabel'>$displayLocation</label></li>";
@@ -458,6 +491,7 @@
 							<label for='dbSearch'>Search the Database: </label>
 					MULTILINE;
 					
+					/*
 					//Only displays entered search text if it is not blank
 					if (isset($_POST['dbSearch']) and $_POST['dbSearch'] != '') {
 						$populateSearch = $_POST['dbSearch'];
@@ -466,8 +500,10 @@
 					else {
 						echo "<input type='text' name='dbSearch' id='dbSearch' placeholder='Press Enter to Search!'>";
 					}
+					*/
 					
 					echo <<< MULTILINE
+							<input type='text' name='dbSearch' id='dbSearch' placeholder='Press Enter to Search!'>
 							</section>
 						</section>
 						</form>
@@ -506,11 +542,13 @@
 								}
 							}
 							
+							/*
 							//Ensuring search results are displayed on all pages when a search is performed
 							if (isset($_POST['dbSearch'])) {
 								$populateSearch = $_POST['dbSearch'];
 								echo "<input type='hidden' name='dbSearch' value='$populateSearch'>"; //Required for re-submitting correct search
 							}
+							*/
 							
 							if ($currentPage == 1) { //Only the "Next Nage" option displayed when no previous page exists
 								echo <<< MULTILINE

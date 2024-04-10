@@ -158,12 +158,6 @@
 				
 				return flag;
 			}
-
-			function gap(time) {
-				return new Promise(resolve => {
-					setTimeout(resolve, time);
-				});
-			}
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
 			let matchFlagSU = false;
@@ -209,35 +203,41 @@
 			logInForm.addEventListener("submit", async function (event) {
 				let userLI = document.getElementById("usernameLI").value;
 				let passwordLI = document.getElementById("passwordLI").value;
-				const passRef = ref(db, '/users/' + userLI + '/password');
-				onValue(passRef, (snapshot) => {
-					const passCompare = snapshot.val();
-					alert(passCompare.value);
-				});
+				let passFlagLI = false;
+				
+				let dbEntry = snapshot.child(userLI);
+				let dbUname = dbEntry.child("username").val();
+				let dbPass = dbEntry.child("password").val();
+				let dbName = dbEntry.child("name_of_user").val();			
 				
 				let UNameFlagLI = false;
-				let passFlagLI = false;
 
-				snapshot.forEach(function(childSnapshot) {
-					let userCompare = childSnapshot.child("username").val();
-					if (userLI ==  userCompare) {
-						UNameFlagLI = true;
-					}
-				});
+				if (dbUname == userLI) {
+					UNameFlagLI = true;
+				}
 				
-				alert("preCheck");
-				
-				
-				alert(passwordLI);
+				//let passSnapshot = await get(ref(db, passRef));
 				if (UNameFlagLI) {	
-					const passRef = ref(db, 'users/' + userLI + '/password');
-					alert("preCheck");		
+					if (dbPass == passwordLI) {
+						alert(dbName);
+						
+						$_SESSION['loggedIn'] = true;
+						
+						$_SESSION['nameDisplay'] = dbName;
+						
+					}
+					else {
+						alert("Password Incorrect.");
+						event.preventDefault();
+					}
+						
 				}
 				else {
 					alert("Please input a valid username.");
 					event.preventDefault();
-				}				
-			})
+				}
+	
+			});
 			
 			//Syntax for writing to database
 			/*

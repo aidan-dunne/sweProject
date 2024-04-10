@@ -219,7 +219,6 @@
 				//let passSnapshot = await get(ref(db, passRef));
 				if (UNameFlagLI) {	
 					if (dbPass == passwordLI) {
-						alert(dbName);
 						
 						$_SESSION['loggedIn'] = true;
 						

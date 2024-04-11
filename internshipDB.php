@@ -86,6 +86,7 @@
 				dbInfoArr[dbArrIndex]['pay'] = pay;
 				dbInfoArr[dbArrIndex]['RMT'] = remote;
 				dbInfoArr[dbArrIndex]['posted'] = posted;
+				dbInfoArr[dbArrIndex]['button'] = '<button type="button" value="B"></button>';
 				dbArrIndex++;
 			});
 			
@@ -746,8 +747,10 @@
 							$pay = $displayData[$i]['pay'];
 							$pay = $displayData[$i]['pay'];
 							$ptd = substr($displayData[$i]['posted'], 0, 10);
+							$btn = $displayData[$i]['button'];
 							
 							echo <<< MULTILINE
+			
 								<table class='dbTable'>
 									<tr>
 										<td colspan='3'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
@@ -757,6 +760,20 @@
 									</tr>
 									<tr>
 										<td><b>Location:</b> $loc</td>
+									</tr>
+									<tr>
+										<button type="button" id='$i' onclick="doThing(this.id);">
+											This is a button
+										</button>
+
+										<script>
+											var buttonForce = getElementById('$i');
+											buttonForce.setAttribute('id', '$i');
+											function doThing(alertId) {
+												alert(alertId);
+											}
+										</script>
+									</tr>
 							MULTILINE;
 							
 							//Displaying pay rate and date posted information if it is available

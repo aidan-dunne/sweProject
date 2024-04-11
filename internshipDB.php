@@ -753,27 +753,26 @@
 			
 								<table class='dbTable'>
 									<tr>
-										<td colspan='3'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+										<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+										<td>
+											<button type="button" id='$i' onclick="doThing(this.id);">
+												This is a button
+											</button>
+
+											<script>
+												var buttonForce = getElementById('$i');
+												buttonForce.setAttribute('id', '$i');
+												function doThing(alertId) {
+													alert(alertId);
+												}
+											</script>
+										</td>
 									</tr>
 									<tr>
 										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
 									</tr>
 									<tr>
 										<td><b>Location:</b> $loc</td>
-									</tr>
-									<tr>
-										<button type="button" id='$i' onclick="doThing(this.id);">
-											This is a button
-										</button>
-
-										<script>
-											var buttonForce = getElementById('$i');
-											buttonForce.setAttribute('id', '$i');
-											function doThing(alertId) {
-												alert(alertId);
-											}
-										</script>
-									</tr>
 							MULTILINE;
 							
 							//Displaying pay rate and date posted information if it is available

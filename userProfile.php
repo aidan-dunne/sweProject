@@ -1,6 +1,7 @@
 <?php
+	/*
 	session_start();
-	/*ini_set('display_errors', 1);
+	ini_set('display_errors', 1);
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
 	
@@ -207,23 +208,18 @@
 					}
 				}
 			});
-
-			let UNameFlagLI = false;
-
-			
+		
 			let logInForm = document.getElementById("logIn");
 			logInForm.addEventListener("submit", async function (event) {
 				let userLI = document.getElementById("usernameLI").value;
 				let passwordLI = document.getElementById("passwordLI").value;
+				let UNameFlagLI = false;
 				let passFlagLI = false;
 				
 				let dbEntry = snapshot.child(userLI);
 				let dbUname = dbEntry.child("username").val();
 				let dbPass = dbEntry.child("password").val();
 				let dbName = dbEntry.child("name_of_user").val();
-							
-				
-				let UNameFlagLI = false;
 
 				if (dbUname == userLI) {
 					UNameFlagLI = true;
@@ -236,24 +232,14 @@
 					else {
 						alert("Password Incorrect.");
 						event.preventDefault();
-					}
-						
+					}						
 				}
 				else {
 					alert("Please input a valid username.");
 					event.preventDefault();
 				}
-	
 			});
-			
-			//Syntax for writing to database
-			/*
-			set(ref(db, "users/testUser"), {
-				username: "test",
-				password: "test",
-				name_of_user: "test_person",
-			});
-			*/
+
 		</script>
 		</section>
 		<footer>

@@ -249,6 +249,15 @@
 					}
 				}
 				
+				//Removing all info except the year, month, and day posted from the date stored in each internship's "posted" field
+				function shortenDate(&$unshortened) {
+					for ($i = 0; $i < sizeof($unshortened); $i++) {
+						if (strlen($unshortened[$i]['posted']) != 0) {
+							$unshortened[$i]['posted'] = substr($unshortened[$i]['posted'], 0, 10);
+						} 
+					}
+				}
+				
 				//Creating an array of all internships' corresponding locations with no diuplicates
 				function determineLocations (&$ref) {
 					$allLocations = array();
@@ -354,18 +363,72 @@
 					}
 				}
 				
+				//Building a more presentable "date posted" string based on pre-formatted date posted data stored in each internship's "posted" field
+				function dateDisplay(&$rawDate) {
+					$stringbuilderDate; //Will contain the date formatted for nicer display
+					$rawMonth = substr($rawDate, 5, 2); //Retrieving the month an internship was posted
+					
+					//Converting a numeric month into the corresponding month's name
+					if ($rawMonth == "01")
+						$stringbuilderDate = "January";
+					else if ($rawMonth == "02")
+						$stringbuilderDate = "February";
+					else if ($rawMonth == "03")
+						$stringbuilderDate = "March";
+					else if ($rawMonth == "04")
+						$stringbuilderDate = "April";
+					else if ($rawMonth == "05")
+						$stringbuilderDate = "May";
+					else if ($rawMonth == "06")
+						$stringbuilderDate = "June";
+					else if ($rawMonth == "07")
+						$stringbuilderDate = "July";
+					else if ($rawMonth == "08")
+						$stringbuilderDate = "August";
+					else if ($rawMonth == "09")
+						$stringbuilderDate = "September";
+					else if ($rawMonth == "10")
+						$stringbuilderDate = "October";
+					else if ($rawMonth == "11")
+						$stringbuilderDate = "November";
+					else
+						$stringbuilderDate = "December";
+					
+					//Retrieving and formatting remaining day and year data
+					$rawDay = substr($rawDate, 8, 2);
+					
+					//Changing the suffix to be displayed behind the day depending on the day number contained in the date
+					//For example, days ending in 1 (1, 11, 21, 31) should be displayed with an -st suffix and not the generic -th suffix
+					$daySuffix = "th";
+					if (substr($rawDay, 1, 1) == "1")
+						$daySuffix = "st";
+					else if (substr($rawDay, 1, 1) == "2")
+						$daySuffix = "nd";
+					else if (substr($rawDay, 1, 1) == "3")
+						$daySuffix = "rd";
+					
+					if (substr($rawDay, 0, 1) == "0") { //Removing the leading "0" from a date's day if it is present
+						$rawDay = substr($rawDay, 1, 1);
+					}
+					
+					$rawYear = substr($rawDate, 0, 4);
+					
+					//Building date formatted for display
+					$rawDate = $stringbuilderDate . " " . $rawDay . $daySuffix . ", " . $rawYear;
+				}
+				
 //RETRIEVING AND SORTING DATA
 /*****************************************************************************************************************************/
-				
-				$_SESSION['alphabetical']; //Session variable for alphabetically-sorted database data is currently unset
 				
 				//Receiving and decoding database data
 				if (isset($_POST['postsendDB'])) {
 					$receiveJson = $_POST['postsendDB'];
 					$decode = json_decode($receiveJson, true); //Value "true" decodes received data as an associative array
 					
-					//Sorting received data alphabetically and storing in a session variable
+					//Sorting received data alphabetically, removing unneeded data from "posted" field, and storing in a session variable
 					sortAlpha($decode);
+					shortenDate($decode);
+					
 					$_SESSION['alphabetical'] = $decode;
 					
 					//Recording in a session variable all locations that should appear in the locations filter
@@ -377,7 +440,9 @@
 					
 					//Assigning each internship a filter attribute number (FAN)
 					$filterAttributeNumbers = array();
-					$displayData = $_SESSION['alphabetical']; //$displayData will contain all database data formatted for display
+					
+					//$displayData will contain all database data formatted for display before any fitlers are applied
+					$displayData = $_SESSION['alphabetical'];
 					
 					if (strcmp($_SESSION['lastSearch'], NULLSEARCH) != 0) { // If no clearing operations have been made since last search
 						$searchDisplayData = []; // to store correct results
@@ -492,19 +557,15 @@
 							<label for='dbSearch'>Search the Database: </label>
 					MULTILINE;
 					
-					/*
-					//Only displays entered search text if it is not blank
-					if (isset($_POST['dbSearch']) and $_POST['dbSearch'] != '') {
-						$populateSearch = $_POST['dbSearch'];
-						echo "<input type='text' name='dbSearch' id='dbSearch' value='$populateSearch'>";
+					if (isset($_SESSION['lastSearch']) and $_SESSION['lastSearch'] != NULLSEARCH) {
+						$currentSearchVal = $_SESSION['lastSearch'];
+						echo "<input type='text' name='dbSearch' id='dbSearch' placeholder='$currentSearchVal'>";
 					}
 					else {
 						echo "<input type='text' name='dbSearch' id='dbSearch' placeholder='Press Enter to Search!'>";
 					}
-					*/
 					
 					echo <<< MULTILINE
-							<input type='text' name='dbSearch' id='dbSearch' placeholder='Press Enter to Search!'>
 							</section>
 						</section>
 						</form>
@@ -542,14 +603,6 @@
 									echo "<input type='hidden' name=$formLocation value='true'>";
 								}
 							}
-							
-							/*
-							//Ensuring search results are displayed on all pages when a search is performed
-							if (isset($_POST['dbSearch'])) {
-								$populateSearch = $_POST['dbSearch'];
-								echo "<input type='hidden' name='dbSearch' value='$populateSearch'>"; //Required for re-submitting correct search
-							}
-							*/
 							
 							if ($currentPage == 1) { //Only the "Next Nage" option displayed when no previous page exists
 								echo <<< MULTILINE
@@ -648,7 +701,7 @@
 							$loc = $displayData[$i]['location'];
 							$lnk = $displayData[$i]['link'];
 							$pay = $displayData[$i]['pay'];
-							$ptd = substr($displayData[$i]['posted'], 0, 10);
+							$ptd = $displayData[$i]['posted'];
 							$fan = $filterAttributeNumbers[$i]; //Required for displaying only desired internships
 							
 							if ($fan > 0) {
@@ -675,6 +728,7 @@
 								}
 								
 								if (strlen($ptd) != 0) {
+									dateDisplay($ptd); //Formatting date for nicer display
 									echo "<td class='locationPayDateInline'><b>Date Posted:</b> $ptd</td>";
 								}
 								else {
@@ -746,7 +800,7 @@
 							$lnk = $displayData[$i]['link'];
 							$pay = $displayData[$i]['pay'];
 							$pay = $displayData[$i]['pay'];
-							$ptd = substr($displayData[$i]['posted'], 0, 10);
+							$ptd = $displayData[$i]['posted'];
 							$btn = $displayData[$i]['button'];
 							
 							echo <<< MULTILINE
@@ -786,6 +840,7 @@
 							}
 							
 							if (strlen($ptd) != 0) {
+								dateDisplay($ptd); //Formatting date for nicer display
 								echo "<td class='locationPayDateInline'><b>Date Posted:</b> $ptd</td>";
 							}
 							else {

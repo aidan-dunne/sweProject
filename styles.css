@@ -358,6 +358,7 @@ input[type="checkbox"] {
 .dbSubmitContainer input[type="text"] {
 	background-color: #e2e2e2;
 	border: none;
+	color: #776e74;
 	border-radius: 20px;
 	font-family: Georgia, serif;
 	font-size: 14pt;
@@ -369,7 +370,13 @@ input[type="checkbox"] {
 .dbSubmitContainer input[type="text"]:focus {
 	background-color: #ffffff;
 	border: 3px solid #66dfff;
+	color: #594f5b;
 	padding: 7px 17px 7px 17px;
+}
+
+::placeholder {
+	color: #776e74;
+	opacity: 1;
 }
 
 .dbSubmitContainer section {

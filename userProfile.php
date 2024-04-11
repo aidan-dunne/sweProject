@@ -1,6 +1,7 @@
 <?php
-	/*
+	
 	session_start();
+	/*
 	ini_set('display_errors', 1);
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
@@ -199,6 +200,7 @@
 						let passwordSU = document.getElementById("passwordSU").value;
 						$_SESSION['nameDisplay'] = nameSU;
 						$_SESSION['usernameDisplay'] = usernameSU;
+						$_SESSION['loggedIn'] = true;
 
 						set(ref(db, "users/"+usernameSU), {
 							username: usernameSU,
@@ -208,6 +210,8 @@
 					}
 				}
 			});
+
+			let UNameFlagLI = false;
 		
 			let logInForm = document.getElementById("logIn");
 			logInForm.addEventListener("submit", async function (event) {
@@ -227,7 +231,7 @@
 				
 				if (UNameFlagLI) {	
 					if (dbPass == passwordLI) {						
-						
+						$_SESSION['loggedIn'] = true;
 					}
 					else {
 						alert("Password Incorrect.");

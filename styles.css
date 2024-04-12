@@ -438,6 +438,9 @@ input[type="checkbox"] {
 	color: #23a1f6;
 }
 
+div #containerListLOC {
+	z-index: 5;
+}
 
 #pageOptionsFirst, #pageOptionsLast, #pageOptions {
 	display: flex;

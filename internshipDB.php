@@ -513,19 +513,19 @@
 					echo "<label for='filterRMT'>Remote</label>";
 					
 					//Locations filter
-					echo "<section class='filterLOC' id='filterLOC'><span class='locationsAnchor' onclick='displayListLOC()'>Select a Location</span>";
-					echo "<ul class='itemsLOC'>";
+					echo "<section class='filterLOC' id='filterLOC'><span class='locationsAnchor' id='locationsAnchor' onclick='displayListLOC()'>Select a Location</span>";
+					echo "<ul class='itemsLOC' id='itemsLOC'>";
 					
 					$allLocationsDisplay = $_SESSION['allLocations'];
 					for ($i = 0; $i < sizeof($allLocationsDisplay); $i++) {
 						$displayLocation = $allLocationsDisplay[$i]; //Used for display, contains original location string
 						$formLocation = preg_replace('/[\W]/', '', $allLocationsDisplay[$i]); //Used for filtering, removes certain special chars
 						if (isset($_POST[$formLocation])) {
-							echo "<li><input type='checkbox' checked name=$formLocation id=$formLocation>";
+							echo "<li id='itemsLOC'><input type='checkbox' checked name=$formLocation id=$formLocation class='selectLOC'>";
 							echo "<label for=$formLocation class='dropdownLabel'>$displayLocation</label></li>";
 						}
 						else {
-							echo "<li><input type='checkbox' name=$formLocation id=$formLocation>";
+							echo "<li id='itemsLOC'><input type='checkbox' name=$formLocation id=$formLocation class='selectLOC'>";
 							echo "<label for=$formLocation class='dropdownLabel'>$displayLocation</label></li>";
 						}
 					}
@@ -535,6 +535,7 @@
 				<script>
 					//Displaying locations list when "Select a Location" option is clicked
 					let filterLOC = document.getElementById("filterLOC");
+					
 					function displayListLOC() {
 						if (filterLOC.classList.contains("visible")) {
 							filterLOC.classList.remove("visible");
@@ -543,6 +544,12 @@
 							filterLOC.classList.add("visible");
 						}
 					}
+					
+					document.onclick = function (clickoffEvent) {
+						if (clickoffEvent.target.id != "locationsAnchor" && clickoffEvent.target.id != "itemsLOC" && clickoffEvent.target.className != "selectLOC" && clickoffEvent.target.className != "dropdownLabel") {
+							filterLOC.classList.remove("visible");
+						}
+					};
 				</script>	
 				<?php
 					echo <<< MULTILINE

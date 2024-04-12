@@ -391,31 +391,35 @@ input[type="checkbox"] {
 }
 
 /*Locations filter dropdown list styles*/
-.filterLOC {
+.filterLOC, .filterSORT {
 	display: inline-block;
 }
 
-.filterLOC .locationsAnchor {
+.filterLOC .locationsAnchor, .filterSORT .sortAnchor {
 	display: inline-block;
 	position: relative;
 	cursor: pointer;
 	user-select: none;
 }
 
-.filterLOC .locationsAnchor:hover {
+.filterLOC .locationsAnchor:hover, .filterSORT .sortAnchor:hover {
 	color: #ffffff;
 }
 
-.filterLOC .locationsAnchor::after {
+.filterLOC .locationsAnchor::after, .filterSORT .sortAnchor::after {
 	content: " ▼";
 	user-select: none;
 }
 
-.filterLOC.visible .locationsAnchor::after {
+.filterLOC.visible .locationsAnchor::after, .filterSORT.visible .sortAnchor::after {
 	content: " ▲";
 }
 
-.filterLOC .itemsLOC {
+.sortAnchor, .itemsSORT {
+	margin-left: 10px;
+}
+
+.filterLOC .itemsLOC, .filterSORT .itemsSORT{
 	list-style: none;
 	display: none;
 	position: absolute;
@@ -425,7 +429,7 @@ input[type="checkbox"] {
 	color: #ffffff;
 }
 
-.filterLOC.visible .itemsLOC {
+.filterLOC.visible .itemsLOC, .filterSORT.visible .itemsSORT {
 	display: block;
 	background-color: #ffffff;
 	border-radius: 25px;
@@ -434,12 +438,8 @@ input[type="checkbox"] {
 	padding: 15px;
 }
 
-.filterLOC.visible .itemsLOC li:hover, #dbFilters label.dropdownLabel:hover {
+.itemsLoc, #dbFilters label.dropdownLabelLOC:hover, #dbFilters label.dropdownLabelSORT:hover {
 	color: #23a1f6;
-}
-
-div #containerListLOC {
-	z-index: 5;
 }
 
 #pageOptionsFirst, #pageOptionsLast, #pageOptions {

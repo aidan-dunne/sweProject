@@ -705,17 +705,48 @@
 							$fan = $filterAttributeNumbers[$i]; //Required for displaying only desired internships
 							
 							if ($fan > 0) {
+								if ($_SESSION['loggedIn'] == true)
+							{
 								echo <<< MULTILINE
-									<table class='dbTable'>
-										<tr>
-											<td colspan='3'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
-										</tr>
-										<tr>
-											<td colspan='3 class='linkRow'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
-										</tr>
-										<tr>
-											<td class='locationPayDateInline'><b>Location:</b> $loc</td>
-								MULTILINE;
+			
+								<table class='dbTable'>
+									<tr>
+										<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+										<td>
+											<button type="button" id='$i' onclick="doThing(this.id);">
+												This is a button
+											</button>
+
+											<script>
+												var buttonForce = getElementById('$i');
+												buttonForce.setAttribute('id', '$i');
+												function doThing(alertId) {
+													alert(alertId);
+												}
+											</script>
+										</td>
+									</tr>
+									<tr>
+										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+									</tr>
+									<tr>
+										<td><b>Location:</b> $loc</td>
+							MULTILINE;
+							}
+							else {
+								echo <<< MULTILINE
+			
+								<table class='dbTable'>
+									<tr>
+										<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+									</tr>
+									<tr>
+										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+									</tr>
+									<tr>
+										<td><b>Location:</b> $loc</td>
+							MULTILINE;
+							}
 								
 								//Displaying pay rate and date posted information if it is available
 								$extraCellDisplay = 0; //Required to ensure the correct number of table cells are dispalyed inline
@@ -803,7 +834,9 @@
 							$ptd = $displayData[$i]['posted'];
 							$btn = $displayData[$i]['button'];
 							
-							echo <<< MULTILINE
+							if ($_SESSION['loggedIn'] == true)
+							{
+								echo <<< MULTILINE
 			
 								<table class='dbTable'>
 									<tr>
@@ -828,6 +861,22 @@
 									<tr>
 										<td><b>Location:</b> $loc</td>
 							MULTILINE;
+							}
+							else {
+								echo <<< MULTILINE
+			
+								<table class='dbTable'>
+									<tr>
+										<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+									</tr>
+									<tr>
+										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+									</tr>
+									<tr>
+										<td><b>Location:</b> $loc</td>
+							MULTILINE;
+							}
+							
 							
 							//Displaying pay rate and date posted information if it is available
 							$extraCellDisplay = 0; //Required to ensure the correct number of table cells are dispalyed inline

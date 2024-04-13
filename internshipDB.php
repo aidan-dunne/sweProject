@@ -851,6 +851,17 @@
 							$displayData = $luckyDisplayData;
 
 						}
+						
+						$sizeTest = 0;
+						while ($filterAttributeNumbers[$sizeTest] != 0) {
+							$sizeTest++;
+						}
+						$sizeTest--;
+						echo $sizeTest;
+						
+						echo "<input type='hidden' value=$sizeTest id='sizeTest'>";
+						echo "<input type='hidden' value=$currentPage id='currentPage'>";
+						
 						for ($i = ($currentPage * PERPAGE) - PERPAGE; $i < $currentPage * PERPAGE; $i++) { //Displaying PERPAGE internships per page
 							if ($i >= sizeOf($displayData)) {
 								break;
@@ -872,23 +883,7 @@
 									<table class='dbTable'>
 										<tr>
 											<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
-											<td>
-												<button type="button" id='$dbInd' onclick="doThing(this.id);">
-													Bookmark
-												</button>
-
-												<script>
-													var buttonForce = getElementById('$dbInd');
-													buttonForce.setAttribute('id', '$dbInd');
-													function doThing(alertId) {
-														//var huntInd = alertId;
-														var proof = dbInfoArr[0].name;
-
-														//let dbEntry = snapshot.child(alertId)
-														alert('nah');
-													}
-												</script>
-											</td>
+											<td></td>
 										</tr>
 										<tr>
 											<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
@@ -1114,11 +1109,14 @@
 					formsArr[i - 1] = (document.getElementById("" + i));
 					formsArr[i - 1].addEventListener("submit", function (event) {
 						let com = document.getElementById("com" + i).value;
+						/*
 						let nam = document.getElementById("nam" + i).value;
 						let loc = document.getElementById("loc" + i).value;
 						let lnk = document.getElementById("lnk" + i).value;
 						let pay = document.getElementById("pay" + i).value;
 						let ptd = document.getElementById("ptd" + i).value;
+						*/
+						alert(com);
 						event.preventDefault();
 					});
 				}

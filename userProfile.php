@@ -18,9 +18,11 @@
 		$_SESSION['loggedIn'] = true;
 		if(isset($_POST['signUpSubmit'])) {
 			$_SESSION['nameDisplay'] = $_POST['nameSU'];
+			$_SESSION['username'] = $_POST['usernameSU'];
 		}
 		else if(isset($_POST['logInSubmit'])) {
 			$_SESSION['nameDisplay'] = $_POST['nameLI'];
+			$_SESSION['username'] = $_POST['usernameLI'];
 		}
 		
 	}

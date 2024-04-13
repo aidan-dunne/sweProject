@@ -366,6 +366,33 @@
 						}
 					}
 				}
+
+				function sortNewest(&$internshipArray) {
+					for ($i = 0; $i < sizeof($internshipArray); $i++) {
+						for ($j = 0; $j < sizeof($internshipArray) - 1; $j++) { //Compare year, followed by month, followed by day
+							if ((int)substr($internshipArray[$j]['posted'], 0, 4) < (int)substr($internshipArray[$j + 1]['posted'], 0, 4)) {
+								$temp = $internshipArray[$j];
+								$internshipArray[$j] = $internshipArray[$j + 1];
+								$internshipArray[$j + 1] = $temp;
+							}
+							else if ((int)substr($internshipArray[$j]['posted'], 0, 4) == (int)substr($internshipArray[$j + 1]['posted'], 0, 4)) {
+								if ((int)substr($internshipArray[$j]['posted'], 5, 2) < (int)substr($internshipArray[$j + 1]['posted'], 5, 2)) {
+									$temp = $internshipArray[$j];
+									$internshipArray[$j] = $internshipArray[$j + 1];
+									$internshipArray[$j + 1] = $temp;
+								}
+								else if ((int)substr($internshipArray[$j]['posted'], 5, 2) == (int)substr($internshipArray[$j + 1]['posted'], 5, 2)) {
+									if ((int)substr($internshipArray[$j]['posted'], 8, 2) < (int)substr($internshipArray[$j + 1]['posted'], 8, 2)) {
+										$temp = $internshipArray[$j];
+										$internshipArray[$j] = $internshipArray[$j + 1];
+										$internshipArray[$j + 1] = $temp;
+									}
+								}
+							}
+							//If year, month, and day are all the same, don't swap to preserve alphabetical ordering
+						}
+					}
+				}
 				
 				//Building a more presentable "date posted" string based on pre-formatted date posted data stored in each internship's "posted" field
 				function dateDisplay(&$rawDate) {
@@ -813,7 +840,14 @@
 								$maxFAN = $maxFAN - 1;
 							}
 							
-							// Finally, sets displaydata to our luckydisplay to be displayed
+							if ($_POST['sortBy'] == "sortByNew") {
+								sortNewest($luckyDisplayData);
+							} else if ($_POST['sortBy'] == "sortByOld") {
+								sortNewest($luckyDisplayData);
+								array_reverse($luckyDisplayData);
+							} else {
+								sortAlpha($luckyDisplayData);
+							}
 							$displayData = $luckyDisplayData;
 
 						}

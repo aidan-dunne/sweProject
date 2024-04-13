@@ -858,8 +858,6 @@
 						while ($filterAttributeNumbers[$sizeTest] != 0) {
 							$sizeTest++;
 						}
-						$sizeTest--;
-						echo $sizeTest;
 						
 						echo "<input type='hidden' value=$sizeTest id='sizeTest'>";
 						echo "<input type='hidden' value=$currentPage id='currentPage'>";
@@ -885,7 +883,19 @@
 									<table class='dbTable'>
 										<tr>
 											<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
-											<td></td>
+											<td>
+									MULTILINE;
+									
+									$idForm = ''.$i + 1;
+									
+									$idCompany = 'com'.$i + 1;
+									$valueCompany = "$com";
+									
+									echo <<< MULTILINE
+											<form action='internshipDB.php' method='post' id='$idForm'>
+												<input type='hidden' name='company' id='$idCompany' value='$valueCompany'>
+												<input type='submit' value='submitTest'>
+											</form></td>
 										</tr>
 										<tr>
 											<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
@@ -1099,7 +1109,6 @@
 				}
 			?>
 			<script type="module">
-
 				import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 				import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 		
@@ -1108,16 +1117,16 @@
 					apiKey: "AIzaSyCEs4fuVQHi2dwqnV6TJHSO1fZ6qx6kXc8",
 					authDomain: "se-internship-database.firebaseapp.com",
 					databaseURL: "https://se-internship-database-default-rtdb.firebaseio.com/",
-					projectId: "se-internship-database",
+					projec tId: "se-internship-database",
 					storageBucket: "se-internship-database.appspot.com",
 					messagingSenderId: "520655988080",
 					appId: "1:520655988080:web:573c2f7436e2acddf89bb5"
 				};
-		
+				
 				//Initializing Firebase
 				const appTwo = initializeApp(firebaseConfig);
-				const dBase = getDatabase(app);
-				const snapshotWrite = await get(ref(db, "users"));
+				const db = getDatabase(app);
+				const snapshotWrite = await get(ref(db, "internships/0"));
 
 				let formsArr = [];
 				let sizeTest = document.getElementById("sizeTest").value;
@@ -1137,10 +1146,13 @@
 						let pay = document.getElementById("pay" + i).value;
 						let ptd = document.getElementById("ptd" + i).value;
 						alert(com);
+						
+						alert(snapshotWrite.child("company").val());
+						
 						let unameTag = "<?php echo $_SESSION['nameDisplay']; ?>"
 						alert(unameTag);
 
-						set(ref(db, 'users/'+ unameTag + '/history/' + nam), {
+						set(ref(db, 'users/' + unameTag + '/history/' + nam), {
 							company: com,
 							date_posted: ptd,
 							job_name: nam,

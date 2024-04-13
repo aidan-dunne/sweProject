@@ -1172,7 +1172,6 @@
 						let pmt = document.getElementById("pay" + i).value;						
 						let ptd = document.getElementById("ptd" + i).value;
 						let unameTag = "<?php echo $_SESSION['username'] ?>";
-						alert(unameTag);
 						
 						//Sanitizing internship name for use as part of paths in our database
 						let pathName = nam.replace(/\W/g, '');
@@ -1185,7 +1184,7 @@
 							location: loc,
 							pay: pmt,
 						});
-						alert("didset");
+						alert("Added to History");
 						event.preventDefault();
 					});
 				}

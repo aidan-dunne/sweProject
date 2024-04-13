@@ -394,6 +394,10 @@
 							//If year, month, and day are all the same, don't swap to preserve alphabetical ordering
 						}
 					}
+					//Array is already sorted in descending order and should only be reversed if the "Oldest First" option was selected
+					if ($_POST['sortBy'] == 'sortByOld') {
+						$internshipArray = array_reverse($internshipArray);
+					}
 				}
 				
 				//Building a more presentable "date posted" string based on pre-formatted date posted data stored in each internship's "posted" field
@@ -854,6 +858,7 @@
 
 						}
 						
+						//Retrieving the number of internships with a FAN > 0 for bookmark button display
 						$sizeTest = 0;
 						while ($filterAttributeNumbers[$sizeTest] != 0) {
 							$sizeTest++;
@@ -891,9 +896,29 @@
 									$idCompany = 'com'.$i + 1;
 									$valueCompany = "$com";
 									
+									$idName = 'nam'.$i + 1;
+									$valueName = "$nam";
+									
+									$idLocation = 'loc'.$i + 1;
+									$valueLocation = "$loc";
+									
+									$idLink = 'lnk'.$i + 1;
+									$valueLink = "$lnk";
+									
+									$idPay = 'pay'.$i + 1;
+									$valuePay = "$pay";
+									
+									$idPosted = 'ptd'.$i + 1;
+									$valuePosted = "$ptd";
+									
 									echo <<< MULTILINE
 											<form action='internshipDB.php' method='post' id='$idForm'>
 												<input type='hidden' name='company' id='$idCompany' value='$valueCompany'>
+												<input type='hidden' name='company' id='$idName' value='$valueName'>
+												<input type='hidden' name='company' id='$idLocation' value='$valueLocation'>
+												<input type='hidden' name='company' id='$idLink' value='$valueLink'>
+												<input type='hidden' name='company' id='$idPay' value='$valuePay'>
+												<input type='hidden' name='company' id='$idPosted' value='$valuePosted'>
 												<input type='submit' value='submitTest'>
 											</form></td>
 										</tr>
@@ -1109,6 +1134,7 @@
 				}
 			?>
 			<script type="module">
+
 				import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 				import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 		
@@ -1117,16 +1143,16 @@
 					apiKey: "AIzaSyCEs4fuVQHi2dwqnV6TJHSO1fZ6qx6kXc8",
 					authDomain: "se-internship-database.firebaseapp.com",
 					databaseURL: "https://se-internship-database-default-rtdb.firebaseio.com/",
-					projec tId: "se-internship-database",
+					projectId: "se-internship-database",
 					storageBucket: "se-internship-database.appspot.com",
 					messagingSenderId: "520655988080",
 					appId: "1:520655988080:web:573c2f7436e2acddf89bb5"
 				};
-				
+		
 				//Initializing Firebase
 				const appTwo = initializeApp(firebaseConfig);
-				const db = getDatabase(app);
-				const snapshotWrite = await get(ref(db, "internships/0"));
+				const dBase = getDatabase(appTwo);
+				const snapshotWrite = get(ref(dBase, "users")); 
 
 				let formsArr = [];
 				let sizeTest = document.getElementById("sizeTest").value;
@@ -1143,23 +1169,23 @@
 						let nam = document.getElementById("nam" + i).value;
 						let loc = document.getElementById("loc" + i).value;
 						let lnk = document.getElementById("lnk" + i).value;
-						let pay = document.getElementById("pay" + i).value;
+						let pmt = document.getElementById("pay" + i).value;						
 						let ptd = document.getElementById("ptd" + i).value;
-						alert(com);
-						
-						alert(snapshotWrite.child("company").val());
-						
-						let unameTag = "<?php echo $_SESSION['nameDisplay']; ?>"
+						let unameTag = "<?php echo $_SESSION['username'] ?>";
 						alert(unameTag);
-
-						set(ref(db, 'users/' + unameTag + '/history/' + nam), {
+						
+						//Sanitizing internship name for use as part of paths in our database
+						let pathName = nam.replace(/\W/g, '');
+						
+						set(ref(dBase, 'users/' + unameTag + '/history/' + pathName), {
 							company: com,
 							date_posted: ptd,
 							job_name: nam,
 							link: lnk,
 							location: loc,
-							pay: pay,
+							pay: pmt,
 						});
+						alert("didset");
 						event.preventDefault();
 					});
 				}

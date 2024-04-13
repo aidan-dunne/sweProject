@@ -216,6 +216,7 @@
 							username: usernameSU,
 							password: passwordSU,
 							name_of_user: nameSU,
+							history: "null",
 						});
 					}
 				}

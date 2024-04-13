@@ -202,7 +202,7 @@
 						$_SESSION['usernameDisplay'] = usernameSU;
 						$_SESSION['loggedIn'] = true;
 
-						set(ref(db, "users/"+usernameSU), {
+						set(ref(db, 'users/'+ usernameSU), {
 							username: usernameSU,
 							password: passwordSU,
 							name_of_user: nameSU,

@@ -86,8 +86,9 @@ session_start();
 				</table>
 			");
 		}
-		?>
+	?>
 		</section>
+		
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,
 			<small>and</small> Paige Su &mdash; 2024.

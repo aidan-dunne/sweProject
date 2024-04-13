@@ -86,7 +86,7 @@
 				dbInfoArr[dbArrIndex]['pay'] = pay;
 				dbInfoArr[dbArrIndex]['RMT'] = remote;
 				dbInfoArr[dbArrIndex]['posted'] = posted;
-				dbInfoArr[dbArrIndex]['button'] = '<button type="button" value="B"></button>';
+				dbInfoArr[dbArrIndex]["dbIndex"] = dbArrIndex;
 				dbArrIndex++;
 			});
 			
@@ -942,6 +942,9 @@
 
 						}
 						
+						$sizeTest = sizeof($displayData);
+						echo "<input type='hidden' value=$sizeTest id='sizeTest'>";
+						echo "<input type='hidden' value=$currentPage id='currentPage'>";
 						for ($i = ($currentPage * PERPAGE) - PERPAGE; $i < $currentPage * PERPAGE; $i++) { //Displaying PERPAGE internships per page
 							if ($i >= sizeOf($displayData)) {
 								break;
@@ -951,9 +954,7 @@
 							$loc = $displayData[$i]['location'];
 							$lnk = $displayData[$i]['link'];
 							$pay = $displayData[$i]['pay'];
-							$pay = $displayData[$i]['pay'];
 							$ptd = $displayData[$i]['posted'];
-							$btn = $displayData[$i]['button'];
 							
 							if ($_SESSION['loggedIn'] == true)
 							{
@@ -963,18 +964,38 @@
 									<tr>
 										<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 										<td>
-											<button type="button" id='$i' onclick="doThing(this.id);">
-												This is a button
-											</button>
-
-											<script>
-												var buttonForce = getElementById('$i');
-												buttonForce.setAttribute('id', '$i');
-												function doThing(alertId) {
-													alert(alertId);
-												}
-											</script>
-										</td>
+								MULTILINE;
+									
+									$idForm = ''.$i + 1;
+									
+									$idCompany = 'com'.$i + 1;
+									$valueCompany = "$com";
+									
+									$idName = 'nam'.$i + 1;
+									$valueName = "$nam";
+									
+									$idLocation = 'loc'.$i + 1;
+									$valueLocation = "$loc";
+									
+									$idLink = 'lnk'.$i + 1;
+									$valueLink = "$lnk";
+									
+									$idPay = 'pay'.$i + 1;
+									$valuePay = "$pay";
+									
+									$idPosted = 'ptd'.$i + 1;
+									$valuePosted = "$ptd";
+									
+									echo <<< MULTILINE
+										<form action='internshipDB.php' method='post' id='$idForm'>
+											<input type='hidden' name='company' id='$idCompany' value='$valueCompany'>
+											<input type='hidden' name='company' id='$idName' value='$valueName'>
+											<input type='hidden' name='company' id='$idLocation' value='$valueLocation'>
+											<input type='hidden' name='company' id='$idLink' value='$valueLink'>
+											<input type='hidden' name='company' id='$idPay' value='$valuePay'>
+											<input type='hidden' name='company' id='$idPosted' value='$valuePosted'>
+											<input type='submit' value='submitTest'>
+										</form></td>
 									</tr>
 									<tr>
 										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
@@ -1029,6 +1050,28 @@
 					echo "</section>";
 				}
 			?>
+			<script type="module">
+				let formsArr = [];
+				let sizeTest = document.getElementById("sizeTest").value;
+				let currentPage = document.getElementById("currentPage").value;
+				
+				for (let i = currentPage * 10 - 9; i <= currentPage * 10; i++) {
+					if (i > sizeTest) {
+						break;
+					}
+					
+					formsArr[i - 1] = (document.getElementById("" + i));
+					formsArr[i - 1].addEventListener("submit", function (event) {
+						let com = document.getElementById("com" + i).value;
+						let nam = document.getElementById("nam" + i).value;
+						let loc = document.getElementById("loc" + i).value;
+						let lnk = document.getElementById("lnk" + i).value;
+						let pay = document.getElementById("pay" + i).value;
+						let ptd = document.getElementById("ptd" + i).value;
+						event.preventDefault();
+					});
+				}
+			</script>
 			<!-- Filter use information -->
 			<h2>Filters</h2>
 			<h3>International Student Filter</h3>

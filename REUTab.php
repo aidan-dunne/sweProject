@@ -28,7 +28,7 @@ session_start();
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
-			<a href="pastInternships.php">Companies and Programs</a>
+			<a href="pastInternships.php">Past Successes</a>
 			<a href="REUTab.php" class="currentPage">REU Information</a>
 		</nav>
 	</header>

@@ -10,7 +10,7 @@ session_start();
 	<style>
 		<?php include 'styles.css' ?>
 	</style>
-	<title>Internship Database - Companies and Programs</title>
+	<title>Internship Database - Past Successes</title>
 </head>
 
 <body>
@@ -18,7 +18,7 @@ session_start();
 	models apporoved by end users -->
 	<div class="headerTopBG"></div>
 	<header>
-		<h1>Companies and Programs</h1>
+		<h1>Past Successes</h1>
 		<a href="userProfile.php"><img src="images/profilePageIcon.png" class="profIcon"></img></a>
 		<?php 
 			//Displaying a "Log Out" button in the event that a user has logged in
@@ -29,7 +29,7 @@ session_start();
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
-			<a href="pastInternships.php" class="currentPage">Companies and Programs</a>
+			<a href="pastInternships.php" class="currentPage">Past Successes</a>
 			<a href="REUTab.php">REU Information</a>
 		</nav>
 	</header>

@@ -60,7 +60,7 @@
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
-			<a href="pastInternships.php">Companies and Programs</a>
+			<a href="pastInternships.php">Past Successes</a>
 			<a href="REUTab.php">REUs</a>
 		</nav>
 	</header>

@@ -119,7 +119,7 @@
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php" class="currentPage">Internship Database</a>
-			<a href="pastInternships.php">Companies and Programs</a>
+			<a href="pastInternships.php">Past Successes</a>
 			<a href="REUTab.php">REU Information</a>
 		</nav>
 	</header>

@@ -12,17 +12,15 @@
 	If the form has been submitted (user has successfully logged in/signed up), a session variable indicating that the user has logged in is set to true.
 	This variable is later used to load the user's profile page rather than the login/signup pages.
 	
-	Additionally, a "name_of_user" session variable is set which allows the user's name to be easily displayed in the profile page's header.
+	Additionally, a "nameDisplay" session variable is set which allows the user's name to be easily displayed in the profile page's header.
 	*/
 	if(isset($_POST['signUpSubmit']) or isset($_POST['logInSubmit'])) {
 		$_SESSION['loggedIn'] = true;
 		if(isset($_POST['signUpSubmit'])) {
-			$_SESSION['usernameDisplay'] = $_POST['usernameSU'];
 			$_SESSION['nameDisplay'] = $_POST['nameSU'];
 		}
 		else if(isset($_POST['logInSubmit'])) {
-			$_SESSION['usernameDisplay'] = $_POST['usernameLI'];
-			$_SESSION['nameDisplay'] = $_POST['usernameLI'];
+			$_SESSION['nameDisplay'] = $_POST['nameLI'];
 		}
 		
 	}
@@ -46,8 +44,8 @@
 		<!-- User's username will be retrieved and displayed in header if the user has logged in -->
 		<?php
 			if ($_SESSION['loggedIn']) {
-				$usernameDisplay = $_SESSION['nameDisplay'];
-				echo "<h1>Profile - $usernameDisplay</h1>";
+				$nameDisplay = $_SESSION['nameDisplay'];
+				echo "<h1>Profile - $nameDisplay</h1>";
 			}
 			else { //A default profile page header will be displayed if the user has not logged in
 				echo "<h1>Profile</h1>";
@@ -99,6 +97,7 @@
 					</form>
 				MULTILINE;
 
+				//Building signup form
 				echo <<< MULTILINE
 						<form method='post' class='dbSubmitContainer' action='userProfile.php' id='signUp'>
 							<input type='hidden' id='formLoaded' value='SU'>
@@ -109,10 +108,12 @@
 						</form>
 					MULTILINE;
 
+				//Building login form
 				echo <<< MULTILINE
 						<form method='post' class='dbSubmitContainer' action='userProfile.php' id='logIn'>
 							<input type='text' name='usernameLI' id='usernameLI' placeholder='Username'>
 							<input type='password' name='passwordLI' id= 'passwordLI' placeholder='Password'>
+							<input type='hidden' name='nameLI' id='nameLI'>
 							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
 						</form>
 					MULTILINE;
@@ -190,6 +191,7 @@
 				let usernameSU = document.getElementById("usernameSU").value;
 				let passwordSU = document.getElementById("passwordSU").value;
 
+				//Ensuring that the user does not leave the username or password fields blank
 				if (usernameSU == "") {
 					alert("Error: Please input a username.");
 					event.preventDefault();
@@ -207,10 +209,6 @@
 					}
 					else { //Otherwise, pull other fields from submitted form and write them to the database
 						let nameSU = document.getElementById("nameSU").value;
-						let passwordSU = document.getElementById("passwordSU").value;
-						$_SESSION['nameDisplay'] = nameSU;
-						$_SESSION['usernameDisplay'] = usernameSU;
-						$_SESSION['loggedIn'] = true;
 
 						set(ref(db, "users/"+usernameSU), {
 							username: usernameSU,
@@ -220,11 +218,10 @@
 					}
 				}
 			});
-
-			let UNameFlagLI = false;
 		
+			//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
 			let logInForm = document.getElementById("logIn");
-			logInForm.addEventListener("submit", async function (event) {
+			logInForm.addEventListener("submit", function (event) {
 				let userLI = document.getElementById("usernameLI").value;
 				let passwordLI = document.getElementById("passwordLI").value;
 				let UNameFlagLI = false;
@@ -235,16 +232,18 @@
 				let dbPass = dbEntry.child("password").val();
 				let dbName = dbEntry.child("name_of_user").val();
 
+				//Checks whether the entered username exists in the database
 				if (dbUname == userLI) {
 					UNameFlagLI = true;
 				}
 				
+				//If the entered username exists, check that the password stored and the password entered match
 				if (UNameFlagLI) {	
 					if (dbPass == passwordLI) {						
-						$_SESSION['loggedIn'] = true;
+						document.getElementById("nameLI").value = dbName;
 					}
-					else {
-						alert("Password Incorrect.");
+					else { //Prevent login form submission if either the username or password is invalid
+						alert("Incorrect password.");
 						event.preventDefault();
 					}						
 				}

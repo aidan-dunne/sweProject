@@ -78,17 +78,29 @@
 			}
 			else { //If the user has not logged in, display either the signup or login page depending on which submit button in the below form is selected
 				if (isset($_COOKIE["loggedOut"])) {
-					echo "Logged out successfully!";
+					echo <<< MULTILINE
+						<script>
+							alert("Logged out successfully!");
+						</script>
+					MULTILINE;
+				}
+				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
+					$signupid = "activeBox";
+					$loginid = "inactiveBox";
+				}
+				else {
+					$loginid = "activeBox";
+					$signupid = "inactiveBox";
 				}
 				echo <<< MULTILINE
 					<form method='post' id='loginBox' action='userProfile.php'>
-						<input type='submit' name='loadPageSignUp' value='Sign Up Here'>
-						<input type='submit' name='loadPageLogIn' value='Log In Here'>
+						<input type='submit' id='$signupid' name='loadPageSignUp' value='Sign Up Here'>
+						<input type='submit' id='$loginid' name='loadPageLogIn' value='Log In Here'>
 					</form>
 				MULTILINE;
 
 				echo <<< MULTILINE
-						<form method='post' action='userProfile.php' id='signUp'>
+						<form method='post' class='dbSubmitContainer' action='userProfile.php' id='signUp'>
 							<input type='hidden' id='formLoaded' value='SU'>
 							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
 							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
@@ -98,7 +110,7 @@
 					MULTILINE;
 
 				echo <<< MULTILINE
-						<form method='post' action='userProfile.php' id='logIn'>
+						<form method='post' class='dbSubmitContainer' action='userProfile.php' id='logIn'>
 							<input type='text' name='usernameLI' id='usernameLI' placeholder='Username'>
 							<input type='password' name='passwordLI' id= 'passwordLI' placeholder='Password'>
 							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
@@ -108,7 +120,6 @@
 				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
 					//Building the signup form which will be validated with javascript later
 					echo <<< MULTILINE
-						Sign Up!
 						<script>
 							document.getElementById('signUp').style.display='block';
 							document.getElementById('logIn').style.display='none';
@@ -119,7 +130,6 @@
 				if (isset($_POST['loadPageLogIn'])) {
 					//Building the login form which will be validated by javascript later
 					echo <<< MULTILINE
-						Log In!
 						<script>
 							document.getElementById('signUp').style.display='none';
 							document.getElementById('logIn').style.display='block';

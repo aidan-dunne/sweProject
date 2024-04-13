@@ -1115,9 +1115,9 @@
 				};
 		
 				//Initializing Firebase
-				const appTwo = initializeApp(firebaseConfig);
-				const dBase = getDatabase(app);
-				const snapshotWrite = await get(ref(db, "users"));
+				//const appTwo = initializeApp(firebaseConfig);
+				//const dBase = getDatabase(app);
+				//const snapshotWrite = get(ref(db, "users"));
 
 				let formsArr = [];
 				let sizeTest = document.getElementById("sizeTest").value;
@@ -1131,13 +1131,18 @@
 					formsArr[i - 1] = (document.getElementById("" + i));
 					formsArr[i - 1].addEventListener("submit", function (event) {
 						let com = document.getElementById("com" + i).value;
-						let nam = document.getElementById("nam" + i).value;
-						let loc = document.getElementById("loc" + i).value;
-						let lnk = document.getElementById("lnk" + i).value;
-						let pay = document.getElementById("pay" + i).value;
-						let ptd = document.getElementById("ptd" + i).value;
 						alert(com);
-						let unameTag = "<?php echo $_SESSION['nameDisplay']; ?>"
+						let nam = document.getElementById("nam" + i).value;
+						alert(nam);
+						let loc = document.getElementById("loc" + i).value;
+						alert(loc);
+						let lnk = document.getElementById("lnk" + i).value;
+						alert(lnk);
+						let pay = document.getElementById("pay" + i).value;
+						alert(pay);
+						let ptd = document.getElementById("ptd" + i).value;
+						alert(ptd);
+						let unameTag = "<?php echo $_SESSION['username'] ?>";
 						alert(unameTag);
 
 						set(ref(db, 'users/'+ unameTag + '/history/' + nam), {

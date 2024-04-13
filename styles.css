@@ -240,6 +240,7 @@ tr.noPad td {
 .dbSubmitContainer {
 	display: flex;
 	flex-direction: row;
+	align-items: center;
 	justify-content: space-between;
 }
 
@@ -344,7 +345,7 @@ tr.noPad td {
 	background-color: #ffffff;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
 	accent-color: #66dfff;
 	height: 20px;
 	width: 20px;
@@ -354,8 +355,7 @@ input[type="checkbox"] {
 	color: #ffffff;
 }
 
-/*Could possibly apply this and the next set of styles to all input type=text elements*/
-.dbSubmitContainer input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"] {
 	background-color: #e2e2e2;
 	border: none;
 	color: #776e74;
@@ -367,7 +367,7 @@ input[type="checkbox"] {
 	min-width: 320px;
 }
 
-.dbSubmitContainer input[type="text"]:focus {
+input[type="text"]:focus, input[type="password"]:focus {
 	background-color: #ffffff;
 	border: 3px solid #66dfff;
 	color: #594f5b;
@@ -377,12 +377,6 @@ input[type="checkbox"] {
 ::placeholder {
 	color: #776e74;
 	opacity: 1;
-}
-
-.dbSubmitContainer section {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
 }
 
 #dbFilters label[for="dbSearch"] {

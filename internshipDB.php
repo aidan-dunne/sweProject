@@ -180,7 +180,7 @@
 							unset($_POST[$removeFormLocation]);
 						}
 					}
-					//unset($_POST['dbSearch']);
+					unset($_POST['sortBy']);
 				}
 				
 				/* Search session management
@@ -448,6 +448,57 @@
 					//$displayData will contain all database data formatted for display before any fitlers are applied
 					$displayData = $_SESSION['alphabetical'];
 					
+					//Sorting internships according to the option selected by the user (data is alphabetically sorted by default, so nothing needs to be
+					//done if this option is selected and the $_POST variable corresponding to sorting options can be unset)
+					if (isset($_POST['sortBy']) and $_POST['sortBy'] == 'sortByAlpha') {
+						unset($_POST['sortBy']);
+					}
+					else if (isset($_POST['sortBy']) and $_POST['sortBy'] != 'sortByAlpha') { //"Newest First" or "Oldest First" were selected
+						//Creating and populating two temporary arrays with internships which list a post date and those which don't, respectively
+						$dateTemp = array();
+						$noDateTemp = array();
+						for ($i = 0; $i < sizeof($displayData); $i++) {
+							if ($displayData[$i]['posted'] == 0) {
+								array_push($noDateTemp, $displayData[$i]);
+							}
+							else {
+								array_push($dateTemp, $displayData[$i]);
+							}
+						}
+						
+						//Sorting the array of internships that list post dates by their dates based on which sorting option was selected by the user
+						for ($i = 0; $i < sizeof($dateTemp); $i++) { //First, the array is sorted in descending order by date (newest dates first)
+							for ($j = 0; $j < sizeof($dateTemp) - 1; $j++) { //Compare year, followed by month, followed by day
+								if ((int)substr($dateTemp[$j]['posted'], 0, 4) < (int)substr($dateTemp[$j + 1]['posted'], 0, 4)) {
+									$temp = $dateTemp[$j];
+									$dateTemp[$j] = $dateTemp[$j + 1];
+									$dateTemp[$j + 1] = $temp;
+								}
+								else if ((int)substr($dateTemp[$j]['posted'], 0, 4) == (int)substr($dateTemp[$j + 1]['posted'], 0, 4)) {
+									if ((int)substr($dateTemp[$j]['posted'], 5, 2) < (int)substr($dateTemp[$j + 1]['posted'], 5, 2)) {
+										$temp = $dateTemp[$j];
+										$dateTemp[$j] = $dateTemp[$j + 1];
+										$dateTemp[$j + 1] = $temp;
+									}
+									else if ((int)substr($dateTemp[$j]['posted'], 5, 2) == (int)substr($dateTemp[$j + 1]['posted'], 5, 2)) {
+										if ((int)substr($dateTemp[$j]['posted'], 8, 2) < (int)substr($dateTemp[$j + 1]['posted'], 8, 2)) {
+											$temp = $dateTemp[$j];
+											$dateTemp[$j] = $dateTemp[$j + 1];
+											$dateTemp[$j + 1] = $temp;
+										}
+									}
+								}
+								//If year, month, and day are all the same, don't swap to preserve alphabetical ordering
+							}
+						}
+						//Array is already sorted in descending order and should only be reversed if the "Oldest First" option was selected
+						if ($_POST['sortBy'] == 'sortByOld') {
+							$dateTemp = array_reverse($dateTemp);
+						}
+						//Appending all internships with no post date listed at the end of the display array
+						$displayData = array_merge($dateTemp, $noDateTemp);
+					}
+					
 					if (strcmp($_SESSION['lastSearch'], NULLSEARCH) != 0) { // If no clearing operations have been made since last search
 						$searchDisplayData = []; // to store correct results
 						$searchValue = strtolower($_SESSION['lastSearch']); // to store 
@@ -517,28 +568,79 @@
 					echo "<label for='filterRMT'>Remote</label>";
 					
 					//Locations filter
-					echo "<section class='filterLOC' id='filterLOC'><span class='locationsAnchor' onclick='displayListLOC()'>Select a Location</span>";
-					echo "<ul class='itemsLOC'>";
+					echo "<section class='filterLOC' id='filterLOC'><span class='locationsAnchor' id='locationsAnchor' onclick='displayListLOC()'>Select a Location</span>";
+					echo "<ul class='itemsLOC' id='itemsLOC'>";
 					
 					$allLocationsDisplay = $_SESSION['allLocations'];
 					for ($i = 0; $i < sizeof($allLocationsDisplay); $i++) {
 						$displayLocation = $allLocationsDisplay[$i]; //Used for display, contains original location string
 						$formLocation = preg_replace('/[\W]/', '', $allLocationsDisplay[$i]); //Used for filtering, removes certain special chars
 						if (isset($_POST[$formLocation])) {
-							echo "<li><input type='checkbox' checked name=$formLocation id=$formLocation>";
-							echo "<label for=$formLocation class='dropdownLabel'>$displayLocation</label></li>";
+							echo "<li id='itemsLOC'><input type='checkbox' checked name=$formLocation id=$formLocation class='selectLOC'>";
+							echo "<label for=$formLocation class='dropdownLabelLOC'>$displayLocation</label></li>";
 						}
 						else {
-							echo "<li><input type='checkbox' name=$formLocation id=$formLocation>";
-							echo "<label for=$formLocation class='dropdownLabel'>$displayLocation</label></li>";
+							echo "<li id='itemsLOC'><input type='checkbox' name=$formLocation id=$formLocation class='selectLOC'>";
+							echo "<label for=$formLocation class='dropdownLabelLOC'>$displayLocation</label></li>";
 						}
 					}
 					
 					echo "</ul></section>";
+					
+					//Sort-by filter
+					echo "<section class='filterSORT' id='filterSORT'><span class='sortAnchor' id='sortAnchor' onclick='displayListSORT()'>Sort By</span>";
+					echo "<ul class='itemsSORT' id='itemsSORT'>";
+					if (!isset($_POST['sortBy'])){ //"Alphabetical" was selected as the sort option
+						echo <<< MULTILINE
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByAlpha' value='sortByAlpha' checked>
+							<label for='sortByAlpha' class='dropdownLabelSORT'>Alphabetical</label></li>
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByNew' value='sortByNew'>
+							<label for='sortByNew' class='dropdownLabelSORT'>Newest First</label></li>
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByOld' value='sortByOld'>
+							<label for='sortByOld' class='dropdownLabelSORT'>Oldest First</label></li>
+						MULTILINE;
+					}
+					else if ($_POST['sortBy'] == 'sortByNew') { //"Sort By Newest" was selected as the sort option
+						echo <<< MULTILINE
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByAlpha' value='sortByAlpha'>
+							<label for='sortByAlpha' class='dropdownLabelSORT'>Alphabetical</label></li>
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByNew' value='sortByNew' checked>
+							<label for='sortByNew' class='dropdownLabelSORT'>Newest First</label></li>
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByOld' value='sortByOld'>
+							<label for='sortByOld' class='dropdownLabelSORT'>Oldest First</label></li>
+						MULTILINE;
+					}
+					else { //"Sort By Oldest" was selected as the sort option
+						echo <<< MULTILINE
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByAlpha' value='sortByAlpha'>
+							<label for='sortByAlpha' class='dropdownLabelSORT'>Alphabetical</label></li>
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByNew' value='sortByNew'>
+							<label for='sortByNew' class='dropdownLabelSORT'>Newest First</label></li>
+							<li id='itemsSORT'><input type='radio' name='sortBy' class='selectSORT' id='sortByOld' value='sortByOld' checked>
+							<label for='sortByOld' class='dropdownLabelSORT'>Oldest First</label></li>
+						MULTILINE;
+					}
+					echo "</ul></section>";
 				?>
 				<script>
-					//Displaying locations list when "Select a Location" option is clicked
+					//Hides any dropdown list currently displayed if any part of the screen is clicked outside of the list
+					document.onclick = function (clickoffEvent) {
+						if (clickoffEvent.target.id != "sortAnchor" && clickoffEvent.target.id != "itemsSORT" && clickoffEvent.target.className != "selectSORT" && clickoffEvent.target.className != "dropdownLabelSORT") {
+							if (filterSORT.classList.contains("visible")) {
+								filterSORT.classList.remove("visible");
+							}
+						}
+						
+						if (clickoffEvent.target.id != "locationsAnchor" && clickoffEvent.target.id != "itemsLOC" && clickoffEvent.target.className != "selectLOC" && clickoffEvent.target.className != "dropdownLabelLOC") {
+							if (filterLOC.classList.contains("visible")) {
+								filterLOC.classList.remove("visible");
+							}
+						}
+					};
+				
+					//Displaying locations list when "Select a Location" dropdown button is clicked
 					let filterLOC = document.getElementById("filterLOC");
+					
 					function displayListLOC() {
 						if (filterLOC.classList.contains("visible")) {
 							filterLOC.classList.remove("visible");
@@ -547,8 +649,20 @@
 							filterLOC.classList.add("visible");
 						}
 					}
-				</script>	
-				<?php
+					
+					//Displaying sort options list when "Sort By" dropdown button is clicked
+					let filterSORT = document.getElementById("filterSORT");
+					
+					function displayListSORT() {
+						if (filterSORT.classList.contains("visible")) {
+							filterSORT.classList.remove("visible");
+						}
+						else {
+							filterSORT.classList.add("visible");
+						}
+					}
+				</script>
+				<?php	
 					echo <<< MULTILINE
 						<br>
 						<section class='dbSubmitContainer'>
@@ -606,6 +720,13 @@
 								if (isset($_POST[$formLocation])) {
 									echo "<input type='hidden' name=$formLocation value='true'>";
 								}
+							}
+							
+							if (isset($_POST['sortBy']) and $_POST['sortBy'] == 'sortByNew') {
+								echo "<input type='hidden' name='sortBy' value='sortByNew'>";
+							}
+							else if (isset($_POST['sortBy']) and $_POST['sortBy'] == 'sortByOld') {
+								echo "<input type='hidden' name='sortBy' value='sortByOld'>";
 							}
 							
 							if ($currentPage == 1) { //Only the "Next Nage" option displayed when no previous page exists

@@ -240,6 +240,7 @@ tr.noPad td {
 .dbSubmitContainer {
 	display: flex;
 	flex-direction: row;
+	align-items: center;
 	justify-content: space-between;
 }
 
@@ -344,7 +345,7 @@ tr.noPad td {
 	background-color: #ffffff;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
 	accent-color: #66dfff;
 	height: 20px;
 	width: 20px;
@@ -354,8 +355,7 @@ input[type="checkbox"] {
 	color: #ffffff;
 }
 
-/*Could possibly apply this and the next set of styles to all input type=text elements*/
-.dbSubmitContainer input[type="text"] {
+input[type="text"], input[type="password"] {
 	background-color: #e2e2e2;
 	border: none;
 	color: #776e74;
@@ -367,7 +367,7 @@ input[type="checkbox"] {
 	min-width: 320px;
 }
 
-.dbSubmitContainer input[type="text"]:focus {
+input[type="text"]:focus, input[type="password"]:focus {
 	background-color: #ffffff;
 	border: 3px solid #66dfff;
 	color: #594f5b;
@@ -379,43 +379,41 @@ input[type="checkbox"] {
 	opacity: 1;
 }
 
-.dbSubmitContainer section {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
 #dbFilters label[for="dbSearch"] {
 	margin-top: 20px;
 	margin-right: 10px;
 }
 
 /*Locations filter dropdown list styles*/
-.filterLOC {
+.filterLOC, .filterSORT {
 	display: inline-block;
 }
 
-.filterLOC .locationsAnchor {
+.filterLOC .locationsAnchor, .filterSORT .sortAnchor {
 	display: inline-block;
 	position: relative;
 	cursor: pointer;
 	user-select: none;
 }
 
-.filterLOC .locationsAnchor:hover {
+.filterLOC .locationsAnchor:hover, .filterSORT .sortAnchor:hover {
 	color: #ffffff;
 }
 
-.filterLOC .locationsAnchor::after {
+.filterLOC .locationsAnchor::after, .filterSORT .sortAnchor::after {
 	content: " ▼";
 	user-select: none;
 }
 
-.filterLOC.visible .locationsAnchor::after {
+.filterLOC.visible .locationsAnchor::after, .filterSORT.visible .sortAnchor::after {
 	content: " ▲";
 }
 
-.filterLOC .itemsLOC {
+.sortAnchor, .itemsSORT {
+	margin-left: 10px;
+}
+
+.filterLOC .itemsLOC, .filterSORT .itemsSORT{
 	list-style: none;
 	display: none;
 	position: absolute;
@@ -425,7 +423,7 @@ input[type="checkbox"] {
 	color: #ffffff;
 }
 
-.filterLOC.visible .itemsLOC {
+.filterLOC.visible .itemsLOC, .filterSORT.visible .itemsSORT {
 	display: block;
 	background-color: #ffffff;
 	border-radius: 25px;
@@ -434,10 +432,9 @@ input[type="checkbox"] {
 	padding: 15px;
 }
 
-.filterLOC.visible .itemsLOC li:hover, #dbFilters label.dropdownLabel:hover {
+.itemsLoc, #dbFilters label.dropdownLabelLOC:hover, #dbFilters label.dropdownLabelSORT:hover {
 	color: #23a1f6;
 }
-
 
 #pageOptionsFirst, #pageOptionsLast, #pageOptions {
 	display: flex;
@@ -488,8 +485,34 @@ input[name="next"]:hover, input[name="previous"]:hover {
 	border-radius: 20px;
 }
 
-#loginBox input[type="submit"] {
+/* #loginBox input[type="submit"] {
 	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	-ms-flex-align: center;
+} */
+
+#activeBox {
+	background-color: #66dfff;
+	border: none;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 16pt;
+	font-weight: bold;
+	padding: 10px;
+	margin-right: 20px;
+	-ms-flex-align: center;
+}
+
+#inactiveBox {
+	background-color: grey;
 	border: none;
 	border-radius: 20px;
 	color: #594f5b;

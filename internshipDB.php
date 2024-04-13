@@ -77,6 +77,10 @@
 				let posted = childSnapshot.child("date_posted").val();
 				
 				dbInfoArr[dbArrIndex]= {};
+
+				// Database index needed for bookmarking system to allow buttons to recognize the specific databasae entry
+				dbInfoArr[dbArrIndex]["dbIndex"] = dbArrIndex;
+
 				dbInfoArr[dbArrIndex]["company"] = company;
 				dbInfoArr[dbArrIndex]["name"] = name;
 				dbInfoArr[dbArrIndex]["INTL"] = citizenship;
@@ -86,13 +90,13 @@
 				dbInfoArr[dbArrIndex]['pay'] = pay;
 				dbInfoArr[dbArrIndex]['RMT'] = remote;
 				dbInfoArr[dbArrIndex]['posted'] = posted;
-				dbInfoArr[dbArrIndex]["dbIndex"] = dbArrIndex;
 				dbArrIndex++;
 			});
 			
 			//Converting the database info array to json format so that it may be properly parsed and displayed later and writing it into the hidden
 			//input field of a form which will be submitted, allowing database information to be displayed with php.
 			let sendjson = JSON.stringify(dbInfoArr);
+
 			document.getElementById("postsendDB").value = (sendjson);
 			
 			//Submit form containing json format database data if the database has not been loaded during the current browser session
@@ -115,7 +119,7 @@
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php" class="currentPage">Internship Database</a>
-			<a href="pastInternships.php">Companies and Programs</a>
+			<a href="pastInternships.php">Past Successes</a>
 			<a href="REUTab.php">REU Information</a>
 		</nav>
 	</header>
@@ -362,10 +366,37 @@
 						}
 					}
 				}
+
+				function sortNewest(&$internshipArray) {
+					for ($i = 0; $i < sizeof($internshipArray); $i++) {
+						for ($j = 0; $j < sizeof($internshipArray) - 1; $j++) { //Compare year, followed by month, followed by day
+							if ((int)substr($internshipArray[$j]['posted'], 0, 4) < (int)substr($internshipArray[$j + 1]['posted'], 0, 4)) {
+								$temp = $internshipArray[$j];
+								$internshipArray[$j] = $internshipArray[$j + 1];
+								$internshipArray[$j + 1] = $temp;
+							}
+							else if ((int)substr($internshipArray[$j]['posted'], 0, 4) == (int)substr($internshipArray[$j + 1]['posted'], 0, 4)) {
+								if ((int)substr($internshipArray[$j]['posted'], 5, 2) < (int)substr($internshipArray[$j + 1]['posted'], 5, 2)) {
+									$temp = $internshipArray[$j];
+									$internshipArray[$j] = $internshipArray[$j + 1];
+									$internshipArray[$j + 1] = $temp;
+								}
+								else if ((int)substr($internshipArray[$j]['posted'], 5, 2) == (int)substr($internshipArray[$j + 1]['posted'], 5, 2)) {
+									if ((int)substr($internshipArray[$j]['posted'], 8, 2) < (int)substr($internshipArray[$j + 1]['posted'], 8, 2)) {
+										$temp = $internshipArray[$j];
+										$internshipArray[$j] = $internshipArray[$j + 1];
+										$internshipArray[$j + 1] = $temp;
+									}
+								}
+							}
+							//If year, month, and day are all the same, don't swap to preserve alphabetical ordering
+						}
+					}
+				}
 				
 				//Building a more presentable "date posted" string based on pre-formatted date posted data stored in each internship's "posted" field
 				function dateDisplay(&$rawDate) {
-					$stringbuilderDate; //Will contain the date formatted for nicer display
+					$stringbuilderDate = ""; //Will contain the date formatted for nicer display
 					$rawMonth = substr($rawDate, 5, 2); //Retrieving the month an internship was posted
 					
 					//Converting a numeric month into the corresponding month's name
@@ -809,7 +840,14 @@
 								$maxFAN = $maxFAN - 1;
 							}
 							
-							// Finally, sets displaydata to our luckydisplay to be displayed
+							if ($_POST['sortBy'] == "sortByNew") {
+								sortNewest($luckyDisplayData);
+							} else if ($_POST['sortBy'] == "sortByOld") {
+								sortNewest($luckyDisplayData);
+								array_reverse($luckyDisplayData);
+							} else {
+								sortAlpha($luckyDisplayData);
+							}
 							$displayData = $luckyDisplayData;
 
 						}
@@ -817,6 +855,7 @@
 							if ($i >= sizeOf($displayData)) {
 								break;
 							}
+							$dbInd = $displayData[$i]['dbIndex'];
 							$com = $displayData[$i]['company'];
 							$nam = $displayData[$i]['name'];
 							$loc = $displayData[$i]['location'];
@@ -827,47 +866,51 @@
 							
 							if ($fan > 0) {
 								if ($_SESSION['loggedIn'] == true)
-							{
-								echo <<< MULTILINE
-			
-								<table class='dbTable'>
-									<tr>
-										<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
-										<td>
-											<button type="button" id='$i' onclick="doThing(this.id);">
-												This is a button
-											</button>
+								{
+									echo <<< MULTILINE
+				
+									<table class='dbTable'>
+										<tr>
+											<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+											<td>
+												<button type="button" id='$dbInd' onclick="doThing(this.id);">
+													Bookmark
+												</button>
 
-											<script>
-												var buttonForce = getElementById('$i');
-												buttonForce.setAttribute('id', '$i');
-												function doThing(alertId) {
-													alert(alertId);
-												}
-											</script>
-										</td>
-									</tr>
-									<tr>
-										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
-									</tr>
-									<tr>
-										<td><b>Location:</b> $loc</td>
-							MULTILINE;
-							}
-							else {
-								echo <<< MULTILINE
-			
-								<table class='dbTable'>
-									<tr>
-										<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
-									</tr>
-									<tr>
-										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
-									</tr>
-									<tr>
-										<td><b>Location:</b> $loc</td>
-							MULTILINE;
-							}
+												<script>
+													var buttonForce = getElementById('$dbInd');
+													buttonForce.setAttribute('id', '$dbInd');
+													function doThing(alertId) {
+														//var huntInd = alertId;
+														var proof = dbInfoArr[0].name;
+
+														//let dbEntry = snapshot.child(alertId)
+														alert('nah');
+													}
+												</script>
+											</td>
+										</tr>
+										<tr>
+											<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+										</tr>
+										<tr>
+											<td><b>Location:</b> $loc</td>
+									MULTILINE;
+								}
+								else {
+									echo <<< MULTILINE
+				
+									<table class='dbTable'>
+										<tr>
+											<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+										</tr>
+										<tr>
+											<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+										</tr>
+										<tr>
+											<td><b>Location:</b> $loc</td>
+								MULTILINE;
+								}
 								
 								//Displaying pay rate and date posted information if it is available
 								$extraCellDisplay = 0; //Required to ensure the correct number of table cells are dispalyed inline
@@ -938,6 +981,14 @@
 								array_splice($tempDisplayData, $randomIndex, 1);
 							}
 							// Sets the display array to our randomly generated array of 5
+							if ($_POST['sortBy'] == "sortByNew") {
+								sortNewest($luckyDisplayData);
+							} else if ($_POST['sortBy'] == "sortByOld") {
+								sortNewest($luckyDisplayData);
+								array_reverse($luckyDisplayData);
+							} else {
+								sortAlpha($luckyDisplayData);
+							}
 							$displayData = $luckyDisplayData;
 
 						}

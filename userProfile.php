@@ -60,7 +60,7 @@
 		<nav id="mainNav">
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
-			<a href="pastInternships.php">Companies and Programs</a>
+			<a href="pastInternships.php">Past Successes</a>
 			<a href="REUTab.php">REUs</a>
 		</nav>
 	</header>
@@ -210,7 +210,7 @@
 					else { //Otherwise, pull other fields from submitted form and write them to the database
 						let nameSU = document.getElementById("nameSU").value;
 
-						set(ref(db, "users/"+usernameSU), {
+						set(ref(db, 'users/'+ usernameSU), {
 							username: usernameSU,
 							password: passwordSU,
 							name_of_user: nameSU,

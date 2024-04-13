@@ -27,7 +27,7 @@ session_start();
 		<nav id="mainNav">
 			<a href="index.php" class="currentPage">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
-			<a href="pastInternships.php">Companies and Programs</a>
+			<a href="pastInternships.php">Past Successes</a>
 			<a href="REUTab.php">REU Information</a>
 		</nav>
 	</header>
@@ -42,7 +42,7 @@ session_start();
 			<p>With our website, we aim to make the internship-searching process more accessible and less stressful for groups like
 			international students and underclassmen who may have a difficult time finding internships that will consider their
 			applications. Our <a href="internshipDB.php">internship database</a> offers a range of easy-to-use search filters which will allow you to refine your internship search
-			and more efficiently find internships that are perfect for you. Additionally, our <a href="pastInternships.php">Companies and Programs</a> 
+			and more efficiently find internships that are perfect for you. Additionally, our <a href="pastInternships.php">Past Successes</a> 
 			page provides a list of companies that offer internship programs at which Truman students have been successful at in the past.</p>
 			<p>Our <a href="REUTab.php">Research Experiences for Undergraduates (REU)</a> page offers an explanation of what REUs are, why you 
 			may want to consider one over an internship, and provides a link to the National Science Foundation's REU database &mdash; an expansive and

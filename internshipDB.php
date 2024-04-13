@@ -13,6 +13,8 @@
 	else if(isset($_POST['previous'])) {
 		$currentPage = --$_POST['page'];
 	}
+
+	$nameDisp = $_SESSION['nameDisplay'];
 ?>
 
 <!DOCTYPE html>
@@ -1097,6 +1099,26 @@
 				}
 			?>
 			<script type="module">
+
+				import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+				import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+		
+				//Storing our Firebase configuration info
+				const firebaseConfig = {
+					apiKey: "AIzaSyCEs4fuVQHi2dwqnV6TJHSO1fZ6qx6kXc8",
+					authDomain: "se-internship-database.firebaseapp.com",
+					databaseURL: "https://se-internship-database-default-rtdb.firebaseio.com/",
+					projectId: "se-internship-database",
+					storageBucket: "se-internship-database.appspot.com",
+					messagingSenderId: "520655988080",
+					appId: "1:520655988080:web:573c2f7436e2acddf89bb5"
+				};
+		
+				//Initializing Firebase
+				const appTwo = initializeApp(firebaseConfig);
+				const dBase = getDatabase(app);
+				const snapshotWrite = await get(ref(db, "users"));
+
 				let formsArr = [];
 				let sizeTest = document.getElementById("sizeTest").value;
 				let currentPage = document.getElementById("currentPage").value;
@@ -1109,14 +1131,23 @@
 					formsArr[i - 1] = (document.getElementById("" + i));
 					formsArr[i - 1].addEventListener("submit", function (event) {
 						let com = document.getElementById("com" + i).value;
-						/*
 						let nam = document.getElementById("nam" + i).value;
 						let loc = document.getElementById("loc" + i).value;
 						let lnk = document.getElementById("lnk" + i).value;
 						let pay = document.getElementById("pay" + i).value;
 						let ptd = document.getElementById("ptd" + i).value;
-						*/
 						alert(com);
+						let unameTag = "<?php echo $_SESSION['nameDisplay']; ?>"
+						alert(unameTag);
+
+						set(ref(db, 'users/'+ unameTag + '/history/' + nam), {
+							company: com,
+							date_posted: ptd,
+							job_name: nam,
+							link: lnk,
+							location: loc,
+							pay: pay,
+						});
 						event.preventDefault();
 					});
 				}

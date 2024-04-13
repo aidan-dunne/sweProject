@@ -981,6 +981,14 @@
 								array_splice($tempDisplayData, $randomIndex, 1);
 							}
 							// Sets the display array to our randomly generated array of 5
+							if ($_POST['sortBy'] == "sortByNew") {
+								sortNewest($luckyDisplayData);
+							} else if ($_POST['sortBy'] == "sortByOld") {
+								sortNewest($luckyDisplayData);
+								array_reverse($luckyDisplayData);
+							} else {
+								sortAlpha($luckyDisplayData);
+							}
 							$displayData = $luckyDisplayData;
 
 						}

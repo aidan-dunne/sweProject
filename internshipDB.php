@@ -937,12 +937,12 @@
 									
 									echo <<< MULTILINE
 											<form action='internshipDB.php' method='post' id='$idForm'>
-												<input type='hidden' name='company' id='$idCompany' value='$valueCompany'>
-												<input type='hidden' name='company' id='$idName' value='$valueName'>
-												<input type='hidden' name='company' id='$idLocation' value='$valueLocation'>
-												<input type='hidden' name='company' id='$idLink' value='$valueLink'>
-												<input type='hidden' name='company' id='$idPay' value='$valuePay'>
-												<input type='hidden' name='company' id='$idPosted' value='$valuePosted'>
+												<input type='hidden' name='company' id='$idCompany' value="$valueCompany">
+												<input type='hidden' name='company' id='$idName' value="$valueName">
+												<input type='hidden' name='company' id='$idLocation' value="$valueLocation">
+												<input type='hidden' name='company' id='$idLink' value="$valueLink">
+												<input type='hidden' name='company' id='$idPay' value="$valuePay">
+												<input type='hidden' name='company' id='$idPosted' value="$valuePosted">
 												<input type='submit' value='submitTest'>
 											</form></td>
 										</tr>
@@ -1092,12 +1092,12 @@
 									
 									echo <<< MULTILINE
 										<form action='internshipDB.php' method='post' id='$idForm'>
-											<input type='hidden' name='company' id='$idCompany' value='$valueCompany'>
-											<input type='hidden' name='company' id='$idName' value='$valueName'>
-											<input type='hidden' name='company' id='$idLocation' value='$valueLocation'>
-											<input type='hidden' name='company' id='$idLink' value='$valueLink'>
-											<input type='hidden' name='company' id='$idPay' value='$valuePay'>
-											<input type='hidden' name='company' id='$idPosted' value='$valuePosted'>
+											<input type='hidden' name='company' id='$idCompany' value="$valueCompany">
+											<input type='hidden' name='company' id='$idName' value="$valueName">
+											<input type='hidden' name='company' id='$idLocation' value="$valueLocation">
+											<input type='hidden' name='company' id='$idLink' value="$valueLink">
+											<input type='hidden' name='company' id='$idPay' value="$valuePay">
+											<input type='hidden' name='company' id='$idPosted' value="$valuePosted">
 											<input type='submit' value='submitTest'>
 										</form></td>
 									</tr>
@@ -1195,7 +1195,7 @@
 						let unameTag = "<?php echo $_SESSION['username'] ?>";
 						
 						//Sanitizing internship name for use as part of paths in our database
-						let pathName = nam.replace(/\W/g, '');
+						let pathName = nam.replace(/[^a-zA-Z0-9]/g, '');
 						
 						set(ref(dBase, 'users/' + unameTag + '/history/' + pathName), {
 							company: com,

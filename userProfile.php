@@ -244,7 +244,7 @@
 			let historyArr = [];
 			let historyArrIndex = 0;
 			
-			//Only reading in history information if it has not already been read in the current session
+			//Only reading in history information if it has not already been read while on the current page (NOT SESSION)
 			let historyLoaded = document.getElementById("historyLoaded").value;
 			
 			//Only reading in history information if a user has logged in

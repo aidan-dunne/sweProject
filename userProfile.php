@@ -54,46 +54,7 @@
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
-	
-	<main>
-		<section class="pageContentMain">
-		<p id="testlol"></p>
-		<?php
-			if ($_SESSION['loggedIn']) {
-				//Load user profile page once the user has sucessfully signed up or logged in
-				echo "<p>User has logged in!</p>";
-			}
-			else { //If the user has not logged in, display either the signup or login page depending on which submit button in the below form is selected
-				if (isset($_COOKIE["loggedOut"])) {
-					echo "Logged out successfully!";
-				}
-				echo <<< MULTILINE
-					<form method='post' action='userProfile.php'>
-						<input type='submit' name='loadPageSignUp' value='Sign Up Here'>
-						<input type='submit' name='loadPageLogIn' value='Log In Here'>
-					</form>
-				MULTILINE;
-				
-				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
-					//Building the signup form which will be validated with javascript later
-					echo <<< MULTILINE
-						<form method='post' action='userProfile.php' id='signUp'>
-							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
-							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
-							<input type='password' name='passwordSU' id= 'passwordSU' placeholder='Password'>
-							<input type='submit' name='signUpSubmit' value='Sign Up'>
-						</form>
-					MULTILINE;
-				}
-				
-				if (isset($_POST['loadPageLogIn'])) {
-					//Building the login form which will be validated by javascript later
-					echo "<p>testLogIn</p>"; //(I haven't actually built this form)
-				}
-			}
-		?>
-		
-		<script type="module">
+	<script type="module">
 			//Importing needed methods and SDKs
 			import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 			import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -133,7 +94,41 @@
 				});
 				
 				return flag;
-			}
+			}; 
+
+			let historyArr = [];
+				let historyIndex = 0;
+				snapshot.forEach(function(childSnaphot) {
+					alert ("insidefunc");
+					let historyElement = childSnapshot.child('history');
+					alert("this one worked (no it has not)");
+					let company = historyElement.child("company").val();
+					alert('and here');
+					let name = childSnapshot.child("history").child("job_name").val();
+					let location = childSnapshot.child("history").child("location").val();
+					let link = childSnapshot.child("history").child("link").val();
+					let pay = childSnapshot.child("history").child("pay").val();
+					let posted = childSnapshot.child("history").child("date_posted").val();
+					alert('and here');
+					historyArr[historyIndex]= {};
+
+					historyArr[historyIndex]["dbIndex"] = historyIndex;
+
+					historyArr[historyIndex]["company"] = company;
+					historyArr[historyIndex]["name"] = name;
+					historyArr[historyIndex]['location'] = location;
+					historyArr[historyIndex]['link'] = link;
+					historyArr[historyIndex]['pay'] = pay;
+					historyArr[historyIndex]['posted'] = posted;
+					historyIndex++;
+				});
+				alert ("I see you");
+				let sendjson = JSON.stringify(dbInfoArr);
+
+				document.getElementById("sendHistory").value = (sendjson);
+			
+				document.getElementById("loadHistory").submit();
+	
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
 			let matchFlagSU = false;
@@ -170,6 +165,90 @@
 			});
 			*/
 		</script>
+	
+	<main>
+		<section class="pageContentMain">
+		<p id="testlol"></p>
+		<form method="post" action="userProfile.php" id="loadHistory">
+			<input type="hidden" name="sendHistory" id="sendHistory">
+		</form>
+		<?php
+			if ($_SESSION['loggedIn']) {
+				//Load user profile page once the user has sucessfully signed up or logged in
+				echo "<p>User has logged in!</p>";
+				echo "done";
+
+				$receiveJson = $_POST['sendHistory'];
+				$displayHistory = json_decode($receiveJson, true);
+				echo $displayHistory;
+				echo sizeof($displayHistory);
+				echo $displayHistory[1]['pay'];
+			}
+			else { //If the user has not logged in, display either the signup or login page depending on which submit button in the below form is selected
+				if (isset($_COOKIE["loggedOut"])) {
+					echo <<< MULTILINE
+						<script>
+							alert("Logged out successfully!");
+						</script>
+					MULTILINE;
+				}
+				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
+					$signupid = "activeBox";
+					$loginid = "inactiveBox";
+				}
+				else {
+					$loginid = "activeBox";
+					$signupid = "inactiveBox";
+				}
+				echo <<< MULTILINE
+					<form method='post' id='loginBox' action='userProfile.php'>
+						<input type='submit' id='$signupid' name='loadPageSignUp' value='Sign Up Here'>
+						<input type='submit' id='$loginid' name='loadPageLogIn' value='Log In Here'>
+					</form>
+				MULTILINE;
+
+				//Building signup form
+				echo <<< MULTILINE
+						<form method='post' class='dbSubmitContainer' action='userProfile.php' id='signUp'>
+							<input type='hidden' id='formLoaded' value='SU'>
+							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
+							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
+							<input type='password' name='passwordSU' id= 'passwordSU' placeholder='Password'>
+							<input type='submit' name='signUpSubmit' value='Sign Up' form='signUp'>
+						</form>
+					MULTILINE;
+
+				//Building login form
+				echo <<< MULTILINE
+						<form method='post' class='dbSubmitContainer' action='userProfile.php' id='logIn'>
+							<input type='text' name='usernameLI' id='usernameLI' placeholder='Username'>
+							<input type='password' name='passwordLI' id= 'passwordLI' placeholder='Password'>
+							<input type='hidden' name='nameLI' id='nameLI'>
+							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
+						</form>
+					MULTILINE;
+				
+				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
+					//Building the signup form which will be validated with javascript later
+					echo <<< MULTILINE
+						<script>
+							document.getElementById('signUp').style.display='block';
+							document.getElementById('logIn').style.display='none';
+						</script>
+						MULTILINE;
+					}
+				
+				if (isset($_POST['loadPageLogIn'])) {
+					//Building the login form which will be validated by javascript later
+					echo <<< MULTILINE
+						<script>
+							document.getElementById('signUp').style.display='none';
+							document.getElementById('logIn').style.display='block';
+						</script>
+						MULTILINE;
+				}
+			}
+		?>
 		</section>
 		<footer>
 			Created by Andy Bernatow, Cole Bracken, Aidan Dunne, <small>and</small> Owen Murphy <small>with help from</small> James Calder, Adi Shah,

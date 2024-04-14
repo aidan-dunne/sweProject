@@ -24,8 +24,17 @@
 			$_SESSION['nameDisplay'] = $_POST['nameLI'];
 			$_SESSION['username'] = $_POST['usernameLI'];
 		}
-		
 	}
+	
+	//$historyLoaded is used to ensure that a user's history table is only read once per page load, but it is not a session variable since the history
+	//table must be re-read from the database each time the page is loaded in case any new internships were saved
+	$historyLoaded = false;
+	if (isset($_POST['sendHistory'])) {
+		$historyLoaded = true;
+	}
+	
+	//Whether or not the history table has been read is written to a form for access by javascript
+	echo "<input type='hidden' id='historyLoaded' value=$historyLoaded>";
 ?>
 
 <!DOCTYPE html>
@@ -70,18 +79,55 @@
 	
 	<main>
 		<section class="pageContentMain">
-		<p id="testlol"></p>
 		<?php
+			//Info in session variables which indicate whether a user has logged in and what username has been used to log in are written into hidden
+			//input fields to be access by javascript
+			$loggedInFlag = $_SESSION['loggedIn'];
+			$usernameToAccess = $_SESSION['username'];
+			
+			echo "<input type='hidden' id='loggedInFlag' value=$loggedInFlag>";
+			echo "<input type='hidden' id='usernameToAccess' value=$usernameToAccess>";
+
+//RETRIEVING AND SORTING DATA
+/*****************************************************************************************************************************/
+
+			//If the user has logged in, read in the user's history from the database and generate the user's profile page
 			if ($_SESSION['loggedIn']) {
+				//If the user has logged in, this form will store the user's history information
 				echo <<< MULTILINE
 				<form method="post" action="userProfile.php" id="historyLoad">
 					<input type="hidden" name="sendHistory" id="sendHistory">
 				</form>
-				<script>
-					getHistory();
-				</script>
 				MULTILINE;
-				echo "hi";
+				
+				//Receiving and decoding user's history data each time the page is loaded
+				if (isset($_POST['sendHistory'])) {
+					$receiveJson = $_POST['sendHistory'];
+					$decode = json_decode($receiveJson, true); //Value "true" decodes received data as an associative array
+					
+					//HISTORYALPHABETICAL stores a user's alphabetically-sorted history data and is defined as a constant since it should not be altered
+					//and must be able to be easily accessed throughout the entire scope of the program
+					define("HISTORYALPHABETICAL", $decode); //TODO: sort $decode in alphabetical order prior to this statement
+					
+//TESTING
+						$displayTest = HISTORYALPHABETICAL;
+						for ($i = 0; $i < sizeof($displayTest); $i++) {
+							echo $displayTest[$i]["company"]. ", ";
+							echo $displayTest[$i]["name"].", ";
+							echo $displayTest[$i]["link"].", ";
+							echo $displayTest[$i]["location"].", ";
+							echo $displayTest[$i]["pay"].", ";
+							echo $displayTest[$i]["posted"].", ";
+							echo "<br><br>";
+						}
+//TESTING
+					
+					//WRITE MAIN DISPLAY CODE HERE
+					//ABOVE DISPLAY BLOCK JUST FOR TESTING PURPOSES
+				}
+				else { //Display a loading graphic if a user's history data has not yet been read
+					echo "<img src='images/loadingGraphic.gif' height='150px' width='150px'>";
+				}
 			}
 			else { //If the user has not logged in, display either the signup or login page depending on which submit button in the below form is selected
 				if (isset($_COOKIE["loggedOut"])) {
@@ -191,37 +237,54 @@
 				return flag;
 			}
 
+//RETRIEVING HISTORY
+/*****************************************************************************************************************************/
+
+			//Array for storing all retrieved history information
 			let historyArr = [];
-
-			function getHistory() {
-				historyIndex = 0;
-				snapshot.forEach(function(childSnapshot) {
-					let company = childSnapshot.child("history").child("company").val();
-					let name = childSnapshot.child("history").child("job name").val();
-					let location = childSnapshot.child("history").child("location").val();
-					let link = childSnapshot.child("history").child("link").val();
-					let pay = childSnapshot.child("history").child("pay").val();
-					let posted = childSnapshot.child("history").child("date_posted").val();
-				
-					historyArr[historyIndex]= {};
-
-					historyArr[historyIndex]["dbIndex"] = historyIndex;
-
-					historyArr[historyIndex]["company"] = company;
-					historyArr[historyIndex]["name"] = name;
-					historyArr[historyIndex]['location'] = location;
-					historyArr[historyIndex]['link'] = link;
-					historyArr[historyIndex]['pay'] = pay;
-					historyArr[historyIndex]['posted'] = posted;
-					historyIndex++;
-				});
+			let historyArrIndex = 0;
 			
-				let sendjson = JSON.stringify(historyArr);
-
-				document.getElementById("sendHistory").value = (sendjson);
+			//Only reading in history information if it has not already been read in the current session
+			let historyLoaded = document.getElementById("historyLoaded").value;
 			
-				document.getElementById("historyLoad").submit();
+			//Only reading in history information if a user has logged in
+			let loggedInFlag = document.getElementById("loggedInFlag").value;
+			
+			if (!historyLoaded) {
+				if (loggedInFlag) {
+					//Accessing a user's history by retrieving their username to get the path to their history table in the database
+					const usernameToAccess = document.getElementById("usernameToAccess").value;
+					const historySnap = await get(ref(db, "users/" + usernameToAccess + "/history"));
+					
+					//Using history table reference to retrieve the value stored in each field of each item in the table. Then, the value in each field
+					//is written as a key-value pair to an object in an array which will be converted to json format to be displayed.
+					historySnap.forEach(function(childHistorySnap) {
+						let company = childHistorySnap.child("company").val();
+						let name = childHistorySnap.child("job_name").val();
+						let link = childHistorySnap.child("link").val();
+						let location = childHistorySnap.child("location").val();
+						let pay = childHistorySnap.child("pay").val();
+						let posted = childHistorySnap.child("date_posted").val();
+						
+						historyArr[historyArrIndex] = {};
+						historyArr[historyArrIndex]["company"] = company;
+						historyArr[historyArrIndex]["name"] = name;
+						historyArr[historyArrIndex]["link"] = link;
+						historyArr[historyArrIndex]["location"] = location;
+						historyArr[historyArrIndex]["pay"] = pay;
+						historyArr[historyArrIndex]["posted"] = posted;
+						historyArrIndex++;
+					});
+					
+					//Converting user's history table info to json format so that it may be properly parsed and displayed later
+					let sendjson = JSON.stringify(historyArr);
+					document.getElementById("sendHistory").value = sendjson;
+					document.getElementById("historyLoad").submit();
+				}
 			}
+			
+//SIGNUP AND LOGIN FUNCTIONALITY
+/*****************************************************************************************************************************/
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available
 			let matchFlagSU = false;

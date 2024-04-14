@@ -936,6 +936,7 @@
 									$valuePosted = "$ptd";
 									
 									echo <<< MULTILINE
+											<section class='bookmarkButtonContainer'>
 											<form action='internshipDB.php' method='post' id='$idForm'>
 												<input type='hidden' name='company' id='$idCompany' value="$valueCompany">
 												<input type='hidden' name='company' id='$idName' value="$valueName">
@@ -943,8 +944,8 @@
 												<input type='hidden' name='company' id='$idLink' value="$valueLink">
 												<input type='hidden' name='company' id='$idPay' value="$valuePay">
 												<input type='hidden' name='company' id='$idPosted' value="$valuePosted">
-												<input type='submit' value='submitTest'>
-											</form></td>
+												<input type='submit' value='Save Internship'>
+											</section></form></td>
 										</tr>
 										<tr>
 											<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
@@ -1091,6 +1092,7 @@
 									$valuePosted = "$ptd";
 									
 									echo <<< MULTILINE
+										<section class='bookmarkButtonContainer'>
 										<form action='internshipDB.php' method='post' id='$idForm'>
 											<input type='hidden' name='company' id='$idCompany' value="$valueCompany">
 											<input type='hidden' name='company' id='$idName' value="$valueName">
@@ -1098,8 +1100,8 @@
 											<input type='hidden' name='company' id='$idLink' value="$valueLink">
 											<input type='hidden' name='company' id='$idPay' value="$valuePay">
 											<input type='hidden' name='company' id='$idPosted' value="$valuePosted">
-											<input type='submit' value='submitTest'>
-										</form></td>
+											<input type='submit' value='Save Internship'>
+										</section></form></td>
 									</tr>
 									<tr>
 										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>

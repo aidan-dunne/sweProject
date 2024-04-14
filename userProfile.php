@@ -73,8 +73,15 @@
 		<p id="testlol"></p>
 		<?php
 			if ($_SESSION['loggedIn']) {
-				//Load user profile page once the user has sucessfully signed up or logged in
-				echo "<p>User has logged in!</p>";
+				echo <<< MULTILINE
+				<form method="post" action="userProfile.php" id="historyLoad">
+					<input type="hidden" name="sendHistory" id="sendHistory">
+				</form>
+				<script>
+					getHistory();
+				</script>
+				MULTILINE;
+				echo "hi";
 			}
 			else { //If the user has not logged in, display either the signup or login page depending on which submit button in the below form is selected
 				if (isset($_COOKIE["loggedOut"])) {
@@ -182,6 +189,38 @@
 				});
 				
 				return flag;
+			}
+
+			let historyArr = [];
+
+			function getHistory() {
+				historyIndex = 0;
+				snapshot.forEach(function(childSnapshot) {
+					let company = childSnapshot.child("history").child("company").val();
+					let name = childSnapshot.child("history").child("job name").val();
+					let location = childSnapshot.child("history").child("location").val();
+					let link = childSnapshot.child("history").child("link").val();
+					let pay = childSnapshot.child("history").child("pay").val();
+					let posted = childSnapshot.child("history").child("date_posted").val();
+				
+					historyArr[historyIndex]= {};
+
+					historyArr[historyIndex]["dbIndex"] = historyIndex;
+
+					historyArr[historyIndex]["company"] = company;
+					historyArr[historyIndex]["name"] = name;
+					historyArr[historyIndex]['location'] = location;
+					historyArr[historyIndex]['link'] = link;
+					historyArr[historyIndex]['pay'] = pay;
+					historyArr[historyIndex]['posted'] = posted;
+					historyIndex++;
+				});
+			
+				let sendjson = JSON.stringify(historyArr);
+
+				document.getElementById("sendHistory").value = (sendjson);
+			
+				document.getElementById("historyLoad").submit();
 			}
 			
 			//Flag variable that indicates whether the username a user entered when signing up is available

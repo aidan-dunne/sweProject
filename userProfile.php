@@ -294,13 +294,18 @@
 			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
 				let usernameSU = document.getElementById("usernameSU").value;
 				let passwordSU = document.getElementById("passwordSU").value;
+				let nameSU = document.getElementById("nameSU").value;
 
 				//Ensuring that the user does not leave the username or password fields blank
-				if (usernameSU == "") {
+				if (usernameSU === "") {
 					alert("Error: Please input a username.");
 					event.preventDefault();
 				}
-				else if (passwordSU == "") {
+				else if (nameSU === "") {
+					alert("Error: Please input a name.");
+					event.preventDefault();
+				}
+				else if (passwordSU === "") {
 					alert("Error: Please input a password.");
 					event.preventDefault();
 				}
@@ -312,7 +317,6 @@
 						event.preventDefault();
 					}
 					else { //Otherwise, pull other fields from submitted form and write them to the database
-						let nameSU = document.getElementById("nameSU").value;
 
 						set(ref(db, 'users/'+ usernameSU), {
 							username: usernameSU,

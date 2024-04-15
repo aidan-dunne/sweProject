@@ -506,58 +506,6 @@
 					
 					//If a non-alphabetical "Sort By" option has been selected, $displayData will be sorted accordingly
 					sortBy($displayData);
-					/*
-					//Sorting internships according to the option selected by the user (data is alphabetically sorted by default, so nothing needs to be
-					//done if this option is selected and the $_POST variable corresponding to sorting options can be unset)
-					if (isset($_POST['sortBy']) and $_POST['sortBy'] == 'sortByAlpha') {
-						unset($_POST['sortBy']);
-					}
-					else if (isset($_POST['sortBy']) and $_POST['sortBy'] != 'sortByAlpha') { //"Newest First" or "Oldest First" were selected
-						//Creating and populating two temporary arrays with internships which list a post date and those which don't, respectively
-						$dateTemp = array();
-						$noDateTemp = array();
-						for ($i = 0; $i < sizeof($displayData); $i++) {
-							if ($displayData[$i]['posted'] == 0) {
-								array_push($noDateTemp, $displayData[$i]);
-							}
-							else {
-								array_push($dateTemp, $displayData[$i]);
-							}
-						}
-						
-						//Sorting the array of internships that list post dates by their dates based on which sorting option was selected by the user
-						for ($i = 0; $i < sizeof($dateTemp); $i++) { //First, the array is sorted in descending order by date (newest dates first)
-							for ($j = 0; $j < sizeof($dateTemp) - 1; $j++) { //Compare year, followed by month, followed by day
-								if ((int)substr($dateTemp[$j]['posted'], 0, 4) < (int)substr($dateTemp[$j + 1]['posted'], 0, 4)) {
-									$temp = $dateTemp[$j];
-									$dateTemp[$j] = $dateTemp[$j + 1];
-									$dateTemp[$j + 1] = $temp;
-								}
-								else if ((int)substr($dateTemp[$j]['posted'], 0, 4) == (int)substr($dateTemp[$j + 1]['posted'], 0, 4)) {
-									if ((int)substr($dateTemp[$j]['posted'], 5, 2) < (int)substr($dateTemp[$j + 1]['posted'], 5, 2)) {
-										$temp = $dateTemp[$j];
-										$dateTemp[$j] = $dateTemp[$j + 1];
-										$dateTemp[$j + 1] = $temp;
-									}
-									else if ((int)substr($dateTemp[$j]['posted'], 5, 2) == (int)substr($dateTemp[$j + 1]['posted'], 5, 2)) {
-										if ((int)substr($dateTemp[$j]['posted'], 8, 2) < (int)substr($dateTemp[$j + 1]['posted'], 8, 2)) {
-											$temp = $dateTemp[$j];
-											$dateTemp[$j] = $dateTemp[$j + 1];
-											$dateTemp[$j + 1] = $temp;
-										}
-									}
-								}
-								//If year, month, and day are all the same, don't swap to preserve alphabetical ordering
-							}
-						}
-						//Array is already sorted in descending order and should only be reversed if the "Oldest First" option was selected
-						if ($_POST['sortBy'] == 'sortByOld') {
-							$dateTemp = array_reverse($dateTemp);
-						}
-						//Appending all internships with no post date listed at the end of the display array
-						$displayData = array_merge($dateTemp, $noDateTemp);
-					}
-					*/
 					
 					if (strcmp($_SESSION['lastSearch'], NULLSEARCH) != 0) { // If no clearing operations have been made since last search
 						$searchDisplayData = []; // to store correct results

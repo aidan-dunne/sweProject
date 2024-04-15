@@ -236,125 +236,125 @@
 				
 				return flag;
 			}
-			
+
 //RETRIEVING HISTORY
 /*****************************************************************************************************************************/
+
+			//Array for storing all retrieved history information
+			let historyArr = [];
+			let historyArrIndex = 0;
 			
-		//Array for storing all retrieved history information
-		let historyArr = [];
-		let historyArrIndex = 0;
-		
-		//Only reading in history information if it has not already been read while on the current page (NOT SESSION)
-		let historyLoaded = document.getElementById("historyLoaded").value;
-		
-		//Only reading in history information if a user has logged in
-		let loggedInFlag = document.getElementById("loggedInFlag").value;
-		
-		if (!historyLoaded) {
-			if (loggedInFlag) {
-				//Accessing a user's history by retrieving their username to get the path to their history table in the database
-				const usernameToAccess = document.getElementById("usernameToAccess").value;
-				const historySnap = await get(ref(db, "users/" + usernameToAccess + "/history"));
-				
-				//Using history table reference to retrieve the value stored in each field of each item in the table. Then, the value in each field
-				//is written as a key-value pair to an object in an array which will be converted to json format to be displayed.
-				historySnap.forEach(function(childHistorySnap) {
-					let company = childHistorySnap.child("company").val();
-					let name = childHistorySnap.child("job_name").val();
-					let link = childHistorySnap.child("link").val();
-					let location = childHistorySnap.child("location").val();
-					let pay = childHistorySnap.child("pay").val();
-					let posted = childHistorySnap.child("date_posted").val();
+			//Only reading in history information if it has not already been read while on the current page (NOT SESSION)
+			let historyLoaded = document.getElementById("historyLoaded").value;
+			
+			//Only reading in history information if a user has logged in
+			let loggedInFlag = document.getElementById("loggedInFlag").value;
+			
+			if (!historyLoaded) {
+				if (loggedInFlag) {
+					//Accessing a user's history by retrieving their username to get the path to their history table in the database
+					const usernameToAccess = document.getElementById("usernameToAccess").value;
+					const historySnap = await get(ref(db, "users/" + usernameToAccess + "/history"));
 					
-					historyArr[historyArrIndex] = {};
-					historyArr[historyArrIndex]["company"] = company;
-					historyArr[historyArrIndex]["name"] = name;
-					historyArr[historyArrIndex]["link"] = link;
-					historyArr[historyArrIndex]["location"] = location;
-					historyArr[historyArrIndex]["pay"] = pay;
-					historyArr[historyArrIndex]["posted"] = posted;
-					historyArrIndex++;
-				});
-				
-				//Converting user's history table info to json format so that it may be properly parsed and displayed later
-				let sendjson = JSON.stringify(historyArr);
-				document.getElementById("sendHistory").value = sendjson;
-				document.getElementById("historyLoad").submit();
+					//Using history table reference to retrieve the value stored in each field of each item in the table. Then, the value in each field
+					//is written as a key-value pair to an object in an array which will be converted to json format to be displayed.
+					historySnap.forEach(function(childHistorySnap) {
+						let company = childHistorySnap.child("company").val();
+						let name = childHistorySnap.child("job_name").val();
+						let link = childHistorySnap.child("link").val();
+						let location = childHistorySnap.child("location").val();
+						let pay = childHistorySnap.child("pay").val();
+						let posted = childHistorySnap.child("date_posted").val();
+						
+						historyArr[historyArrIndex] = {};
+						historyArr[historyArrIndex]["company"] = company;
+						historyArr[historyArrIndex]["name"] = name;
+						historyArr[historyArrIndex]["link"] = link;
+						historyArr[historyArrIndex]["location"] = location;
+						historyArr[historyArrIndex]["pay"] = pay;
+						historyArr[historyArrIndex]["posted"] = posted;
+						historyArrIndex++;
+					});
+					
+					//Converting user's history table info to json format so that it may be properly parsed and displayed later
+					let sendjson = JSON.stringify(historyArr);
+					document.getElementById("sendHistory").value = sendjson;
+					document.getElementById("historyLoad").submit();
+				}
 			}
-		}
 			
 //SIGNUP AND LOGIN FUNCTIONALITY
 /*****************************************************************************************************************************/
-		
-		//Flag variable that indicates whether the username a user entered when signing up is available
-		let matchFlagSU = false;
-		
-		//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
-		let signInForm = document.getElementById("signUp");
-		signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
-			let usernameSU = document.getElementById("usernameSU").value;
-			let passwordSU = document.getElementById("passwordSU").value;
 
-			//Ensuring that the user does not leave the username or password fields blank
-			if (usernameSU == "") {
-				alert("Error: Please input a username.");
-				event.preventDefault();
-			}
-			else if (passwordSU == "") {
-				alert("Error: Please input a password.");
-				event.preventDefault();
-			}
-			else {
-				//Calling the determineMatch function to check if the user-entered username is available
-				matchFlagSU = determineMatch(usernameSU);
-				if (matchFlagSU) { //If username is unavailable, send alert and prevent form from being submitted
-					alert("Error: that username is already in use!");
+			//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
+			let signInForm = document.getElementById("signUp");
+			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
+				let usernameSU = document.getElementById("usernameSU").value;
+				let passwordSU = document.getElementById("passwordSU").value;
+				let nameSU = document.getElementById("nameSU").value;
+
+				//Ensuring that the user does not leave the username or password fields blank
+				if (usernameSU === "") {
+					alert("Error: Please input a username.");
 					event.preventDefault();
 				}
-				else { //Otherwise, pull other fields from submitted form and write them to the database
-					let nameSU = document.getElementById("nameSU").value;
-
-					set(ref(db, 'users/'+ usernameSU), {
-						username: usernameSU,
-						password: passwordSU,
-						name_of_user: nameSU,
-						history: "null",
-					});
+				else if (nameSU === "") {
+					alert("Error: Please input a name.");
+					event.preventDefault();
 				}
-			}
-		});
+				else if (passwordSU === "") {
+					alert("Error: Please input a password.");
+					event.preventDefault();
+				}
+				else {
+					//Calling the determineMatch function to check if the user-entered username is available
+					let matchFlagSU = determineMatch(usernameSU);
+					if (matchFlagSU) {
+						alert("That username is already in use!");
+						event.preventDefault();
+					}
+					else {
+						set(ref(db, 'users/'+ usernameSU), {
+							username: usernameSU,
+							password: passwordSU,
+							name_of_user: nameSU,
+							history: "null",
+						});
+					}
+				}
+			});
 	
-		//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
-		let logInForm = document.getElementById("logIn");
-		logInForm.addEventListener("submit", function (event) {
-			let userLI = document.getElementById("usernameLI").value;
-			let passwordLI = document.getElementById("passwordLI").value;
-			let passFlagLI = false;
-			
-			//Checks whether the entered username exists in the database (matches any currently stored username)
-			let UNameFlagLI = determineMatch(userLI);
-			
-			//If the entered username does not exist in the database, alert the user that their entered username is incorrect
-			if (!UNameFlagLI) {
-				alert("Incorrect username.");
-				event.preventDefault();
-			}
-			
-			let dbEntry = snapshot.child(userLI);
-			
-			let dbUname = dbEntry.child("username").val();
-			let dbPass = dbEntry.child("password").val();
-			let dbName = dbEntry.child("name_of_user").val();
-			
-			//If the entered username exists, check that the password stored and the password entered match
-			if (dbPass == passwordLI) {						
-				document.getElementById("nameLI").value = dbName;
-			}
-			else { //Prevent login form submission if the entered password is invalid
-				alert("Incorrect password.");
-				event.preventDefault();
-			}
-		});
+			//Getting a reference to the login form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
+			let logInForm = document.getElementById("logIn");
+			logInForm.addEventListener("submit", function (event) {
+				let userLI = document.getElementById("usernameLI").value;
+				let passwordLI = document.getElementById("passwordLI").value;
+				let passFlagLI = false;
+				
+				//Checks whether the entered username exists in the database (matches any currently stored username)
+				let UNameFlagLI = determineMatch(userLI);
+				
+				//If the entered username does not exist in the database, alert the user that their entered username is incorrect
+				if (!UNameFlagLI) {
+					alert("Incorrect username.");
+					event.preventDefault();
+				}
+				
+				let dbEntry = snapshot.child(userLI);
+				
+				let dbUname = dbEntry.child("username").val();
+				let dbPass = dbEntry.child("password").val();
+				let dbName = dbEntry.child("name_of_user").val();
+				
+				//If the entered username exists, check that the password stored and the password entered match
+				if (dbPass === passwordLI) {
+					document.getElementById("nameLI").value = dbName;
+				}
+				else { //Prevent login form submission if the entered password is invalid
+					alert("Incorrect password.");
+					event.preventDefault();
+				}
+			});
 		
 		</script>
 		</section>

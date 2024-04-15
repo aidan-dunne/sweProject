@@ -58,7 +58,7 @@ session_start();
 			get your search started. Their database is large, descriptive, and allows you to both browse for REUs within a specific research field 
 			and search for specific REUs of interest to you by using keywords. <br><br>If you're interested in REU programs but aren't really sure where to
 			start or would otherwise like help applying, feel free to reach out to Andy Bernatow at andybernato@gmail.com for tips with applying! </p>
-			<h2>Consider Truman!</h2>
+			<h3>Consider Truman!</h3>
 			<p>While Truman does not offer traditional REU programs, research opportunities still exist for eager students. If you're interested in
 			seeing what research opportunities Truman has to offer, you can visit <a href="https://osr.truman.edu/truscholars" target="_blank"
 			rel="noreferrer noopener">Truman's TruScholars page</a> to learn about how to get involved with research right here at Truman.</p>

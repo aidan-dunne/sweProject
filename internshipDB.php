@@ -369,34 +369,57 @@
 					}
 				}
 
-				function sortNewest(&$internshipArray) {
-					for ($i = 0; $i < sizeof($internshipArray); $i++) {
-						for ($j = 0; $j < sizeof($internshipArray) - 1; $j++) { //Compare year, followed by month, followed by day
-							if ((int)substr($internshipArray[$j]['posted'], 0, 4) < (int)substr($internshipArray[$j + 1]['posted'], 0, 4)) {
-								$temp = $internshipArray[$j];
-								$internshipArray[$j] = $internshipArray[$j + 1];
-								$internshipArray[$j + 1] = $temp;
+				//Sorting internships according to the option selected by the user
+				function sortBy(&$internshipArray) {
+					//data is alphabetically sorted by default, so nothing needs to be done if this option is selected and the $_POST variable 
+					//corresponding to sorting options can be unset
+					if (isset($_POST['sortBy']) and $_POST['sortBy'] == 'sortByAlpha') {
+						unset($_POST['sortBy']);
+					}
+					else if (isset($_POST['sortBy']) and $_POST['sortBy'] != 'sortByAlpha') { //"Newest First" or "Oldest First" were selected
+						//Creating and populating two temporary arrays with internships which list a post date and those which don't, respectively
+						$dateTemp = array();
+						$noDateTemp = array();
+						for ($i = 0; $i < sizeof($internshipArray); $i++) {
+							if ($internshipArray[$i]['posted'] == 0) {
+								array_push($noDateTemp, $internshipArray[$i]);
 							}
-							else if ((int)substr($internshipArray[$j]['posted'], 0, 4) == (int)substr($internshipArray[$j + 1]['posted'], 0, 4)) {
-								if ((int)substr($internshipArray[$j]['posted'], 5, 2) < (int)substr($internshipArray[$j + 1]['posted'], 5, 2)) {
-									$temp = $internshipArray[$j];
-									$internshipArray[$j] = $internshipArray[$j + 1];
-									$internshipArray[$j + 1] = $temp;
+							else {
+								array_push($dateTemp, $internshipArray[$i]);
+							}
+						}
+						
+						//Sorting the array of internships that list post dates by their dates based on which sorting option was selected by the user
+						for ($i = 0; $i < sizeof($dateTemp); $i++) { //First, the array is sorted in descending order by date (newest dates first)
+							for ($j = 0; $j < sizeof($dateTemp) - 1; $j++) { //Compare year, followed by month, followed by day
+								if ((int)substr($dateTemp[$j]['posted'], 0, 4) < (int)substr($dateTemp[$j + 1]['posted'], 0, 4)) {
+									$temp = $dateTemp[$j];
+									$dateTemp[$j] = $dateTemp[$j + 1];
+									$dateTemp[$j + 1] = $temp;
 								}
-								else if ((int)substr($internshipArray[$j]['posted'], 5, 2) == (int)substr($internshipArray[$j + 1]['posted'], 5, 2)) {
-									if ((int)substr($internshipArray[$j]['posted'], 8, 2) < (int)substr($internshipArray[$j + 1]['posted'], 8, 2)) {
-										$temp = $internshipArray[$j];
-										$internshipArray[$j] = $internshipArray[$j + 1];
-										$internshipArray[$j + 1] = $temp;
+								else if ((int)substr($dateTemp[$j]['posted'], 0, 4) == (int)substr($dateTemp[$j + 1]['posted'], 0, 4)) {
+									if ((int)substr($dateTemp[$j]['posted'], 5, 2) < (int)substr($dateTemp[$j + 1]['posted'], 5, 2)) {
+										$temp = $dateTemp[$j];
+										$dateTemp[$j] = $dateTemp[$j + 1];
+										$dateTemp[$j + 1] = $temp;
+									}
+									else if ((int)substr($dateTemp[$j]['posted'], 5, 2) == (int)substr($dateTemp[$j + 1]['posted'], 5, 2)) {
+										if ((int)substr($dateTemp[$j]['posted'], 8, 2) < (int)substr($dateTemp[$j + 1]['posted'], 8, 2)) {
+											$temp = $dateTemp[$j];
+											$dateTemp[$j] = $dateTemp[$j + 1];
+											$dateTemp[$j + 1] = $temp;
+										}
 									}
 								}
+								//If year, month, and day are all the same, don't swap to preserve alphabetical ordering
 							}
-							//If year, month, and day are all the same, don't swap to preserve alphabetical ordering
 						}
-					}
-					//Array is already sorted in descending order and should only be reversed if the "Oldest First" option was selected
-					if ($_POST['sortBy'] == 'sortByOld') {
-						$internshipArray = array_reverse($internshipArray);
+						//Array is already sorted in descending order and should only be reversed if the "Oldest First" option was selected
+						if ($_POST['sortBy'] == 'sortByOld') {
+							$dateTemp = array_reverse($dateTemp);
+						}
+						//Appending all internships with no post date listed at the end of the display array
+						$internshipArray = array_merge($dateTemp, $noDateTemp);
 					}
 				}
 				
@@ -481,6 +504,9 @@
 					//$displayData will contain all database data formatted for display before any fitlers are applied
 					$displayData = $_SESSION['alphabetical'];
 					
+					//If a non-alphabetical "Sort By" option has been selected, $displayData will be sorted accordingly
+					sortBy($displayData);
+					/*
 					//Sorting internships according to the option selected by the user (data is alphabetically sorted by default, so nothing needs to be
 					//done if this option is selected and the $_POST variable corresponding to sorting options can be unset)
 					if (isset($_POST['sortBy']) and $_POST['sortBy'] == 'sortByAlpha') {
@@ -531,6 +557,7 @@
 						//Appending all internships with no post date listed at the end of the display array
 						$displayData = array_merge($dateTemp, $noDateTemp);
 					}
+					*/
 					
 					if (strcmp($_SESSION['lastSearch'], NULLSEARCH) != 0) { // If no clearing operations have been made since last search
 						$searchDisplayData = []; // to store correct results
@@ -846,11 +873,8 @@
 								$maxFAN = $maxFAN - 1;
 							}
 							
-							if ($_POST['sortBy'] == "sortByNew") {
-								sortNewest($luckyDisplayData);
-							} else if ($_POST['sortBy'] == "sortByOld") {
-								sortNewest($luckyDisplayData);
-								array_reverse($luckyDisplayData);
+							if (isset($_POST['sortBy'])) {
+								sortBy($luckyDisplayData);
 							} else {
 								sortAlpha($luckyDisplayData);
 							}
@@ -912,15 +936,16 @@
 									$valuePosted = "$ptd";
 									
 									echo <<< MULTILINE
+											<section class='bookmarkButtonContainer'>
 											<form action='internshipDB.php' method='post' id='$idForm'>
-												<input type='hidden' name='company' id='$idCompany' value='$valueCompany'>
-												<input type='hidden' name='company' id='$idName' value='$valueName'>
-												<input type='hidden' name='company' id='$idLocation' value='$valueLocation'>
-												<input type='hidden' name='company' id='$idLink' value='$valueLink'>
-												<input type='hidden' name='company' id='$idPay' value='$valuePay'>
-												<input type='hidden' name='company' id='$idPosted' value='$valuePosted'>
-												<input type='submit' value='submitTest'>
-											</form></td>
+												<input type='hidden' name='company' id='$idCompany' value="$valueCompany">
+												<input type='hidden' name='company' id='$idName' value="$valueName">
+												<input type='hidden' name='company' id='$idLocation' value="$valueLocation">
+												<input type='hidden' name='company' id='$idLink' value="$valueLink">
+												<input type='hidden' name='company' id='$idPay' value="$valuePay">
+												<input type='hidden' name='company' id='$idPosted' value="$valuePosted">
+												<input type='submit' value='Save Internship'>
+											</section></form></td>
 										</tr>
 										<tr>
 											<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
@@ -1013,11 +1038,8 @@
 								array_splice($tempDisplayData, $randomIndex, 1);
 							}
 							// Sets the display array to our randomly generated array of 5
-							if ($_POST['sortBy'] == "sortByNew") {
-								sortNewest($luckyDisplayData);
-							} else if ($_POST['sortBy'] == "sortByOld") {
-								sortNewest($luckyDisplayData);
-								array_reverse($luckyDisplayData);
+							if (isset($_POST['sortBy'])) {
+								sortBy($luckyDisplayData);
 							} else {
 								sortAlpha($luckyDisplayData);
 							}
@@ -1070,15 +1092,16 @@
 									$valuePosted = "$ptd";
 									
 									echo <<< MULTILINE
+										<section class='bookmarkButtonContainer'>
 										<form action='internshipDB.php' method='post' id='$idForm'>
-											<input type='hidden' name='company' id='$idCompany' value='$valueCompany'>
-											<input type='hidden' name='company' id='$idName' value='$valueName'>
-											<input type='hidden' name='company' id='$idLocation' value='$valueLocation'>
-											<input type='hidden' name='company' id='$idLink' value='$valueLink'>
-											<input type='hidden' name='company' id='$idPay' value='$valuePay'>
-											<input type='hidden' name='company' id='$idPosted' value='$valuePosted'>
-											<input type='submit' value='submitTest'>
-										</form></td>
+											<input type='hidden' name='company' id='$idCompany' value="$valueCompany">
+											<input type='hidden' name='company' id='$idName' value="$valueName">
+											<input type='hidden' name='company' id='$idLocation' value="$valueLocation">
+											<input type='hidden' name='company' id='$idLink' value="$valueLink">
+											<input type='hidden' name='company' id='$idPay' value="$valuePay">
+											<input type='hidden' name='company' id='$idPosted' value="$valuePosted">
+											<input type='submit' value='Save Internship'>
+										</section></form></td>
 									</tr>
 									<tr>
 										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
@@ -1174,7 +1197,7 @@
 						let unameTag = "<?php echo $_SESSION['username'] ?>";
 						
 						//Sanitizing internship name for use as part of paths in our database
-						let pathName = nam.replace(/\W/g, '');
+						let pathName = nam.replace(/[^a-zA-Z0-9]/g, '');
 						
 						set(ref(dBase, 'users/' + unameTag + '/history/' + pathName), {
 							company: com,
@@ -1184,7 +1207,6 @@
 							location: loc,
 							pay: pmt,
 						});
-						alert("Added to History");
 						event.preventDefault();
 					});
 				}

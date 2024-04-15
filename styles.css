@@ -327,6 +327,37 @@ tr.noPad td {
 	background-color: #49a3e4;
 }
 
+.bookmarkButtonContainer {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+.bookmarkButtonContainer input[type="submit"] {
+	background-color: #ffffff;
+	border: 4px solid #8229a8;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 14pt;
+	font-weight: bold;
+	padding: 8px;
+	margin: 0;
+	transition: background-color 1.25s, color 1.25s;
+	transition-timing-function: ease-out;
+}
+
+.bookmarkButtonContainer input[type="submit"]:active {
+	background-color: #23a1f6;
+	color: #ffffff;
+	transition: background-color 0.1s, color 0.1s;
+}
+
+.bookmarkButtonContainer input[type="submit"]:hover {
+	border: 4px solid #23a1f6;
+	cursor: pointer;
+}
+
 /*Database filter checkbox and button styles*/
 #dbFilters input[type="submit"] {
 	background-color: #66dfff;

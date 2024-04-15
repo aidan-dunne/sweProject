@@ -195,6 +195,15 @@
 					}
 					else { //Displaying saved internships if any are present
 						echo "<section id='dbContainer'>";
+						
+						$nameDisplay = $_SESSION['nameDisplay'];
+						echo <<< MULTILINE
+							<section id='historyTabDisplay'>
+								<h2>$nameDisplay's history</h2>
+							</section>
+							<div id='historyTabBottomBG'></div>
+						MULTILINE;
+						
 						for ($i = 0; $i < sizeof($displayHistory); $i++) {
 							$com = $displayHistory[$i]["company"];
 							$nam = $displayHistory[$i]["name"];
@@ -203,7 +212,7 @@
 							$pay = $displayHistory[$i]["pay"];
 							$ptd = $displayHistory[$i]["posted"];
 							
-							echo "<table class=dbTable>";
+							echo "<table class='historyTable'>";
 							
 							echo <<< MULTILINE
 								<tr>
@@ -233,7 +242,7 @@
 							$valuePosted = "$ptd";
 							
 							echo <<< MULTILINE
-								<section class='bookmarkButtonContainer'>
+								<section class='removeButtonContainer'>
 									<form action='userProfile.php' method='post' id='$idForm'>
 										<input type='hidden' name='company' id='$idCompany' value="$valueCompany">
 										<input type='hidden' name='company' id='$idName' value="$valueName">
@@ -522,20 +531,21 @@
 					alert("Incorrect username.");
 					event.preventDefault();
 				}
-				
-				let dbEntry = snapshot.child(userLI);
-				
-				let dbUname = dbEntry.child("username").val();
-				let dbPass = dbEntry.child("password").val();
-				let dbName = dbEntry.child("name_of_user").val();
-				
-				//If the entered username exists, check that the password stored and the password entered match
-				if (dbPass === passwordLI) {
-					document.getElementById("nameLI").value = dbName;
-				}
-				else { //Prevent login form submission if the entered password is invalid
-					alert("Incorrect password.");
-					event.preventDefault();
+				else {
+					let dbEntry = snapshot.child(userLI);
+					
+					let dbUname = dbEntry.child("username").val();
+					let dbPass = dbEntry.child("password").val();
+					let dbName = dbEntry.child("name_of_user").val();
+					
+					//If the entered username exists, check that the password stored and the password entered match
+					if (dbPass === passwordLI) {
+						document.getElementById("nameLI").value = dbName;
+					}
+					else { //Prevent login form submission if the entered password is invalid
+						alert("Incorrect password.");
+						event.preventDefault();
+					}
 				}
 			});
 		</script>

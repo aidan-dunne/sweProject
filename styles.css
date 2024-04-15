@@ -145,13 +145,13 @@ h3 {
 }
 
 /*Main content section link styles*/
-p a, .pastTable tr td a, .dbTable tr td a {
+p a, .pastTable a, .dbTable a, .historyTable a {
 	color: #8229a8;
 	font-style: italic;
 	text-decoration: none;
 }
 
-p a:hover, .pastTable tr td a:hover, .dbTable tr td a:hover {
+p a:hover, .pastTable a:hover, .dbTable a:hover, .historyTable a:hover {
 	color: #23a1f6;
 }
 
@@ -168,9 +168,10 @@ footer {
 	margin: 0;
 	padding: 10px;
 }
-/*
+
+/******************************************************************************************************************************
 Styles specific to certain individual elements listed below:
-*/
+******************************************************************************************************************************/
 
 /*Past internship table styles*/
 .pastTable {
@@ -219,7 +220,23 @@ tr.noPad td {
 	z-index: 5;
 }
 
-#filtersBottomBG {
+#historyTabDisplay {
+	background-color: #8229a8;
+	border-radius: 30px;
+	color: #e2e2e2;
+	font-family: Calibri, sans-serif;
+	padding: 30px;
+	margin: 0;
+	z-index: 2;
+}
+
+#historyTabDisplay h2 {
+	font-size: 40pt;
+	padding: 0;
+	margin: 0;
+}
+
+#filtersBottomBG, #historyTabBottomBG {
 	background-color: #66dfff;
 	border-radius: 30px;
 	position: relative;
@@ -255,6 +272,7 @@ tr.noPad td {
 	background-color: #e2e2e2;
 	border-radius: 30px;
 	padding: 0 0 30px 0;
+	margin-bottom: 30px;
 }
 
 .dbTable {
@@ -283,10 +301,6 @@ tr.noPad td {
 .dbTable tr td h3 {
 	margin: 0;
 	padding: 0;
-}
-
-.dbTable tr td.linkRow {
-	padding-bottom: 15px;
 }
 
 .internshipPosition {
@@ -348,13 +362,13 @@ tr.noPad td {
 }
 
 .bookmarkButtonContainer input[type="submit"]:active {
-	background-color: #23a1f6;
+	background-color: #42d771;
 	color: #ffffff;
 	transition: background-color 0.1s, color 0.1s;
 }
 
 .bookmarkButtonContainer input[type="submit"]:hover {
-	border: 4px solid #23a1f6;
+	border: 4px solid #42d771;
 	cursor: pointer;
 }
 
@@ -516,19 +530,6 @@ input[name="next"]:hover, input[name="previous"]:hover {
 	border-radius: 20px;
 }
 
-/* #loginBox input[type="submit"] {
-	background-color: #66dfff;
-	border: none;
-	border-radius: 20px;
-	color: #594f5b;
-	font-family: Calibri, sans-serif;
-	font-size: 16pt;
-	font-weight: bold;
-	padding: 10px;
-	margin-right: 20px;
-	-ms-flex-align: center;
-} */
-
 #activeBox {
 	background-color: #66dfff;
 	border: none;
@@ -591,4 +592,70 @@ input[name="next"]:hover, input[name="previous"]:hover {
 
 #signUp input[type="submit"]:hover {
 	background-color: #ffffff;
+}
+
+/*Styles for history (saved internships) table*/
+.historyTable {
+	font-size: 13pt;
+	color: #594f5b;
+	padding: 10px 40px 10px 40px;
+	margin: 0;
+	table-layout: fixed;
+	width: 100%;
+}
+
+.historyTable:nth-child(2n) {
+	background-color: #ffffff;
+}
+
+.historyTable:nth-child(2n+1) {
+	background-color: #e2e2e2;
+}
+
+.historyTable:hover {
+	border: 3px solid #23a1f6;
+	border-radius: 10px;
+	border-left: 10px solid #23a1f6;
+	padding: 7px 37px 7px 30px;
+}
+
+.historyTable h3 {
+	font-size: 14.5pt;
+	padding: 0;
+	margin: 0;
+}
+
+.historyTable td.linkRow {
+	font-size: 14.5pt;
+}
+
+.removeButtonContainer {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+.removeButtonContainer input[type="submit"] {
+	background-color: #ffffff;
+	border: 4px solid #8229a8;
+	border-radius: 20px;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 14pt;
+	font-weight: bold;
+	padding: 4px 8px 4px 8px;
+	margin: 0;
+	transition: background-color 1.25s, color 1.25s;
+	transition-timing-function: ease-out;
+}
+
+.removeButtonContainer input[type="submit"]:active {
+	background-color: #fe5b49;
+	color: #ffffff;
+	transition: background-color 0.1s, color 0.1s;
+}
+
+.removeButtonContainer input[type="submit"]:hover {
+	border: 4px solid #fe5b49;
+	cursor: pointer;
 }

@@ -72,7 +72,7 @@
 			<a href="index.php">Home</a>
 			<a href="internshipDB.php">Internship Database</a>
 			<a href="pastInternships.php">Past Successes</a>
-			<a href="REUTab.php">REUs</a>
+			<a href="REUTab.php">REU Information</a>
 		</nav>
 	</header>
 	<div class="headerBottomBorder"></div>
@@ -87,6 +87,73 @@
 			
 			echo "<input type='hidden' id='loggedInFlag' value=$loggedInFlag>";
 			echo "<input type='hidden' id='usernameToAccess' value=$usernameToAccess>";
+			
+			//Sorting saved internships alphabetically by company name
+			function sortAlpha(&$unsorted) {
+				for ($i = 0; $i < sizeof($unsorted) - 1; $i++) {
+					for ($j = $i + 1; $j < sizeof($unsorted); $j++) {
+						if (strcmp(strtolower($unsorted[$i]['company']), strtolower($unsorted[$j]['company'])) > 0) {
+							$temp = $unsorted[$i];
+							$unsorted[$i] = $unsorted[$j];
+							$unsorted[$j] = $temp;
+						}
+					}
+				}
+			}
+			
+			//Building a more presentable "date posted" string based on pre-formatted date posted data stored in each internship's "posted" field
+			function dateDisplay(&$rawDate) {
+				$stringbuilderDate = ""; //Will contain the date formatted for nicer display
+				$rawMonth = substr($rawDate, 5, 2); //Retrieving the month an internship was posted
+				
+				//Converting a numeric month into the corresponding month's name
+				if ($rawMonth == "01")
+					$stringbuilderDate = "January";
+				else if ($rawMonth == "02")
+					$stringbuilderDate = "February";
+				else if ($rawMonth == "03")
+					$stringbuilderDate = "March";
+				else if ($rawMonth == "04")
+					$stringbuilderDate = "April";
+				else if ($rawMonth == "05")
+					$stringbuilderDate = "May";
+				else if ($rawMonth == "06")
+					$stringbuilderDate = "June";
+				else if ($rawMonth == "07")
+					$stringbuilderDate = "July";
+				else if ($rawMonth == "08")
+					$stringbuilderDate = "August";
+				else if ($rawMonth == "09")
+					$stringbuilderDate = "September";
+				else if ($rawMonth == "10")
+					$stringbuilderDate = "October";
+				else if ($rawMonth == "11")
+					$stringbuilderDate = "November";
+				else
+					$stringbuilderDate = "December";
+				
+				//Retrieving and formatting remaining day and year data
+				$rawDay = substr($rawDate, 8, 2);
+				
+				//Changing the suffix to be displayed behind the day depending on the day number contained in the date
+				//For example, days ending in 1 (1, 11, 21, 31) should be displayed with an -st suffix and not the generic -th suffix
+				$daySuffix = "th";
+				if (substr($rawDay, 1, 1) == "1")
+					$daySuffix = "st";
+				else if (substr($rawDay, 1, 1) == "2")
+					$daySuffix = "nd";
+				else if (substr($rawDay, 1, 1) == "3")
+					$daySuffix = "rd";
+				
+				if (substr($rawDay, 0, 1) == "0") { //Removing the leading "0" from a date's day if it is present
+					$rawDay = substr($rawDay, 1, 1);
+				}
+				
+				$rawYear = substr($rawDate, 0, 4);
+				
+				//Building date formatted for display
+				$rawDate = $stringbuilderDate . " " . $rawDay . $daySuffix . ", " . $rawYear;
+			}
 
 //RETRIEVING AND SORTING DATA
 /*****************************************************************************************************************************/
@@ -104,26 +171,117 @@
 				if (isset($_POST['sendHistory'])) {
 					$receiveJson = $_POST['sendHistory'];
 					$decode = json_decode($receiveJson, true); //Value "true" decodes received data as an associative array
+					sortAlpha($decode); //Sorting saved internships alphabetically
 					
 					//HISTORYALPHABETICAL stores a user's alphabetically-sorted history data and is defined as a constant since it should not be altered
 					//and must be able to be easily accessed throughout the entire scope of the program
-					define("HISTORYALPHABETICAL", $decode); //TODO: sort $decode in alphabetical order prior to this statement
+					define("HISTORYALPHABETICAL", $decode);
 					
-//TESTING
-						$displayTest = HISTORYALPHABETICAL;
-						for ($i = 0; $i < sizeof($displayTest); $i++) {
-							echo $displayTest[$i]["company"]. ", ";
-							echo $displayTest[$i]["name"].", ";
-							echo $displayTest[$i]["link"].", ";
-							echo $displayTest[$i]["location"].", ";
-							echo $displayTest[$i]["pay"].", ";
-							echo $displayTest[$i]["posted"].", ";
-							echo "<br><br>";
+					$displayHistory = HISTORYALPHABETICAL;
+					
+					//Writing number of saved internships to a form to be accessed by javascript (required for internship removal)
+					$historySize = sizeof($displayHistory);
+					echo "<input type='hidden' value=$historySize id='historySize'>";
+					
+					if ($historySize == 0) { //Displaying a special message if no internships have been saved
+						$nameDisplay = $_SESSION['nameDisplay'];
+						echo <<< MULTILINE
+							<h2>Seems Quiet Here...</h2>
+							<p>Hello, $nameDisplay, this is your profile page! It looks a bit empty at the moment, but once you've bookmarked some 
+							internships, they'll show up here. You can get started by navigating to our 
+							<a href="internshipDB.php">Internship Database</a> page and bookmaring some internships you find interesting using the 
+							"Save Internship" button in the top-right of each listing!</p>
+						MULTILINE;
+					}
+					else { //Displaying saved internships if any are present
+						echo "<section id='dbContainer'>";
+						for ($i = 0; $i < sizeof($displayHistory); $i++) {
+							$com = $displayHistory[$i]["company"];
+							$nam = $displayHistory[$i]["name"];
+							$lnk = $displayHistory[$i]["link"];
+							$loc = $displayHistory[$i]["location"];
+							$pay = $displayHistory[$i]["pay"];
+							$ptd = $displayHistory[$i]["posted"];
+							
+							echo "<table class=dbTable>";
+							
+							echo <<< MULTILINE
+								<tr>
+									<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+									<td>
+							MULTILINE;
+							
+							//Creating form for internship removal
+							$idForm = ''.$i + 1;
+							
+							$idCompany = 'com'.$i + 1;
+							$valueCompany = "$com";
+							
+							$idName = 'nam'.$i + 1;
+							$valueName = "$nam";
+							
+							$idLocation = 'loc'.$i + 1;
+							$valueLocation = "$loc";
+							
+							$idLink = 'lnk'.$i + 1;
+							$valueLink = "$lnk";
+							
+							$idPay = 'pay'.$i + 1;
+							$valuePay = "$pay";
+							
+							$idPosted = 'ptd'.$i + 1;
+							$valuePosted = "$ptd";
+							
+							echo <<< MULTILINE
+								<section class='bookmarkButtonContainer'>
+									<form action='userProfile.php' method='post' id='$idForm'>
+										<input type='hidden' name='company' id='$idCompany' value="$valueCompany">
+										<input type='hidden' name='company' id='$idName' value="$valueName">
+										<input type='hidden' name='company' id='$idLocation' value="$valueLocation">
+										<input type='hidden' name='company' id='$idLink' value="$valueLink">
+										<input type='hidden' name='company' id='$idPay' value="$valuePay">
+										<input type='hidden' name='company' id='$idPosted' value="$valuePosted">
+										<input type='submit' value='Remove'>
+									</section></form></td>
+							MULTILINE;
+							
+							echo <<< MULTILINE
+								</td></tr>
+								<tr>
+									<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
+								</tr>
+								<tr>
+									<td><b>Location:</b> $loc</td>
+							MULTILINE;
+							
+							//Displaying pay rate and date posted information if it is available
+							$extraCellDisplay = 0; //Required to ensure the correct number of table cells are dispalyed inline
+							
+							if ($pay != "0") {
+								echo "<td class='locationPayDateInline'><b>Pay:</b> $$pay</td>";
+							}
+							else {
+								$extraCellDisplay++;
+							}
+							
+							if (strlen($ptd) != 0) {
+								dateDisplay($ptd); //Formatting date for nicer display
+								echo "<td class='locationPayDateInline'><b>Date Posted:</b> $ptd</td>";
+							}
+							else {
+								$extraCellDisplay++;
+							}
+							
+							//Displays any extra needed table cells inline with location/pay/date posted information
+							while($extraCellDisplay != 0) {
+								echo "<td></td>";
+								$extraCellDisplay--;
+							}
+							
+							echo "</tr></table>";
 						}
-//TESTING
-					
-					//WRITE MAIN DISPLAY CODE HERE
-					//ABOVE DISPLAY BLOCK JUST FOR TESTING PURPOSES
+						echo "</section>";
+					}
 				}
 				else { //Display a loading graphic if a user's history data has not yet been read
 					echo "<img src='images/loadingGraphic.gif' height='150px' width='150px'>";
@@ -198,7 +356,7 @@
 		<script type="module">
 			//Importing needed methods and SDKs
 			import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-			import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+			import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 			
 			//Storing our Firebase configuration info
 			const firebaseConfig = {
@@ -282,6 +440,31 @@
 					document.getElementById("historyLoad").submit();
 				}
 			}
+//REMOVING SAVED INTERNSHIPS
+/*****************************************************************************************************************************/
+			else {
+				if (loggedInFlag) { //Functionality is only present if history has loaded and user has logged in
+					let formsArr = [];
+					let historySize = document.getElementById("historySize").value;
+					
+					for (let i = 1; i <= historySize; i++) {
+						formsArr[i - 1] = (document.getElementById("" + i));
+						formsArr[i - 1].addEventListener("submit", function (event) {
+							let nam = document.getElementById("nam" + i).value;
+							let unameTag = "<?php echo $_SESSION['username'] ?>";
+							
+							//Sanitizing internship name for use as part of paths in our database
+							let pathName = nam.replace(/[^a-zA-Z0-9]/g, '');
+							
+							//Removing all data stored under a certain sanitized internship name (key)
+							let removeRef = ref(db, "users/" + unameTag + "/history/" + pathName);
+							remove(removeRef);
+							
+							//No preventDefault(), page should reload when form is submitted to show changes applied by the "Remove" button
+						});
+					}
+				}
+			}
 			
 //SIGNUP AND LOGIN FUNCTIONALITY
 /*****************************************************************************************************************************/
@@ -355,7 +538,6 @@
 					event.preventDefault();
 				}
 			});
-		
 		</script>
 		</section>
 		<footer>

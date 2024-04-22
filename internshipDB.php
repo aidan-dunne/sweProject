@@ -1,6 +1,7 @@
 <?php
 	session_start();
 	$currentPage;
+	$pageNavFlag = false; //Used to determine whether a page has been navigated to in order to retain any entered search term
 	define("PERPAGE", 10); //Creating a constant for the amount of internships that may be displayed on a page
 	define("NULLSEARCH", "");
 	
@@ -10,15 +11,18 @@
 	}
 	else if(isset($_POST['next'])) {
 		$currentPage = ++$_POST['page'];
+		$pageNavFlag = true;
 	}
 	else if(isset($_POST['previous'])) {
 		$currentPage = --$_POST['page'];
+		$pageNavFlag = true;
 	}
 	else {
 		for ($pageJumpToIndex = 0; $pageJumpToIndex <= $_SESSION['maxPages']; $pageJumpToIndex++) {
 			$pageJumpToName = "page".$pageJumpToIndex;
 			if (isset($_POST[$pageJumpToName])) {
 				$currentPage = $pageJumpToIndex;
+				$pageNavFlag = true;
 			}
 		}
 	}
@@ -216,13 +220,13 @@
 							$locationClearFlag = true; //No location filters are selected, lastsearch should be reset to NULLSEARCH
 						}
 						
-						if (!(isset($_POST['previous']) || isset($_POST['next']) || isset($_POST['filterINTL']) || isset($_POST['filterUCLASS']) || isset($_POST['filterRMT']))) {
+						if (!(isset($_POST['filterINTL']) || isset($_POST['filterUCLASS']) || isset($_POST['filterRMT']) || $pageNavFlag)) {
 							if ($locationClearFlag) {
 								$_SESSION['lastSearch'] = NULLSEARCH;
 							}
 						}
 					}
-					else if (!(isset($_POST['previous']) || isset($_POST['next']) || isset($_POST['filterINTL']) || isset($_POST['filterUCLASS']) || isset($_POST['filterRMT']))) {
+					else if (!(isset($_POST['filterINTL']) || isset($_POST['filterUCLASS']) || isset($_POST['filterRMT']) || $pageNavFlag)) {
 						$_SESSION['lastSearch'] = NULLSEARCH;
 					}
 				}
@@ -749,7 +753,9 @@
 							if ($currentPage == 1) { //Only the "Next Nage" option displayed when no previous page exists
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
-									<section id='pageOptionsFirst'>
+									<section id='pageOptions'>
+									<section class='pagePrev'></section>
+									<section class='pageJump'>
 								MULTILINE;
 								
 								//Displaying options to jump to specific pages
@@ -759,15 +765,17 @@
 								}
 								
 								echo <<< MULTILINE
-										<input type='submit' name='next' value='Next Page ►'>
+										</section>
+										<section class='pageNext'><input type='submit' name='next' value='Next Page ►'></section>
 									</section>
 								MULTILINE;
 							}
 							else if ($currentPage == $_SESSION['maxPages']) { //Only the "Previous Page" option displayed when no next page exists
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
-									<section id='pageOptionsLast'>
-										<input type='submit' name='previous' value='◄ Previous Page'>
+									<section id='pageOptions'>
+										<section class='pagePrev'><input type='submit' name='previous' value='◄ Previous Page'></section>
+										<section class='pageJump'>
 								MULTILINE;
 								
 								//Displaying options to jump to specific pages
@@ -776,13 +784,18 @@
 									echo "<input type='submit' name='$pageJumpTo' value='$i'>";
 								}
 								
-								echo "</section>";
+								echo <<< MULTILINE
+										</section>
+										<section class='pageNext'></section>
+									</section>
+								MULTILINE;
 							}
 							else { //Otherwise, display both "Previous Page" and "Next Page" options
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
 									<section id='pageOptions'>
-										<input type='submit' name='previous' value='◄ Previous Page'>
+										<section class='pagePrev'><input type='submit' name='previous' value='◄ Previous Page'></section>
+										<section class='pageJump'>
 								MULTILINE;
 								
 								//Displaying options to jump to specific pages
@@ -792,7 +805,8 @@
 								}
 								
 								echo <<< MULTILINE
-										<input type='submit' name='next' value='Next Page ►'>
+										</section>
+										<section class='pageNext'><input type='submit' name='next' value='Next Page ►'></section>
 									</section>
 								MULTILINE;
 							}

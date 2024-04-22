@@ -481,29 +481,48 @@ input[type="text"]:focus, input[type="password"]:focus {
 	color: #23a1f6;
 }
 
-#pageOptionsFirst, #pageOptionsLast, #pageOptions {
+#pageOptions {
 	display: flex;
 	flex-direction: row;
 	border-bottom: 5px solid #8229a8;
 	padding-bottom: 20px;
 	margin: 0 30px 0 30px;
+	justify-content: space-between;
 }
 
-#pageOptionsFirst h2, #pageOptionsLast h2, #pageOptions h2{
+#pageOptions h2{
 	color: #8229a8;
 	margin: 10px 0 0 0;
 }
 
-#pageOptionsFirst {
+.pagePrev, .pageJump, .pageNext {
+	display: flex;
+	flex-direction: row;
+}
+
+.pagePrev {
+	width: 300px;
+	justify-content: flex-start;
+}
+
+.pageNext {
+	width: 300px;
 	justify-content: flex-end;
 }
 
-#pageOptionsLast {
-	justify-content: flex-start
+.pageJump input[type="submit"] {
+	/*background-color: #e2e2e2;*/
+	background: none;
+	border: none;
+	color: #594f5b;
+	font-family: Calibri, sans-serif;
+	font-size: 20pt;
+	padding: 10px 15px 10px 15px;
 }
 
-#pageOptions {
-	justify-content: space-between
+.pageJump input[type="submit"]:hover {
+	color: #23a1f6;
+	font-weight: bold;
 }
 
 input[name="next"], input[name="previous"] {

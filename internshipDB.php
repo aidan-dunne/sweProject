@@ -4,6 +4,7 @@
 	define("PERPAGE", 10); //Creating a constant for the amount of internships that may be displayed on a page
 	define("NULLSEARCH", "");
 	
+	//Updating the current page when a user moves to the next/a previous page or jumps to a specific page
 	if(!isset($_POST['page'])) {
 		$currentPage = 1;
 	}
@@ -12,6 +13,14 @@
 	}
 	else if(isset($_POST['previous'])) {
 		$currentPage = --$_POST['page'];
+	}
+	else {
+		for ($pageJumpToIndex = 0; $pageJumpToIndex <= $_SESSION['maxPages']; $pageJumpToIndex++) {
+			$pageJumpToName = "page".$pageJumpToIndex;
+			if (isset($_POST[$pageJumpToName])) {
+				$currentPage = $pageJumpToIndex;
+			}
+		}
 	}
 
 	$nameDisp = $_SESSION['nameDisplay'];
@@ -741,6 +750,15 @@
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
 									<section id='pageOptionsFirst'>
+								MULTILINE;
+								
+								//Displaying options to jump to specific pages
+								for ($i = 1; $i <= $_SESSION['maxPages']; $i++) {
+									$pageJumpTo = "page".$i;
+									echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+								}
+								
+								echo <<< MULTILINE
 										<input type='submit' name='next' value='Next Page ►'>
 									</section>
 								MULTILINE;
@@ -750,14 +768,30 @@
 									<input type='hidden' name='page' value=$currentPage>
 									<section id='pageOptionsLast'>
 										<input type='submit' name='previous' value='◄ Previous Page'>
-									</section>
 								MULTILINE;
+								
+								//Displaying options to jump to specific pages
+								for ($i = 1; $i <= $_SESSION['maxPages']; $i++) {
+									$pageJumpTo = "page".$i;
+									echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+								}
+								
+								echo "</section>";
 							}
 							else { //Otherwise, display both "Previous Page" and "Next Page" options
 								echo <<< MULTILINE
 									<input type='hidden' name='page' value=$currentPage>
 									<section id='pageOptions'>
 										<input type='submit' name='previous' value='◄ Previous Page'>
+								MULTILINE;
+								
+								//Displaying options to jump to specific pages
+								for ($i = 1; $i <= $_SESSION['maxPages']; $i++) {
+									$pageJumpTo = "page".$i;
+									echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+								}
+								
+								echo <<< MULTILINE
 										<input type='submit' name='next' value='Next Page ►'>
 									</section>
 								MULTILINE;

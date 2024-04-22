@@ -326,6 +326,7 @@
 							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
 							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
 							<input type='password' name='passwordSU' id= 'passwordSU' placeholder='Password'>
+							<input type='password' name='cpasswordSU' id= 'cpasswordSU' placeholder='Confirm Password'>
 							<input type='submit' name='signUpSubmit' value='Sign Up' form='signUp'>
 						</form>
 					MULTILINE;
@@ -483,6 +484,7 @@
 			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
 				let usernameSU = document.getElementById("usernameSU").value;
 				let passwordSU = document.getElementById("passwordSU").value;
+				let cpasswordSU = document.getElementById("cpasswordSU").value;
 				let nameSU = document.getElementById("nameSU").value;
 
 				//Ensuring that the user does not leave the username or password fields blank
@@ -496,6 +498,16 @@
 				}
 				else if (passwordSU === "") {
 					alert("Error: Please input a password.");
+					event.preventDefault();
+				}
+				else if (cpasswordSU === "") {
+					alert("Error: Please confirm password.");
+					event.preventDefault();
+				}
+				else if (cpasswordSU !== passwordSU) {
+					alert("Error: Passwords don't match.");
+					document.getElementById("cpasswordSU").value="";
+					document.getElementById("passwordSU").value="";
 					event.preventDefault();
 				}
 				else {

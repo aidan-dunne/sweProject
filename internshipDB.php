@@ -761,7 +761,12 @@
 								//Displaying options to jump to specific pages
 								for ($i = 1; $i <= $_SESSION['maxPages']; $i++) {
 									$pageJumpTo = "page".$i;
-									echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+									if ($currentPage == $i) {
+										echo "<input type='submit' name='$pageJumpTo' value='$i' class='currentPageDB'>";
+									}
+									else {
+										echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+									}
 								}
 								
 								echo <<< MULTILINE
@@ -781,7 +786,12 @@
 								//Displaying options to jump to specific pages
 								for ($i = 1; $i <= $_SESSION['maxPages']; $i++) {
 									$pageJumpTo = "page".$i;
-									echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+									if ($currentPage == $i) {
+										echo "<input type='submit' name='$pageJumpTo' value='$i' class='currentPageDB'>";
+									}
+									else {
+										echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+									}
 								}
 								
 								echo <<< MULTILINE
@@ -801,7 +811,12 @@
 								//Displaying options to jump to specific pages
 								for ($i = 1; $i <= $_SESSION['maxPages']; $i++) {
 									$pageJumpTo = "page".$i;
-									echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+									if ($currentPage == $i) {
+										echo "<input type='submit' name='$pageJumpTo' value='$i' class='currentPageDB'>";
+									}
+									else {
+										echo "<input type='submit' name='$pageJumpTo' value='$i'>";
+									}
 								}
 								
 								echo <<< MULTILINE

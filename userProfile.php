@@ -339,7 +339,20 @@
 							<input type='hidden' name='nameLI' id='nameLI'>
 							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
 						</form>
+						<script>
+							function showPassword() {
+								alert("Entered");
+								let liPass = document.getElementById("passwordLI");
+								if (liPass.type === "password") {
+									liPass.type = "text";
+								} else {
+									liPass.type = "password:;
+								}
+							}
+						</script>
 					MULTILINE;
+
+					echo "<input type=\"checkbox\" id=\"showPass\" onclick=\"showPassword()\"> Show Password";
 				
 				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
 					//Building the signup form which will be validated with javascript later
@@ -404,6 +417,25 @@
 				
 				return flag;
 			}
+
+			/* function showPassword() {
+				alert("Called");
+				let loginPass = document.getElementById("passwordLI");
+				alert(loginPass.type);
+				let signUpPass = document.getElementById("passwordSU");
+				let confirmPass = document.getElementById("cpasswordSU");
+				if (loginPass.type == "password") {
+					loginPass.type = "text"
+				} else { loginPass.type = "password"; }
+
+				if (signUpPass.type == "password") {
+					signUpPass.type = "text";
+					confirmPass.type = "text";
+				} else {
+					signUpPass.type = "password";
+					confirmPass.type = "password";
+				}
+			} */
 
 //RETRIEVING HISTORY
 /*****************************************************************************************************************************/

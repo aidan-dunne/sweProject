@@ -1,29 +1,61 @@
 <?php
 	
 	session_start();
+	
 	/*
-	ini_set('display_errors', 1);
-	ini_set('display_startup_errors', 1);
-	error_reporting(E_ALL);
+	When the user profile page loads, check whether the user has attempted to log in or sign up (the login and signup forms can only be submitted if all
+	entered info is valid, so whether or not the $_POST variable corresponding to each of the form submit buttons is set is checked).
 	
-	When page loads, check if the user has logged in or signed up (in this particular case, the login or signup forms can only be submitted if all the
-	entered info is correct, so whether the $_POST variable corresponding to the form submit button is checked).
+	If the signup form has been submitted, the user's newly created password is hashed and stored in the database along with their other account info and
+	a session variable indicating that the user has logged in is set to true. This variable is later used to generate the user's profile page rather than
+	the generic signup/login page.
 	
-	If the form has been submitted (user has successfully logged in/signed up), a session variable indicating that the user has logged in is set to true.
-	This variable is later used to load the user's profile page rather than the login/signup pages.
+	If the login form has been submitted, the entered password is checked against the user's stored, hashed password. If the passwords match, the session
+	variable indicating that a user has logged in is set to true.
 	
-	Additionally, a "nameDisplay" session variable is set which allows the user's name to be easily displayed in the profile page's header.
+	Additionally, the "nameDisplay" session variable is set which allows the user's name to be displayed in the profile page's header.
 	*/
-	if(isset($_POST['signUpSubmit']) or isset($_POST['logInSubmit'])) {
+	$passwordIncorrect = false; //Used to correctly display login form when a user enters an incorrect password when logging in
+	if(isset($_POST['signUpSubmit'])) {
+		//Hashing the user's password before it is stored
+		$unhashed = $_POST['passwordSU'];
+		$hashedPasswordSU = password_hash($unhashed, PASSWORD_DEFAULT);
+		
+		//Retrieving the user's name and username for storage
+		$hashedUsernameSU = $_POST['usernameSU'];
+		$hashedNameSU = $_POST['nameSU'];
+		
+		//Input fields store user account information so that it may be accessed by javascript and stored in the database
+		echo "<input type='hidden' value=$hashedPasswordSU id='hashedPasswordSU'>";
+		echo "<input type='hidden' value=$hashedUsernameSU id='hashedUsernameSU'>";
+		echo "<input type='hidden' value=$hashedNameSU id='hashedNameSU'>";
+		echo "<input type='hidden' value='true' id='hashedSU'>";
+		
 		$_SESSION['loggedIn'] = true;
-		if(isset($_POST['signUpSubmit'])) {
-			$_SESSION['nameDisplay'] = $_POST['nameSU'];
-			$_SESSION['username'] = $_POST['usernameSU'];
-		}
-		else if(isset($_POST['logInSubmit'])) {
+		$_SESSION['nameDisplay'] = $_POST['nameSU'];
+		$_SESSION['username'] = $_POST['usernameSU'];
+	}
+	else if(isset($_POST['logInSubmit'])) {
+		echo "<input type='hidden' value='loginAttempt' id='hashedSU'>";
+		
+		//Checking to ensure that the entered password matches the stored, hashed password
+		$enteredPasswordLI = $_POST['passwordLI'];
+		$hashedPasswordLI = $_POST['hashedPasswordLI'];
+		if (password_verify($enteredPasswordLI, $hashedPasswordLI)) {
+			$_SESSION['loggedIn'] = true;
 			$_SESSION['nameDisplay'] = $_POST['nameLI'];
 			$_SESSION['username'] = $_POST['usernameLI'];
+			echo "<input type='hidden' value='false' id='passwordIncorrect'>";
 		}
+		else {
+			//If a user's password is incorrect, they are alerted to the issue and sent back to the login page with their entered information still
+			//present in the username and password fields
+			echo "<input type='hidden' value='true' id='passwordIncorrect'>";
+			$passwordIncorrect = true;
+		}
+	}
+	else { //Used to check if a password has been hashed/matches user input (prevents javascript history retrieval code from breaking)
+		echo "<input type='hidden' value='false' id='hashedSU'>";
 	}
 	
 	//$historyLoaded is used to ensure that a user's history table is only read once per page load, but it is not a session variable since the history
@@ -304,14 +336,20 @@
 						</script>
 					MULTILINE;
 				}
-				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
+				
+				
+				
+				//Used to grey-out inactive signup/login option buttons
+				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']) and !$passwordIncorrect)) {
 					$signupid = "activeBox";
 					$loginid = "inactiveBox";
 				}
-				else {
+				else if (isset($_POST['loadPageLogIn']) or $passwordIncorrect){
 					$loginid = "activeBox";
 					$signupid = "inactiveBox";
 				}
+				
+				//Displaying "Sign Up Here" and "Log In Here" buttons
 				echo <<< MULTILINE
 					<form method='post' id='loginBox' action='userProfile.php'>
 						<input type='submit' id='$signupid' name='loadPageSignUp' value='Sign Up Here'>
@@ -319,30 +357,42 @@
 					</form>
 				MULTILINE;
 
-				//Building signup form
+				//Building signup form which will be validated with javascript later
 				echo <<< MULTILINE
-						<form method='post' class='dbSubmitContainer' action='userProfile.php' id='signUp'>
-							<input type='hidden' id='formLoaded' value='SU'>
-							<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
-							<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
-							<input type='password' name='passwordSU' id= 'passwordSU' placeholder='Password'>
-							<input type='password' name='cpasswordSU' id= 'cpasswordSU' placeholder='Confirm Password'>
-							<input type='submit' name='signUpSubmit' value='Sign Up' form='signUp'>
-						</form>
-					MULTILINE;
+					<form method='post' class='dbSubmitContainer' action='userProfile.php' id='signUp'>
+						<input type='hidden' id='formLoaded' value='SU'>
+						<input type='text' name='nameSU' id='nameSU' placeholder='Name'>
+						<input type='text' name='usernameSU' id='usernameSU' placeholder='Username'>
+						<input type='password' name='passwordSU' id= 'passwordSU' placeholder='Password'>
+						<input type='password' name='cpasswordSU' id= 'cpasswordSU' placeholder='Confirm Password'>
+						<input type='submit' name='signUpSubmit' value='Sign Up' form='signUp'>
+					</form>
+				MULTILINE;
 
-				//Building login form
-				echo <<< MULTILINE
-						<form method='post' class='dbSubmitContainer' action='userProfile.php' id='logIn'>
-							<input type='text' name='usernameLI' id='usernameLI' placeholder='Username'>
-							<input type='password' name='passwordLI' id= 'passwordLI' placeholder='Password'>
-							<input type='hidden' name='nameLI' id='nameLI'>
-							<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
-						</form>
-					MULTILINE;
+				//Building login form which will be validated by javascript later
+				echo "<form method='post' class='dbSubmitContainer' action='userProfile.php' id='logIn'>";
 				
-				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']))) {
-					//Building the signup form which will be validated with javascript later
+				//Auto-refilling user username and password when a login attempt fails because of an incorrect password
+				if ($passwordIncorrect) {
+					$enteredUsernameLI = $_POST['usernameLI'];
+					$enteredPasswordLI = $_POST['passwordLI'];
+					echo "<input type='text' name='usernameLI' id='usernameLI' value=$enteredUsernameLI placeholder='Username'> ";
+					echo "<input type='password' name='passwordLI' id= 'passwordLI' value=$enteredPasswordLI placeholder='Password'> ";
+				}
+				else { //Otherwise, these fields are generated blank
+					echo "<input type='text' name='usernameLI' id='usernameLI' placeholder='Username'> ";
+					echo "<input type='password' name='passwordLI' id= 'passwordLI' placeholder='Password'> ";
+				}
+						
+				echo <<< MULTILINE
+						<input type='hidden' name='nameLI' id='nameLI'>
+						<input type='hidden' name='hashedPasswordLI' id='hashedPasswordLI'>
+						<input type='submit' name='logInSubmit' value='Log In' form='logIn'>
+					</form>
+				MULTILINE;
+				
+				if (isset($_POST['loadPageSignUp']) or (!isset($_POST['loadPageSignUp']) and !isset($_POST['loadPageLogIn']) and !$passwordIncorrect)) {
+					//Displaying only the signup form when the "Sign Up Here" button is clicked
 					echo <<< MULTILINE
 						<script>
 							document.getElementById('signUp').style.display='block';
@@ -351,8 +401,8 @@
 						MULTILINE;
 					}
 				
-				if (isset($_POST['loadPageLogIn'])) {
-					//Building the login form which will be validated by javascript later
+				if (isset($_POST['loadPageLogIn']) or $passwordIncorrect) {
+					//Displaying only the login form when the "Log In Here" button is clicked
 					echo <<< MULTILINE
 						<script>
 							document.getElementById('signUp').style.display='none';
@@ -403,6 +453,31 @@
 				});
 				
 				return flag;
+			}
+//HANDLING HASHED PASSWORDS AND STORING ACCOUNT INFORMATION
+/*****************************************************************************************************************************
+* The step of handling hashed passwords and storing user account information must be performed upon page reload immediately
+* following the submission of the signup or login forms but must also be performed prior to the page reload required for
+* displaying a user's history. For this reason, the following functionalities are separated from the signup/login input
+* validation functionalities below the history retrieval code.
+*****************************************************************************************************************************/
+
+			//Storing hashed passwords and other user information upon user signup
+			if (document.getElementById("hashedSU").value == "true") {
+				let hashedPasswordSU = document.getElementById('hashedPasswordSU').value;
+				let hashedUsernameSU = document.getElementById('hashedUsernameSU').value;
+				let hashedNameSU = document.getElementById('hashedNameSU').value;
+				
+				set(await ref(db, 'users/' + hashedUsernameSU), {
+					username: hashedUsernameSU,
+					password: hashedPasswordSU,
+					name_of_user: hashedNameSU,
+					history: "null",
+				});
+			}
+			//When a login to an existing account is attempted, the user is alerted if their entered password is incorrect.
+			else if (document.getElementById("hashedSU").value == "loginAttempt" && document.getElementById("passwordIncorrect").value == "true") {
+				alert("Incorrect password.");
 			}
 
 //RETRIEVING HISTORY
@@ -476,18 +551,18 @@
 				}
 			}
 			
-//SIGNUP AND LOGIN FUNCTIONALITY
+//SIGNUP AND LOGIN FUNCTIONALITY (INPUT VALIDATION)
 /*****************************************************************************************************************************/
 
 			//Getting a reference to the signup form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
 			let signInForm = document.getElementById("signUp");
-			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, check entered username availability
+			signInForm.addEventListener("submit", function (event) { //When the signup form is submitted, validate user input
 				let usernameSU = document.getElementById("usernameSU").value;
 				let passwordSU = document.getElementById("passwordSU").value;
 				let cpasswordSU = document.getElementById("cpasswordSU").value;
 				let nameSU = document.getElementById("nameSU").value;
 
-				//Ensuring that the user does not leave the username or password fields blank
+				//Ensuring that the user does not leave the name, username, or either of the password fields blank
 				if (usernameSU === "") {
 					alert("Error: Please input a username.");
 					event.preventDefault();
@@ -504,7 +579,7 @@
 					alert("Error: Please confirm password.");
 					event.preventDefault();
 				}
-				else if (cpasswordSU !== passwordSU) {
+				else if (cpasswordSU !== passwordSU) { //Ensuring that the two entered passwords match (confirm password functionality)
 					alert("Error: Passwords don't match.");
 					document.getElementById("cpasswordSU").value="";
 					document.getElementById("passwordSU").value="";
@@ -517,15 +592,8 @@
 						alert("That username is already in use!");
 						event.preventDefault();
 					}
-					else {
-						set(ref(db, 'users/'+ usernameSU), {
-							username: usernameSU,
-							password: passwordSU,
-							name_of_user: nameSU,
-							history: "null",
-						});
-					}
 				}
+				//If all user input is valid, the signup form will be submitted so that the user's password can be hashed and their information stored
 			});
 	
 			//Getting a reference to the login form (built earlier in php) and assigning it an event listener which listens the "form submitted" event
@@ -543,21 +611,15 @@
 					alert("Incorrect username.");
 					event.preventDefault();
 				}
-				else {
+				else { //Otherwise, return the stored hashed password so that it can be determined whether the user entered the correct password
 					let dbEntry = snapshot.child(userLI);
 					
 					let dbUname = dbEntry.child("username").val();
-					let dbPass = dbEntry.child("password").val();
+					let dbHashedPass = dbEntry.child("password").val();
 					let dbName = dbEntry.child("name_of_user").val();
 					
-					//If the entered username exists, check that the password stored and the password entered match
-					if (dbPass === passwordLI) {
-						document.getElementById("nameLI").value = dbName;
-					}
-					else { //Prevent login form submission if the entered password is invalid
-						alert("Incorrect password.");
-						event.preventDefault();
-					}
+					document.getElementById("nameLI").value = dbName;
+					document.getElementById("hashedPasswordLI").value = dbHashedPass;
 				}
 			});
 		</script>

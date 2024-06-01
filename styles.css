@@ -600,6 +600,10 @@ input[name="next"]:hover, input[name="previous"]:hover {
 	background-color: #ffffff;
 }
 
+#logIn input {
+	margin-right: 10px;
+}
+
 #signUp input[type="submit"] {
 	background-color: #66dfff;
 	border: none;
@@ -615,6 +619,10 @@ input[name="next"]:hover, input[name="previous"]:hover {
 
 #signUp input[type="submit"]:hover {
 	background-color: #ffffff;
+}
+
+#signUp input {
+	margin-right: 10px;
 }
 
 /*Styles for history (saved internships) table*/

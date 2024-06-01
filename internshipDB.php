@@ -970,7 +970,7 @@
 				
 									<table class='dbTable'>
 										<tr>
-											<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+											<td colspan='3'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 										</tr>
 										<tr>
 											<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
@@ -1126,7 +1126,7 @@
 			
 								<table class='dbTable'>
 									<tr>
-										<td colspan='2'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
+										<td colspan='3'><h3>$com<span class='internshipPosition'> &mdash; $nam</span></h3></td>
 									</tr>
 									<tr>
 										<td class='linkRow' colspan='3'><a href='$lnk' target='_blank' rel='noreferrer noopener'>$com</a></td>
@@ -1168,7 +1168,6 @@
 				}
 			?>
 			<script type="module">
-
 				import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 				import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 		

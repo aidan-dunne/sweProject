@@ -14,8 +14,9 @@ APIKEY = os.getenv('API_KEY')
 def jobScrape():
     # initializing empty object list in order to populate a unique one
     objectList = []
+    qual_flag = True
     # these are our current locations for searching, this can change
-    jobSearch = ['kansas city', 'kansas city', 'st. louis', 'st. louis', 'chicago', 'chicago', 'iowa', 'iowa']
+    jobSearch = ['kansas city',  'st. louis', 'chicago',  'iowa', ]
     # this is to get the current year for searching
     thisYear = datetime.date.today()
     # incrementer goes between even and odd numbers, changing the page count from 1 to 2 on every other search
@@ -38,9 +39,9 @@ def jobScrape():
                 'engine': 'google_jobs',  # SerpApi search engine
                 'gl': 'us',  # country of the search
                 'hl': 'en',  # language of the search
-                'start': '10',  # page of start
                 'q': strsearch,  # search query
             }
+
         incrementer += 1
 
         # variables to store all database information
@@ -55,8 +56,8 @@ def jobScrape():
         # underclassman determines if the applicant can be a freshman or sophomore
         underclassman = False
 
-        search = GoogleSearch(params).get_dict()['jobs_results']  # where data extraction happens on the SerpApi backend
-
+        search = GoogleSearch(params).get_dict()# where data extraction happens on the SerpApi backend
+        search = search['jobs_results']
         # going through each job...
         for items in search:
 
@@ -84,8 +85,16 @@ def jobScrape():
                     jobTitle = items.get('title')
                     companyName = items.get('company_name')
                     location = items.get('location')
-                    qualifications = items.get('job_highlights')[0].get('items')
-                    apply = items.get('related_links')[0].get('link')
+                    qualifications = items.get('job_highlights')
+                    if qualifications and len(qualifications) > 0:
+                        qualifications = qualifications[0].get('items')
+                        if qualifications is not None:
+                            qualifications = items.get('job_highlights')[0].get('items')
+                        else:
+                            qual_flag = False
+                    else:
+                        qual_flag = False
+                    apply = items.get('apply_options')[0].get('link')
                     date = items.get('detected_extensions').get('posted_at')
 
                     pay = items.get('detected_extensions').get('salary')
@@ -98,34 +107,34 @@ def jobScrape():
                     # needing to be an upperclassman, add one to the count. If the count
                     # is anything but 0, the flag is marked as FALSE; meaning
                     # that you either must be a citizen or an upperclassman
+                    if qual_flag == True:
+                        for y in range(len(qualifications)):
+                            if 'Citizenship' in qualifications[y] or 'Citizen' in qualifications[y]:
+                                checkI += 1
+                            else:
+                                checkI += 0
 
-                    for y in range(len(qualifications)):
-                        if 'Citizenship' in qualifications[y] or 'Citizen' in qualifications[y]:
-                            checkI += 1
+                            if 'Junior' in qualifications[y] or 'Senior' in qualifications[y]:
+                                checkU += 1
+
+                            else:
+                                checkU += 0
+
+                        if checkI != 0:
+                            citizen = False
                         else:
-                            checkI += 0
+                            citizen = True
 
-                        if 'Junior' in qualifications[y] or 'Senior' in qualifications[y]:
-                            checkU += 1
-
+                        if checkU != 0:
+                            underclassman = False
                         else:
-                            checkU += 0
+                            underclassman = True
 
-                    if checkI != 0:
-                        citizen = False
-                    else:
-                        citizen = True
-
-                    if checkU != 0:
-                        underclassman = False
-                    else:
-                        underclassman = True
-
-                    if (items.get('detected_extensions').get('work_from_home') is None
-                            or 'remote' in items.get('description').lower()):
-                        remoteOption = False
-                    else:
-                        remoteOption = True
+                        if (items.get('detected_extensions').get('work_from_home') is None
+                                or 'remote' in items.get('description').lower()):
+                            remoteOption = False
+                        else:
+                            remoteOption = True
 
                     # this makes the links that are unreadable possibly readable
                     # to be clear, if the link links to a google search, then this is my attempt at formatting
@@ -133,33 +142,33 @@ def jobScrape():
                     # (that being spaces, underscores, .com and .org)
                     # goes to a valid address. if not, i've made it just google search.
 
-                    if ('web' in items.get('related_links')[0].get('text') and
-                            'results' in items.get('related_links')[0].get('text')):
-                         apply1 = 'https://' +(items.get('related_links')[0].get('text').replace('See web results for', '').replace(' ', '').lower()
+                    if ('web' in items.get('apply_options')[0].get('title') and
+                            'results' in items.get('apply_options')[0].get('title') and items.get('apply_options'[0] != None)):
+                         apply1 = 'https://' +(items.get('apply_options')[0].get('title').replace('See web results for', '').replace(' ', '').lower()
                                   + '.com')
 
-                         apply2 = 'https://' +(items.get('related_links')[0].get('text').replace('See web results for', '').replace(' ', '_').lower()
+                         apply2 = 'https://' +(items.get('apply_options')[0].get('title').replace('See web results for', '').replace(' ', '_').lower()
                                   + '.com')
-                         apply3 = 'https://' +(items.get('related_links')[0].get('text').replace('See web results for', '').replace(' ', '').lower()
+                         apply3 = 'https://' +(items.get('apply_options')[0].get('title').replace('See web results for', '').replace(' ', '').lower()
                                   + '.org')
-                         apply4 = 'https://' +(items.get('related_links')[0].get('text').replace('See web results for', '').replace(' ', '_').lower()
+                         apply4 = 'https://' +(items.get('apply_options')[0].get('title').replace('See web results for', '').replace(' ', '_').lower()
                                   + '.org')
                          try:
                             status = requests.head(apply1)
                          except ConnectionError:
-                            apply = apply
+                            apply = apply + ' ' + companyName
                             try:
                                 status = requests.head(apply2)
                             except ConnectionError:
-                                apply = apply
+                                apply = apply + ' ' + companyName
                                 try:
                                     status = requests.head(apply3)
                                 except ConnectionError:
-                                    apply = apply
+                                    apply = apply + ' ' + companyName
                                     try:
                                         status = requests.head(apply4)
                                     except ConnectionError:
-                                        apply = apply
+                                        apply = apply + ' ' + companyName
                                     else:
                                         apply = apply4
                                 else:
